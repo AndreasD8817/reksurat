@@ -82,18 +82,16 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
             overflow: hidden;
         }
         .main-container {
-            height: calc(100vh - 80px);
+            height: calc(100vh - 80px); /* 80px adalah tinggi header */
             overflow-y: auto;
         }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex">
-    <!-- Overlay untuk mobile -->
     <div class="overlay" id="overlay"></div>
 
-    <!-- Sidebar/Navbar -->
     <div class="sidebar bg-white w-64 shadow-lg z-20 h-screen fixed transition-transform duration-300 ease-in-out" id="sidebar">
-        <div class="p-5 border-b border-gray-200 bg-gradient-to-r from-primary to-secondary">
+        <div class="px-5 h-20 flex flex-col justify-center border-b border-gray-200 bg-gradient-to-r from-primary to-secondary">
             <h1 class="text-xl font-bold text-white">Reksurat</h1>
             <p class="text-sm text-indigo-100">Dashboard Penomoran</p>
         </div>
@@ -117,31 +115,25 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
         </nav>
     </div>
 
-    <!-- Main Content Area -->
     <div class="flex-1 flex flex-col md:ml-64">
-        <!-- Header dengan bentuk melengkung -->
-        <header class="bg-gradient-to-r from-primary to-secondary text-white shadow-lg">
-            <div class="relative h-24 overflow-hidden">
-                <div class="absolute -bottom-12 left-0 right-0 h-24 bg-white rounded-tl-[100%]"></div>
-            </div>
-            <div class="px-6 pb-4 -mt-16 relative z-10">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <button class="md:hidden text-white bg-primary p-2 rounded-lg mr-4 shadow-md hover:bg-indigo-700 transition-colors" id="menu-toggle">
-                            <i class="fas fa-bars text-lg"></i>
-                        </button>
-                        <h2 class="text-xl font-semibold text-white drop-shadow-md"><?php echo $pageTitle ?? 'Dashboard'; ?></h2>
+        <header class="h-20 bg-gradient-to-r from-primary to-secondary text-white shadow-lg">
+            <div class="px-6 h-full flex items-center justify-between">
+                <div class="flex items-center">
+                    <button class="md:hidden text-white bg-primary p-2 rounded-lg mr-4 shadow-md hover:bg-indigo-700 transition-colors" id="menu-toggle">
+                        <i class="fas fa-bars text-lg"></i>
+                    </button>
+                    <h2 class="text-xl font-semibold text-white drop-shadow-md"><?php echo $pageTitle ?? 'Dashboard'; ?></h2>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary font-bold shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                        <?php echo htmlspecialchars($inisial_user); ?>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <span class="text-indigo-100 font-medium hidden md:block"><?php echo htmlspecialchars($nama_user); ?></span>
-                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary font-bold shadow-md hover:shadow-lg transition-shadow cursor-pointer">
-                            <?php echo htmlspecialchars($inisial_user); ?>
-                        </div>
-                    </div>
+                    <span class="text-white font-medium text-sm mt-2 hidden md:block">
+                        <?php echo htmlspecialchars($nama_user); ?>
+                    </span>
                 </div>
             </div>
         </header>
 
-        <!-- Container utama dengan scroll yang tepat -->
         <div class="main-container">
             <main class="p-6">
