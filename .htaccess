@@ -1,0 +1,11 @@
+# reksurat/.htaccess
+
+# Aktifkan Modul Rewrite
+RewriteEngine On
+
+# Hindari file & direktori yang benar-benar ada
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Arahkan semua request ke index.php
+RewriteRule ^(.*)$ index.php?page=$1 [L,QSA]
