@@ -198,11 +198,14 @@ require_once 'templates/header.php';
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Perihal</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Tujuan</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Lampiran</th>
+                    <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
+                    <?php endif; ?>
                 </tr>
             </thead>
             <tbody id="tableBodyKeluar" class="bg-white divide-y divide-gray-200">
                 <?php foreach ($surat_keluar_list as $surat): ?>
-                     <tr class="hover:bg-blue-50 transition-colors duration-200">
+                    <tr class="hover:bg-blue-50 transition-colors duration-200">
                         <td class="px-6 py-4 font-medium text-primary"><?php echo htmlspecialchars($surat['nomor_surat_lengkap']); ?></td>
                         <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($surat['tgl_formatted']); ?></td>
                         <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($surat['perihal']); ?></td>
@@ -216,6 +219,14 @@ require_once 'templates/header.php';
                                 <span class="text-gray-400">-</span>
                             <?php endif; ?>
                         </td>
+                        <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                            <td class="px-6 py-4">
+                                <div class="flex space-x-2">
+                                    <a href="/edit-surat-keluar?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
+                                    <button onclick="confirmDelete('keluar', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </td>
+                        <?php endif; ?>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

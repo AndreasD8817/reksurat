@@ -198,6 +198,9 @@ require_once 'templates/header.php';
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Perihal</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Tgl Diterima</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Lampiran</th>
+                    <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
+                    <?php endif; ?>
                 </tr>
             </thead>
             <tbody id="tableBodyMasuk" class="bg-white divide-y divide-gray-200">
@@ -216,6 +219,14 @@ require_once 'templates/header.php';
                                 <span class="text-gray-400">-</span>
                             <?php endif; ?>
                         </td>
+                        <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                            <td class="px-6 py-4">
+                                <div class="flex space-x-2">
+                                    <a href="/edit-surat-masuk?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
+                                    <button onclick="confirmDelete('masuk', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </td>
+                        <?php endif; ?>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

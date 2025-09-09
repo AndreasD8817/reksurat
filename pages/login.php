@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Jika berhasil, simpan data user ke session
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_nama'] = $user['nama'];
+        $_SESSION['user_role'] = $user['role'];
         header('Location: /surat-keluar'); // Arahkan ke halaman surat keluar
         exit;
     } else {

@@ -29,6 +29,25 @@
           return str ? str.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;') : '';
       }
 
+      // --- FUNGSI BARU UNTUK KONFIRMASI HAPUS ---
+function confirmDelete(type, id) {
+    Swal.fire({
+        title: 'Anda Yakin?',
+        text: "Data surat ini akan dihapus secara permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Arahkan ke halaman hapus (Anda perlu membuat file ini nanti)
+            window.location.href = `/hapus-surat-${type}?id=${id}`;
+        }
+    });
+        }
+
       // Bagian 2: Logika untuk Pencarian AJAX di Halaman Surat Keluar
       if (document.getElementById('searchFormKeluar')) {
           
@@ -57,28 +76,42 @@
           }
 
           function updateTable(suratList) {
-              tableBody.innerHTML = '';
-              if (suratList.length === 0) {
-                  tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center"><p class="text-lg">Data tidak ditemukan.</p></td></tr>';
-                  return;
-              }
-              let rowsHTML = '';
-              suratList.forEach(surat => {
-                  let lampiranHtml = surat.file_lampiran 
-                      ? `<a href="/uploads/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
-                      : '<span class="text-gray-400">-</span>';
+                tableBody.innerHTML = '';
+                if (suratList.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center"><p class="text-lg">Data tidak ditemukan.</p></td></tr>';
+                    return;
+                }
+                let rowsHTML = '';
+                const isAdmin = "<?php echo $_SESSION['user_role'] ?? 'staff'; ?>" === 'admin';
 
-                  rowsHTML += `
-                      <tr class="hover:bg-gray-50">
-                          <td class="px-6 py-4 font-medium text-primary">${escapeHTML(surat.nomor_surat_lengkap)}</td>
-                          <td class="px-6 py-4">${escapeHTML(surat.tgl_formatted)}</td>
-                          <td class="px-6 py-4">${escapeHTML(surat.perihal)}</td>
-                          <td class="px-6 py-4">${escapeHTML(surat.tujuan)}</td>
-                          <td class="px-6 py-4">${lampiranHtml}</td>
-                      </tr>`;
-              });
-              tableBody.innerHTML = rowsHTML;
-          }
+                suratList.forEach(surat => {
+                    let lampiranHtml = surat.file_lampiran 
+                        ? `<a href="/uploads/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
+                        : '<span class="text-gray-400">-</span>';
+                    
+                    let actionButtons = '';
+                    if (isAdmin) {
+                        actionButtons = `
+                            <td class="px-6 py-4">
+                                <div class="flex space-x-2">
+                                    <a href="/edit-surat-keluar?id=${surat.id}" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
+                                    <button onclick="confirmDelete('keluar', ${surat.id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </td>`;
+                    }
+
+                    rowsHTML += `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 font-medium text-primary">${escapeHTML(surat.nomor_surat_lengkap)}</td>
+                            <td class="px-6 py-4">${escapeHTML(surat.tgl_formatted)}</td>
+                            <td class="px-6 py-4">${escapeHTML(surat.perihal)}</td>
+                            <td class="px-6 py-4">${escapeHTML(surat.tujuan)}</td>
+                            <td class="px-6 py-4">${lampiranHtml}</td>
+                            ${actionButtons}
+                        </tr>`;
+                });
+                tableBody.innerHTML = rowsHTML;
+            }
 
           function updatePagination(pagination) {
               paginationContainer.innerHTML = '';
@@ -186,14 +219,27 @@
         function updateTableMasuk(suratList) {
             tableBodyMasuk.innerHTML = '';
             if (suratList.length === 0) {
-                tableBodyMasuk.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500"><p>Data tidak ditemukan.</p></td></tr>';
+                tableBodyMasuk.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500"><p>Data tidak ditemukan.</p></td></tr>';
                 return;
             }
             let rowsHTML = '';
+            const isAdmin = "<?php echo $_SESSION['user_role'] ?? 'staff'; ?>" === 'admin';
+
             suratList.forEach(surat => {
                 let lampiranHtml = surat.file_lampiran 
                     ? `<a href="/uploads/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
                     : '<span class="text-gray-400">-</span>';
+
+                let actionButtons = '';
+                if (isAdmin) {
+                    actionButtons = `
+                        <td class="px-6 py-4">
+                            <div class="flex space-x-2">
+                                <a href="/edit-surat-masuk?id=${surat.id}" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
+                                <button onclick="confirmDelete('masuk', ${surat.id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>`;
+                }
 
                 rowsHTML += `
                     <tr class="hover:bg-gray-50">
@@ -202,6 +248,7 @@
                         <td class="px-6 py-4">${escapeHTML(surat.perihal)}</td>
                         <td class="px-6 py-4">${escapeHTML(surat.tgl_terima_formatted)}</td>
                         <td class="px-6 py-4">${lampiranHtml}</td>
+                        ${actionButtons}
                     </tr>`;
             });
             tableBodyMasuk.innerHTML = rowsHTML;
