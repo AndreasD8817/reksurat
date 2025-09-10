@@ -77,6 +77,10 @@ document.addEventListener("DOMContentLoaded", () => {
                              <i class="fas fa-file-download mr-2"></i> Lihat Lampiran
                            </a>`
               : '<span class="text-gray-500">Tidak ada lampiran</span>';
+            // === KODE BARU: Buat tombol cetak disposisi ===
+            const cetakBtn = `<a href="/cetak-disposisi?id=${data.id}" target="_blank" class="inline-flex items-center text-white bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg text-sm">
+                                <i class="fas fa-print mr-2"></i> Cetak Disposisi
+                              </a>`;
 
             modalBody.innerHTML = `
                         <div class="grid grid-cols-3 gap-x-6 gap-y-4 text-sm">
@@ -133,6 +137,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             )}</div>
                         </div>
                     `;
+            // Sisipkan tombol cetak ke dalam footer modal setelah body-nya terisi
+            document.getElementById("modal-footer-content").innerHTML =
+              cetakBtn;
           })
           .catch((error) => {
             modalBody.innerHTML = `<div class="text-center p-8"><i class="fas fa-exclamation-triangle text-red-500 text-3xl"></i><p class="mt-2 text-red-600">Gagal memuat data.</p></div>`;

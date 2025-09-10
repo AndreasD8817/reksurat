@@ -21,6 +21,8 @@
                             <p class="mt-2 text-gray-500">Memuat data...</p>
                         </div>
                     </div>
+                    <div class="p-4 bg-gray-50 rounded-b-2xl border-t" id="modal-footer-content">
+                    </div>
         </div> 
     </div>
     
