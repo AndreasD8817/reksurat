@@ -10,15 +10,16 @@ if (isLoggedIn()) {
 $error = '';
 // Cek jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'] ?? '';
+    // ---- PERUBAHAN 1: Mengambil 'username' dari POST ----
+    $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    // Cari user di database
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->execute([$email]);
+    // ---- PERUBAHAN 2: Mencari user berdasarkan 'username' ----
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt->execute([$username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Verifikasi password
+    // Verifikasi password (logika ini tidak berubah)
     if ($user && password_verify($password, $user['password'])) {
         // Jika berhasil, simpan data user ke session
         $_SESSION['user_id'] = $user['id'];
@@ -27,7 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: /surat-keluar'); // Arahkan ke halaman surat keluar
         exit;
     } else {
-        $error = 'Email atau kata sandi salah!';
+        // ---- PERUBAHAN 3: Memperbarui pesan error ----
+        $error = 'Username atau kata sandi salah!';
     }
 }
 ?>
@@ -58,13 +60,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <form class="space-y-6" method="POST" action="/login">
+                
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fas fa-envelope text-gray-400"></i>
-                        </div>
-                        <input type="email" name="email" id="email" class="pl-10 w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-300 outline-none" placeholder="admin@reksurat.com" required />
+                            <i class="fas fa-user text-gray-400"></i> </div>
+                        <input type="text" name="username" id="username" class="pl-10 w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-300 outline-none" placeholder="admin" required />
                     </div>
                 </div>
 

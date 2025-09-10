@@ -87,7 +87,7 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex">
+<body class="bg-gray-50 min-h-screen flex" data-user-role="<?php echo $_SESSION['user_role'] ?? 'staff'; ?>">
     <div class="overlay" id="overlay"></div>
 
     <div class="sidebar bg-white w-64 shadow-lg z-20 h-screen fixed transition-transform duration-300 ease-in-out" id="sidebar">
