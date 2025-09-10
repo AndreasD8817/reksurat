@@ -206,7 +206,11 @@ require_once 'templates/header.php';
             <tbody id="tableBodyMasuk" class="bg-white divide-y divide-gray-200">
                 <?php foreach ($surat_masuk_list as $surat): ?>
                     <tr class="hover:bg-blue-50 transition-colors duration-200">
-                        <td class="px-6 py-4 font-semibold text-primary"><?php echo htmlspecialchars($surat['nomor_agenda_lengkap']); ?></td>
+                        <td class="px-6 py-4 font-semibold">
+                            <a href="#" class="text-primary hover:underline detail-link" data-id="<?php echo $surat['id']; ?>">
+                                <?php echo htmlspecialchars($surat['nomor_agenda_lengkap']); ?>
+                            </a>
+                        </td>
                         <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($surat['asal_surat']); ?></td>
                         <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($surat['perihal']); ?></td>
                         <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($surat['tgl_terima_formatted']); ?></td>

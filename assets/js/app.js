@@ -19,6 +19,221 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // --- LOGIKA BARU: MODAL DETAIL SURAT MASUK ---
+  const modal = document.getElementById("detail-modal");
+  const closeModalBtn = document.getElementById("close-modal-btn");
+  const modalContent = document.getElementById("detail-modal-content");
+  const modalBody = document.getElementById("modal-body-content");
+  const tableBodyMasuk = document.getElementById("tableBodyMasuk");
+
+  // Fungsi untuk menampilkan modal
+  const openModal = () => {
+    modal.classList.remove("hidden");
+    setTimeout(() => {
+      modal.classList.remove("opacity-0");
+      modalContent.classList.remove("scale-95");
+    }, 10);
+  };
+
+  // Fungsi untuk menutup modal
+  const closeModal = () => {
+    modal.classList.add("opacity-0");
+    modalContent.classList.add("scale-95");
+    setTimeout(() => {
+      modal.classList.add("hidden");
+    }, 300);
+  };
+
+  if (modal) {
+    // Event listener untuk tombol close
+    closeModalBtn.addEventListener("click", closeModal);
+    // Event listener untuk menutup modal jika klik di luar area konten
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    // Menggunakan event delegation pada tabel
+    document.body.addEventListener("click", function (e) {
+      if (e.target && e.target.classList.contains("detail-link")) {
+        e.preventDefault();
+        const suratId = e.target.dataset.id;
+
+        // Tampilkan modal dan loading spinner
+        modalBody.innerHTML = `<div class="text-center p-8"><i class="fas fa-spinner fa-spin text-primary text-3xl"></i><p class="mt-2 text-gray-500">Memuat data...</p></div>`;
+        openModal();
+
+        // Ambil data dari server
+        fetch(`/ajax-get-surat-details?id=${suratId}`)
+          .then((response) => {
+            if (!response.ok) throw new Error("Data tidak ditemukan");
+            return response.json();
+          })
+          .then((data) => {
+            // Bangun konten HTML untuk detail
+            const lampiranLink = data.file_lampiran
+              ? `<a href="/uploads/${data.file_lampiran}" target="_blank" class="inline-flex items-center text-white bg-primary hover:bg-secondary px-4 py-2 rounded-lg text-sm">
+                             <i class="fas fa-file-download mr-2"></i> Lihat Lampiran
+                           </a>`
+              : '<span class="text-gray-500">Tidak ada lampiran</span>';
+
+            modalBody.innerHTML = `
+                        <div class="grid grid-cols-3 gap-x-6 gap-y-4 text-sm">
+                            <div class="col-span-1 text-gray-500">No. Agenda</div>
+                            <div class="col-span-2 font-semibold text-gray-800">: ${escapeHTML(
+                              data.nomor_agenda_lengkap
+                            )}</div>
+
+                            <div class="col-span-1 text-gray-500">No. Surat</div>
+                            <div class="col-span-2 font-medium text-gray-700">: ${escapeHTML(
+                              data.nomor_surat_lengkap
+                            )}</div>
+
+                            <div class="col-span-1 text-gray-500">Asal Surat</div>
+                            <div class="col-span-2 text-gray-700">: ${escapeHTML(
+                              data.asal_surat
+                            )}</div>
+
+                            <div class="col-span-1 text-gray-500">Sifat Surat</div>
+                            <div class="col-span-2 text-gray-700">: <span class="font-semibold px-2 py-1 bg-blue-100 text-blue-700 rounded-full">${escapeHTML(
+                              data.sifat_surat
+                            )}</span></div>
+
+                            <div class="col-span-1 text-gray-500">Tanggal Surat</div>
+                            <div class="col-span-2 text-gray-700">: ${escapeHTML(
+                              data.tgl_surat_formatted
+                            )}</div>
+
+                            <div class="col-span-1 text-gray-500">Tanggal Diterima</div>
+                            <div class="col-span-2 text-gray-700">: ${escapeHTML(
+                              data.tgl_diterima_formatted
+                            )}</div>
+                            
+                            <div class="col-span-3 pt-2 mt-2 border-t"></div>
+
+                            <div class="col-span-1 text-gray-500 self-start">Perihal</div>
+                            <div class="col-span-2 text-gray-700 self-start">: ${escapeHTML(
+                              data.perihal
+                            )}</div>
+
+                            <div class="col-span-1 text-gray-500 self-start">Keterangan</div>
+                            <div class="col-span-2 text-gray-700 self-start">: ${
+                              escapeHTML(data.keterangan) || "-"
+                            }</div>
+
+                            <div class="col-span-3 pt-2 mt-2 border-t"></div>
+                            
+                            <div class="col-span-1 text-gray-500">Lampiran</div>
+                            <div class="col-span-2">${lampiranLink}</div>
+
+                            <div class="col-span-1 text-gray-500 mt-2">Dicatat pada</div>
+                            <div class="col-span-2 text-gray-500 mt-2">: ${escapeHTML(
+                              data.tgl_input_formatted
+                            )}</div>
+                        </div>
+                    `;
+          })
+          .catch((error) => {
+            modalBody.innerHTML = `<div class="text-center p-8"><i class="fas fa-exclamation-triangle text-red-500 text-3xl"></i><p class="mt-2 text-red-600">Gagal memuat data.</p></div>`;
+          });
+      }
+    });
+  }
+  // --- AKHIR LOGIKA MODAL ---
+
+  // --- LOGIKA BARU: MODAL DETAIL SURAT KELUAR ---
+  // Kita bisa menggunakan modal yang sama, hanya event listener dan kontennya yang beda
+  document.body.addEventListener("click", function (e) {
+    if (e.target && e.target.classList.contains("detail-link-keluar")) {
+      e.preventDefault();
+      const suratId = e.target.dataset.id;
+
+      // Ubah judul modal
+      document.querySelector(
+        "#detail-modal h3"
+      ).innerHTML = `<i class="fas fa-paper-plane text-primary mr-3"></i> Detail Surat Keluar`;
+
+      // Tampilkan modal dan loading spinner
+      modalBody.innerHTML = `<div class="text-center p-8"><i class="fas fa-spinner fa-spin text-primary text-3xl"></i><p class="mt-2 text-gray-500">Memuat data...</p></div>`;
+      openModal();
+
+      // Ambil data dari server
+      fetch(`/ajax-get-surat-keluar-details?id=${suratId}`)
+        .then((response) => {
+          if (!response.ok) throw new Error("Data tidak ditemukan");
+          return response.json();
+        })
+        .then((data) => {
+          const lampiranLink = data.file_lampiran
+            ? `<a href="/uploads/${data.file_lampiran}" target="_blank" class="inline-flex items-center text-white bg-primary hover:bg-secondary px-4 py-2 rounded-lg text-sm">
+                           <i class="fas fa-file-download mr-2"></i> Lihat Lampiran
+                         </a>`
+            : '<span class="text-gray-500">Tidak ada lampiran</span>';
+
+          modalBody.innerHTML = `
+                      <div class="grid grid-cols-3 gap-x-6 gap-y-4 text-sm">
+                          <div class="col-span-1 text-gray-500">No. Surat</div>
+                          <div class="col-span-2 font-semibold text-gray-800">: ${escapeHTML(
+                            data.nomor_surat_lengkap
+                          )}</div>
+
+                          <div class="col-span-1 text-gray-500">Tujuan</div>
+                          <div class="col-span-2 text-gray-700">: ${escapeHTML(
+                            data.tujuan
+                          )}</div>
+
+                          <div class="col-span-1 text-gray-500">Sifat Surat</div>
+                          <div class="col-span-2 text-gray-700">: <span class="font-semibold px-2 py-1 bg-blue-100 text-blue-700 rounded-full">${escapeHTML(
+                            data.sifat_surat
+                          )}</span></div>
+
+                          <div class="col-span-1 text-gray-500">Tanggal Surat</div>
+                          <div class="col-span-2 text-gray-700">: ${escapeHTML(
+                            data.tgl_surat_formatted
+                          )}</div>
+
+                          <div class="col-span-1 text-gray-500">Konseptor</div>
+                          <div class="col-span-2 text-gray-700">: ${
+                            escapeHTML(data.konseptor) || "-"
+                          }</div>
+
+                          <div class="col-span-3 pt-2 mt-2 border-t"></div>
+
+                          <div class="col-span-1 text-gray-500 self-start">Perihal</div>
+                          <div class="col-span-2 text-gray-700 self-start">: ${escapeHTML(
+                            data.perihal
+                          )}</div>
+
+                          <div class="col-span-1 text-gray-500 self-start">Keterangan</div>
+                          <div class="col-span-2 text-gray-700 self-start">: ${
+                            escapeHTML(data.keterangan) || "-"
+                          }</div>
+
+                          <div class="col-span-1 text-gray-500 self-start">Hub. dgn Surat No.</div>
+                          <div class="col-span-2 text-gray-700 self-start">: ${
+                            escapeHTML(data.hub_surat_no) || "-"
+                          }</div>
+                          
+                          <div class="col-span-3 pt-2 mt-2 border-t"></div>
+                          
+                          <div class="col-span-1 text-gray-500">Lampiran</div>
+                          <div class="col-span-2">${lampiranLink}</div>
+
+                          <div class="col-span-1 text-gray-500 mt-2">Dicatat pada</div>
+                          <div class="col-span-2 text-gray-500 mt-2">: ${escapeHTML(
+                            data.tgl_input_formatted
+                          )}</div>
+                      </div>
+                  `;
+        })
+        .catch((error) => {
+          modalBody.innerHTML = `<div class="text-center p-8"><i class="fas fa-exclamation-triangle text-red-500 text-3xl"></i><p class="mt-2 text-red-600">Gagal memuat data.</p></div>`;
+        });
+    }
+  });
+  // --- AKHIR LOGIKA MODAL SURAT KELUAR ---
+
   // --- LOGIKA MINIMIZE/MAXIMIZE FORM SURAT KELUAR ---
   const toggleBtn = document.getElementById("toggle-form-btn");
   const formBody = document.getElementById("form-keluar-body");
