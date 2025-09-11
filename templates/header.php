@@ -97,13 +97,23 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
         </div>
         <nav class="mt-6">
             <div class="px-5 mb-2">
-                <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Menu Utama</p>
+                <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Sekretariat</p>
             </div>
             <a href="/surat-keluar" class="block py-3 px-5 mx-2 rounded-lg transition-all duration-200 <?php echo ($_GET['page'] ?? '') === 'surat-keluar' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
-                <i class="fas fa-paper-plane mr-3"></i> Surat Keluar
+                <i class="fas fa-paper-plane mr-3"></i> Surat Keluar Setwan
             </a>
             <a href="/surat-masuk" class="block py-3 px-5 mx-2 rounded-lg transition-all duration-200 <?php echo ($_GET['page'] ?? '') === 'surat-masuk' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
-                <i class="fas fa-envelope mr-3"></i> Surat Masuk
+                <i class="fas fa-envelope mr-3"></i> Surat Masuk Setwan
+            </a>
+
+            <div class="px-5 mt-6 mb-2">
+                <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Dewan</p>
+            </div>
+            <a href="/surat-keluar-dewan" class="block py-3 px-5 mx-2 rounded-lg transition-all duration-200 <?php echo ($_GET['page'] ?? '') === 'surat-keluar-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                <i class="fas fa-paper-plane mr-3"></i> Surat Keluar Dewan
+            </a>
+            <a href="/surat-masuk-dewan" class="block py-3 px-5 mx-2 rounded-lg transition-all duration-200 <?php echo ($_GET['page'] ?? '') === 'surat-masuk-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                <i class="fas fa-envelope mr-3"></i> Surat Masuk Dewan
             </a>
             
             <div class="px-5 mt-8 mb-2">
