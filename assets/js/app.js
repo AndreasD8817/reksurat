@@ -1,6 +1,6 @@
 // Menunggu semua konten halaman dimuat sebelum menjalankan skrip
 document.addEventListener("DOMContentLoaded", () => {
-  // Bagian 1: Logika untuk Toggle Sidebar Mobile (Tidak Berubah)
+  // Bagian 1: Logika untuk Toggle Sidebar Mobile
   const menuToggle = document.getElementById("menu-toggle");
   const sidebar = document.getElementById("sidebar");
   const overlay = document.getElementById("overlay");
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Bagian 2: Logika Modal Detail (Berlaku untuk semua jenis surat)
+  // Bagian 2: Logika Modal Detail
   const modal = document.getElementById("detail-modal");
   const closeModalBtn = document.getElementById("close-modal-btn");
   const modalContent = document.getElementById("detail-modal-content");
@@ -39,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
     modalContent.classList.add("scale-95");
     setTimeout(() => {
       modal.classList.add("hidden");
-      // Reset footer modal setiap kali ditutup
       modalFooter.innerHTML = "";
     }, 300);
   };
@@ -53,99 +52,80 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Event Delegation untuk semua link detail ---
+  // Event Delegation untuk semua link detail
   document.body.addEventListener("click", function (e) {
-    const link = e.target.closest("a");
+    const link = e.target.closest(
+      "a.detail-link, a.detail-link-keluar, a.detail-link-keluar-dewan, a.detail-link-masuk-dewan"
+    );
     if (!link) return;
 
-    // A. Detail Surat Masuk SEKWAN
+    e.preventDefault();
+    const suratId = link.dataset.id;
+    let apiUrl, modalTitle, type;
+
     if (link.classList.contains("detail-link")) {
-      e.preventDefault();
-      const suratId = link.dataset.id;
-      document.querySelector(
-        "#detail-modal h3"
-      ).innerHTML = `<i class="fas fa-envelope-open-text text-primary mr-3"></i> Detail Surat Masuk`;
-      fetchAndShowDetails(`/ajax-get-surat-details?id=${suratId}`, "masuk");
+      modalTitle = `<i class="fas fa-envelope-open-text text-primary mr-3"></i> Detail Surat Masuk`;
+      apiUrl = `/ajax-get-surat-details?id=${suratId}`;
+      type = "masuk";
+    } else if (link.classList.contains("detail-link-keluar")) {
+      modalTitle = `<i class="fas fa-paper-plane text-primary mr-3"></i> Detail Surat Keluar`;
+      apiUrl = `/ajax-get-surat-keluar-details?id=${suratId}`;
+      type = "keluar";
+    } else if (link.classList.contains("detail-link-keluar-dewan")) {
+      modalTitle = `<i class="fas fa-user-tie text-primary mr-3"></i> Detail Surat Keluar Dewan`;
+      apiUrl = `/ajax-get-surat-keluar-details-dewan?id=${suratId}`;
+      type = "keluar-dewan";
+    } else if (link.classList.contains("detail-link-masuk-dewan")) {
+      modalTitle = `<i class="fas fa-user-tie text-primary mr-3"></i> Detail Surat Masuk Dewan`;
+      apiUrl = `/ajax-get-surat-details-dewan?id=${suratId}`;
+      type = "masuk-dewan";
     }
 
-    // B. Detail Surat Keluar SEKWAN
-    if (link.classList.contains("detail-link-keluar")) {
-      e.preventDefault();
-      const suratId = link.dataset.id;
-      document.querySelector(
-        "#detail-modal h3"
-      ).innerHTML = `<i class="fas fa-paper-plane text-primary mr-3"></i> Detail Surat Keluar`;
-      fetchAndShowDetails(
-        `/ajax-get-surat-keluar-details?id=${suratId}`,
-        "keluar"
-      );
-    }
-
-    // C. Detail Surat Keluar DEWAN (BARU)
-    if (link.classList.contains("detail-link-keluar-dewan")) {
-      e.preventDefault();
-      const suratId = link.dataset.id;
-      document.querySelector(
-        "#detail-modal h3"
-      ).innerHTML = `<i class="fas fa-user-tie text-primary mr-3"></i> Detail Surat Keluar Dewan`;
-      // UBAH: Panggil endpoint baru untuk dewan
-      fetchAndShowDetails(
-        `/ajax-get-surat-keluar-details-dewan?id=${suratId}`,
-        "keluar-dewan"
-      );
-    }
-
-    // D. Detail Surat Masuk DEWAN (BARU)
-    if (link.classList.contains("detail-link-masuk-dewan")) {
-      e.preventDefault();
-      const suratId = link.dataset.id;
-      document.querySelector(
-        "#detail-modal h3"
-      ).innerHTML = `<i class="fas fa-user-tie text-primary mr-3"></i> Detail Surat Masuk Dewan`;
-      fetchAndShowDetails(
-        `/ajax-get-surat-details-dewan?id=${suratId}`,
-        "masuk-dewan"
-      );
+    if (apiUrl) {
+      document.querySelector("#detail-modal h3").innerHTML = modalTitle;
+      fetchAndShowDetails(apiUrl, type);
     }
   });
 
-  // Fungsi terpusat untuk fetch dan render detail di modal
   function fetchAndShowDetails(url, type) {
     modalBody.innerHTML = `<div class="text-center p-8"><i class="fas fa-spinner fa-spin text-primary text-3xl"></i><p class="mt-2 text-gray-500">Memuat data...</p></div>`;
     openModal();
 
     fetch(url)
       .then((response) => {
-        if (!response.ok) throw new Error("Data tidak ditemukan");
+        if (!response.ok)
+          throw new Error("Data tidak ditemukan atau terjadi error server.");
         return response.json();
       })
       .then((data) => {
         let contentHTML = "";
         let footerHTML = "";
+
+        let basePath = type.includes("dewan") ? "/uploads-dewan/" : "/uploads/";
         const lampiranLink = data.file_lampiran
-          ? `<a href="/uploads-dewan/${data.file_lampiran}" target="_blank" class="inline-flex items-center text-white bg-primary hover:bg-secondary px-4 py-2 rounded-lg text-sm"><i class="fas fa-file-download mr-2"></i> Lihat Lampiran</a>`
+          ? `<a href="${basePath}${data.file_lampiran}" target="_blank" class="inline-flex items-center text-white bg-primary hover:bg-secondary px-4 py-2 rounded-lg text-sm"><i class="fas fa-file-download mr-2"></i> Lihat Lampiran</a>`
           : '<span class="text-gray-500">Tidak ada lampiran</span>';
 
         if (type === "masuk") {
           contentHTML = getSuratMasukDetailHTML(data, lampiranLink);
           footerHTML = `<a href="/cetak-disposisi?id=${data.id}" target="_blank" class="inline-flex items-center text-white bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg text-sm"><i class="fas fa-print mr-2"></i> Cetak Disposisi</a>`;
+        } else if (type === "masuk-dewan") {
+          contentHTML = getSuratMasukDetailHTML(data, lampiranLink);
+          footerHTML = `<a href="/cetak-disposisi-dewan?id=${data.id}" target="_blank" class="inline-flex items-center text-white bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg text-sm"><i class="fas fa-print mr-2"></i> Cetak Disposisi</a>`;
         } else if (type === "keluar" || type === "keluar-dewan") {
           contentHTML = getSuratKeluarDetailHTML(data, lampiranLink);
-          // Surat keluar tidak ada footer
         }
 
         modalBody.innerHTML = contentHTML;
         modalFooter.innerHTML = footerHTML;
       })
       .catch((error) => {
-        modalBody.innerHTML = `<div class="text-center p-8"><i class="fas fa-exclamation-triangle text-red-500 text-3xl"></i><p class="mt-2 text-red-600">Gagal memuat data.</p></div>`;
+        modalBody.innerHTML = `<div class="text-center p-8"><i class="fas fa-exclamation-triangle text-red-500 text-3xl"></i><p class="mt-2 text-red-600">${error.message}</p></div>`;
       });
   }
 
   // Bagian 3: Logika Pencarian, Minimize, dan Cek Nomor
-  // Fungsi helper untuk inisialisasi fungsionalitas halaman
   function setupPageFunctionality(config) {
-    // Toggle Form
     const toggleBtn = document.getElementById(config.toggleBtnId);
     const formBody = document.getElementById(config.formBodyId);
     const listContainer = document.getElementById(config.listContainerId);
@@ -181,7 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
       applyState(localStorage.getItem(config.localStorageKey) === "true");
     }
 
-    // File Input Name Display
     const fileInput = document.getElementById(config.fileInputId);
     if (fileInput) {
       fileInput.addEventListener("change", (e) => {
@@ -192,7 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Check Nomor Urut
     const checkBtn = document.getElementById(config.checkBtnId);
     if (checkBtn) {
       checkBtn.addEventListener("click", () => {
@@ -225,11 +203,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 html: `${config.urutLabel} <strong>${data.nomor}</strong> dapat digunakan.`,
               });
             }
-          });
+          })
+          .catch(() =>
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Gagal mengecek nomor urut.",
+            })
+          );
       });
     }
 
-    // AJAX Search
     const searchForm = document.getElementById(config.searchFormId);
     if (searchForm) {
       const searchInput = document.getElementById(config.searchInputId);
@@ -250,9 +234,13 @@ document.addEventListener("DOMContentLoaded", () => {
           .then((response) => response.json())
           .then((data) => {
             config.updateTable(data.surat_list);
-            config.updatePagination(data.pagination);
+            config.updatePagination(
+              data.pagination,
+              config.searchFormId,
+              "fetchData"
+            );
           })
-          .catch((error) => {
+          .catch(() => {
             tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-red-500">Gagal memuat data.</td></tr>`;
           });
       };
@@ -262,12 +250,14 @@ document.addEventListener("DOMContentLoaded", () => {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => fetchData(1), 300);
       });
+      searchForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        fetchData(1);
+      });
     }
   }
 
   // --- Inisialisasi untuk setiap halaman ---
-
-  // Halaman Surat Keluar SEKWAN
   if (document.getElementById("form-keluar-container")) {
     setupPageFunctionality({
       toggleBtnId: "toggle-form-btn",
@@ -286,12 +276,10 @@ document.addEventListener("DOMContentLoaded", () => {
       paginationContainerId: "paginationContainerKeluar",
       searchUrl: "/ajax-search-surat-keluar",
       updateTable: updateTableSuratKeluar,
-      updatePagination: (p) =>
-        updatePagination(p, "searchFormKeluar", "fetchData"),
+      updatePagination: updatePagination,
     });
   }
 
-  // Halaman Surat Masuk SEKWAN
   if (document.getElementById("form-masuk-body")) {
     setupPageFunctionality({
       toggleBtnId: "toggle-form-masuk-btn",
@@ -310,12 +298,10 @@ document.addEventListener("DOMContentLoaded", () => {
       paginationContainerId: "paginationContainerMasuk",
       searchUrl: "/ajax-search-surat-masuk",
       updateTable: updateTableSuratMasuk,
-      updatePagination: (p) =>
-        updatePagination(p, "searchFormMasuk", "fetchDataMasuk"),
+      updatePagination: updatePagination,
     });
   }
 
-  // Halaman Surat Keluar DEWAN (BARU)
   if (document.getElementById("form-keluar-dewan-container")) {
     setupPageFunctionality({
       toggleBtnId: "toggle-form-dewan-btn",
@@ -327,19 +313,17 @@ document.addEventListener("DOMContentLoaded", () => {
       checkBtnId: "checkNomorKeluarDewanBtn",
       urutInputId: "nomor_urut_keluar_dewan",
       urutLabel: "No. Urut",
-      checkUrl: "/ajax-check-nomor-keluar-dewan", // Endpoint baru
+      checkUrl: "/ajax-check-nomor-keluar-dewan",
       searchFormId: "searchFormKeluarDewan",
       searchInputId: "searchInputKeluarDewan",
       tableBodyId: "tableBodyKeluarDewan",
       paginationContainerId: "paginationContainerKeluarDewan",
-      searchUrl: "/ajax-search-surat-keluar-dewan", // Endpoint baru
-      updateTable: updateTableSuratKeluarDewan, // Fungsi render tabel baru
-      updatePagination: (p) =>
-        updatePagination(p, "searchFormKeluarDewan", "fetchData"),
+      searchUrl: "/ajax-search-surat-keluar-dewan",
+      updateTable: updateTableSuratKeluarDewan,
+      updatePagination: updatePagination,
     });
   }
 
-  // Halaman Surat Masuk DEWAN (BARU)
   if (document.getElementById("form-masuk-dewan-container")) {
     setupPageFunctionality({
       toggleBtnId: "toggle-form-masuk-dewan-btn",
@@ -358,30 +342,30 @@ document.addEventListener("DOMContentLoaded", () => {
       paginationContainerId: "paginationContainerMasukDewan",
       searchUrl: "/ajax-search-surat-masuk-dewan",
       updateTable: updateTableSuratMasukDewan,
-      updatePagination: (p) =>
-        updatePagination(p, "searchFormMasukDewan", "fetchData"),
+      updatePagination: updatePagination,
     });
   }
-}); // Akhir dari DOMContentLoaded
+});
 
 // =======================================================
 // --- FUNGSI-FUNGSI GLOBAL & TEMPLATE RENDERER ---
 // =======================================================
 
-// Fungsi untuk menghindari XSS
 function escapeHTML(str) {
   return str
-    ? str
-        .toString()
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;")
+    ? String(str).replace(/[&<>"']/g, (match) => {
+        const map = {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;",
+        };
+        return map[match];
+      })
     : "";
 }
 
-// Fungsi konfirmasi hapus
 function confirmDelete(type, id) {
   Swal.fire({
     title: "Anda Yakin?",
@@ -399,22 +383,21 @@ function confirmDelete(type, id) {
   });
 }
 
-// Fungsi untuk membuat HTML pagination
 function updatePagination(pagination, formId, fetchFunctionName) {
-  const container = document.getElementById(
-    `paginationContainer${formId.replace("searchForm", "")}`
-  );
+  const containerId = `paginationContainer${formId.replace("searchForm", "")}`;
+  const container = document.getElementById(containerId);
+  if (!container) return;
   container.innerHTML = "";
   if (pagination.total_pages <= 1) return;
 
   let paginationHTML = `<div class="flex items-center justify-between"><div class="text-sm text-gray-600">Halaman ${pagination.current_page} dari ${pagination.total_pages}</div><div class="flex space-x-1">`;
   if (pagination.current_page > 1) {
-    paginationHTML += `<button onclick="document.getElementById('${formId}').${fetchFunctionName}(${
+    paginationHTML += `<button type="button" onclick="document.getElementById('${formId}').fetchData(${
       pagination.current_page - 1
     })" class="px-4 py-2 rounded-lg border text-sm">Sebelumnya</button>`;
   }
   if (pagination.current_page < pagination.total_pages) {
-    paginationHTML += `<button onclick="document.getElementById('${formId}').${fetchFunctionName}(${
+    paginationHTML += `<button type="button" onclick="document.getElementById('${formId}').fetchData(${
       pagination.current_page + 1
     })" class="px-4 py-2 rounded-lg border text-sm">Selanjutnya</button>`;
   }
@@ -422,7 +405,27 @@ function updatePagination(pagination, formId, fetchFunctionName) {
   container.innerHTML = paginationHTML;
 }
 
-// --- FUNGSI UNTUK MERENDER ISI TABEL ---
+function renderTableRows(tableBody, list, rowRenderer) {
+  if (!tableBody) return;
+  if (list.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500"><p>Data tidak ditemukan.</p></td></tr>`;
+  } else {
+    tableBody.innerHTML = list.map(rowRenderer).join("");
+  }
+}
+
+const isAdmin = document.body.dataset.userRole === "admin";
+
+function getActionButtons(type, id) {
+  if (!isAdmin) return "";
+  return `
+    <td class="px-6 py-4">
+        <div class="flex space-x-2">
+            <a href="/edit-surat-${type}?id=${id}" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
+            <button onclick="confirmDelete('${type}', ${id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+        </div>
+    </td>`;
+}
 
 function updateTableSuratKeluar(suratList) {
   const tableBody = document.getElementById("tableBodyKeluar");
@@ -439,33 +442,14 @@ function updateTableSuratMasuk(suratList) {
   renderTableRows(tableBody, suratList, getSuratMasukRowHTML);
 }
 
-function renderTableRows(tableBody, list, rowRenderer) {
-  tableBody.innerHTML = "";
-  if (list.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500"><p>Data tidak ditemukan.</p></td></tr>`;
-    return;
-  }
-  tableBody.innerHTML = list.map(rowRenderer).join("");
-}
-
-// --- FUNGSI UNTUK MEMBUAT SATU BARIS HTML (ROW) ---
-
-const isAdmin = document.body.dataset.userRole === "admin";
-
-function getActionButtons(type, id) {
-  if (!isAdmin) return "";
-  return `
-    <td class="px-6 py-4">
-        <div class="flex space-x-2">
-            <a href="/edit-surat-${type}?id=${id}" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
-            <button onclick="confirmDelete('${type}', ${id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
-        </div>
-    </td>`;
+function updateTableSuratMasukDewan(suratList) {
+  const tableBody = document.getElementById("tableBodyMasukDewan");
+  renderTableRows(tableBody, suratList, getSuratMasukDewanRowHTML);
 }
 
 function getSuratKeluarRowHTML(surat) {
   const lampiranHtml = surat.file_lampiran
-    ? `<a href="/uploads/surat_keluar/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
+    ? `<a href="/uploads/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
     : '<span class="text-gray-400">-</span>';
   return `<tr class="hover:bg-gray-50">
         <td class="px-6 py-4 font-medium"><a href="#" class="text-primary hover:underline detail-link-keluar" data-id="${
@@ -481,7 +465,7 @@ function getSuratKeluarRowHTML(surat) {
 
 function getSuratKeluarDewanRowHTML(surat) {
   const lampiranHtml = surat.file_lampiran
-    ? `<a href="/uploads-dewan/surat_keluar_dewan/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
+    ? `<a href="/uploads-dewan/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
     : '<span class="text-gray-400">-</span>';
   return `<tr class="hover:bg-gray-50">
         <td class="px-6 py-4 font-medium"><a href="#" class="text-primary hover:underline detail-link-keluar-dewan" data-id="${
@@ -497,7 +481,7 @@ function getSuratKeluarDewanRowHTML(surat) {
 
 function getSuratMasukRowHTML(surat) {
   const lampiranHtml = surat.file_lampiran
-    ? `<a href="/uploads/surat_masuk/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
+    ? `<a href="/uploads/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
     : '<span class="text-gray-400">-</span>';
   return `<tr class="hover:bg-gray-50">
         <td class="px-6 py-4 font-semibold"><a href="#" class="text-primary hover:underline detail-link" data-id="${
@@ -511,7 +495,21 @@ function getSuratMasukRowHTML(surat) {
     </tr>`;
 }
 
-// --- FUNGSI UNTUK MEMBUAT KONTEN MODAL DETAIL ---
+function getSuratMasukDewanRowHTML(surat) {
+  const lampiranHtml = surat.file_lampiran
+    ? `<a href="/uploads-dewan/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
+    : '<span class="text-gray-400">-</span>';
+  return `<tr class="hover:bg-gray-50">
+        <td class="px-6 py-4 font-semibold"><a href="#" class="text-primary hover:underline detail-link-masuk-dewan" data-id="${
+          surat.id
+        }">${escapeHTML(surat.nomor_agenda_lengkap)}</a></td>
+        <td class="px-6 py-4">${escapeHTML(surat.asal_surat)}</td>
+        <td class="px-6 py-4">${escapeHTML(surat.perihal)}</td>
+        <td class="px-6 py-4">${escapeHTML(surat.tgl_terima_formatted)}</td>
+        <td class="px-6 py-4">${lampiranHtml}</td>
+        ${getActionButtons("masuk-dewan", surat.id)}
+    </tr>`;
+}
 
 function getSuratMasukDetailHTML(data, lampiranLink) {
   return `<div class="grid grid-cols-3 gap-x-6 gap-y-4 text-sm">
@@ -581,27 +579,4 @@ function getSuratKeluarDetailHTML(data, lampiranLink) {
           data.tgl_input_formatted
         )}</div>
     </div>`;
-}
-
-// --- FUNGSI UNTUK MERENDER ISI TABEL (Tambahan untuk Surat Masuk Dewan) ---
-function updateTableSuratMasukDewan(suratList) {
-  const tableBody = document.getElementById("tableBodyMasukDewan");
-  renderTableRows(tableBody, suratList, getSuratMasukDewanRowHTML);
-}
-
-// --- FUNGSI UNTUK MEMBUAT SATU BARIS HTML (ROW) (Tambahan untuk Surat Masuk Dewan) ---
-function getSuratMasukDewanRowHTML(surat) {
-  const lampiranHtml = surat.file_lampiran
-    ? `<a href="/uploads-dewan/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
-    : '<span class="text-gray-400">-</span>';
-  return `<tr class="hover:bg-gray-50">
-        <td class="px-6 py-4 font-semibold"><a href="#" class="text-primary hover:underline detail-link-masuk-dewan" data-id="${
-          surat.id
-        }">${escapeHTML(surat.nomor_agenda_lengkap)}</a></td>
-        <td class="px-6 py-4">${escapeHTML(surat.asal_surat)}</td>
-        <td class="px-6 py-4">${escapeHTML(surat.perihal)}</td>
-        <td class="px-6 py-4">${escapeHTML(surat.tgl_terima_formatted)}</td>
-        <td class="px-6 py-4">${lampiranHtml}</td>
-        ${getActionButtons("masuk-dewan", surat.id)}
-    </tr>`;
 }

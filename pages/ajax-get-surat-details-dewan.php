@@ -1,11 +1,7 @@
 <?php
 // pages/ajax-get-surat-details-dewan.php
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-require_once '../config/database.php';
-
+// Keamanan: Pastikan user sudah login
 if (!isset($_SESSION['user_id'])) {
     http_response_code(403);
     echo json_encode(['error' => 'Akses ditolak']);
@@ -19,6 +15,7 @@ if (!$id || !is_numeric($id)) {
     exit;
 }
 
+// Ambil data detail surat dari database dewan
 $stmt = $pdo->prepare(
     "SELECT *,
             DATE_FORMAT(tanggal_surat, '%d %M %Y') as tgl_surat_formatted,
@@ -35,6 +32,7 @@ if (!$surat) {
     exit;
 }
 
+// Kirim data sebagai JSON
 header('Content-Type: application/json');
 echo json_encode($surat);
 ?>

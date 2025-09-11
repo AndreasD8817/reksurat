@@ -227,7 +227,7 @@ require_once 'templates/header.php';
                         <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($surat['tujuan']); ?></td>
                         <td class="px-6 py-4">
                             <?php if ($surat['file_lampiran']): ?>
-                                <a href="/uploads/<?php echo htmlspecialchars($surat['file_lampiran']); ?>" target="_blank" class="inline-flex items-center text-primary hover:text-secondary">
+                                <a href="/uploads-dewan/<?php echo htmlspecialchars($surat['file_lampiran']); ?>" target="_blank" class="inline-flex items-center text-primary hover:text-secondary">
                                     <i class="fas fa-file-alt mr-1"></i> Lihat
                                 </a>
                             <?php else: ?>
