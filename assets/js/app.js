@@ -94,6 +94,19 @@ document.addEventListener("DOMContentLoaded", () => {
         "keluar-dewan"
       );
     }
+
+    // D. Detail Surat Masuk DEWAN (BARU)
+    if (link.classList.contains("detail-link-masuk-dewan")) {
+      e.preventDefault();
+      const suratId = link.dataset.id;
+      document.querySelector(
+        "#detail-modal h3"
+      ).innerHTML = `<i class="fas fa-user-tie text-primary mr-3"></i> Detail Surat Masuk Dewan`;
+      fetchAndShowDetails(
+        `/ajax-get-surat-details-dewan?id=${suratId}`,
+        "masuk-dewan"
+      );
+    }
   });
 
   // Fungsi terpusat untuk fetch dan render detail di modal
@@ -325,6 +338,30 @@ document.addEventListener("DOMContentLoaded", () => {
         updatePagination(p, "searchFormKeluarDewan", "fetchData"),
     });
   }
+
+  // Halaman Surat Masuk DEWAN (BARU)
+  if (document.getElementById("form-masuk-dewan-container")) {
+    setupPageFunctionality({
+      toggleBtnId: "toggle-form-masuk-dewan-btn",
+      formBodyId: "form-masuk-dewan-body",
+      listContainerId: "list-masuk-dewan-container",
+      localStorageKey: "formMasukDewanMinimized",
+      fileInputId: "file-upload-masuk-dewan",
+      fileNameId: "file-name-masuk-dewan",
+      checkBtnId: "checkAgendaDewanBtn",
+      urutInputId: "agenda_urut_dewan",
+      urutLabel: "No. Urut Agenda",
+      checkUrl: "/ajax-check-nomor-agenda-dewan",
+      searchFormId: "searchFormMasukDewan",
+      searchInputId: "searchInputMasukDewan",
+      tableBodyId: "tableBodyMasukDewan",
+      paginationContainerId: "paginationContainerMasukDewan",
+      searchUrl: "/ajax-search-surat-masuk-dewan",
+      updateTable: updateTableSuratMasukDewan,
+      updatePagination: (p) =>
+        updatePagination(p, "searchFormMasukDewan", "fetchData"),
+    });
+  }
 }); // Akhir dari DOMContentLoaded
 
 // =======================================================
@@ -544,4 +581,27 @@ function getSuratKeluarDetailHTML(data, lampiranLink) {
           data.tgl_input_formatted
         )}</div>
     </div>`;
+}
+
+// --- FUNGSI UNTUK MERENDER ISI TABEL (Tambahan untuk Surat Masuk Dewan) ---
+function updateTableSuratMasukDewan(suratList) {
+  const tableBody = document.getElementById("tableBodyMasukDewan");
+  renderTableRows(tableBody, suratList, getSuratMasukDewanRowHTML);
+}
+
+// --- FUNGSI UNTUK MEMBUAT SATU BARIS HTML (ROW) (Tambahan untuk Surat Masuk Dewan) ---
+function getSuratMasukDewanRowHTML(surat) {
+  const lampiranHtml = surat.file_lampiran
+    ? `<a href="/uploads-dewan/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
+    : '<span class="text-gray-400">-</span>';
+  return `<tr class="hover:bg-gray-50">
+        <td class="px-6 py-4 font-semibold"><a href="#" class="text-primary hover:underline detail-link-masuk-dewan" data-id="${
+          surat.id
+        }">${escapeHTML(surat.nomor_agenda_lengkap)}</a></td>
+        <td class="px-6 py-4">${escapeHTML(surat.asal_surat)}</td>
+        <td class="px-6 py-4">${escapeHTML(surat.perihal)}</td>
+        <td class="px-6 py-4">${escapeHTML(surat.tgl_terima_formatted)}</td>
+        <td class="px-6 py-4">${lampiranHtml}</td>
+        ${getActionButtons("masuk-dewan", surat.id)}
+    </tr>`;
 }
