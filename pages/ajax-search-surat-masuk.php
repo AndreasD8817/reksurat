@@ -2,8 +2,8 @@
 // pages/ajax-search-surat-masuk.php
 
 // Memulai session dan memuat koneksi database
-session_start();
-require_once '../config/database.php';
+// session_start();
+// require_once '../config/database.php';
 
 // Pastikan hanya user yang sudah login yang bisa akses
 if (!isset($_SESSION['user_id'])) {

@@ -1,10 +1,10 @@
 <?php
 // pages/ajax-search-surat-masuk-dewan.php
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-require_once '../config/database.php';
+// if (session_status() === PHP_SESSION_NONE) {
+//     session_start();
+// }
+// require_once '../config/database.php';
 
 if (!isset($_SESSION['user_id'])) {
     http_response_code(403);

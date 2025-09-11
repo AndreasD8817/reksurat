@@ -2,8 +2,8 @@
 // pages/ajax-search-surat-keluar.php
 
 // Memulai session dan memuat koneksi database
-session_start();
-require_once '../config/database.php'; // Path diubah karena file ada di dalam folder
+// session_start();
+// require_once '../config/database.php'; // Path diubah karena file ada di dalam folder
 
 // Pastikan hanya user yang sudah login yang bisa akses
 if (!isset($_SESSION['user_id'])) {
