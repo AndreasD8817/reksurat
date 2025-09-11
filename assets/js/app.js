@@ -106,12 +106,13 @@ document.addEventListener("DOMContentLoaded", () => {
           ? `<a href="${basePath}${data.file_lampiran}" target="_blank" class="inline-flex items-center text-white bg-primary hover:bg-secondary px-4 py-2 rounded-lg text-sm"><i class="fas fa-file-download mr-2"></i> Lihat Lampiran</a>`
           : '<span class="text-gray-500">Tidak ada lampiran</span>';
 
-        if (type === "masuk") {
+        if (type === "masuk" || type === "masuk-dewan") {
           contentHTML = getSuratMasukDetailHTML(data, lampiranLink);
-          footerHTML = `<a href="/cetak-disposisi?id=${data.id}" target="_blank" class="inline-flex items-center text-white bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg text-sm"><i class="fas fa-print mr-2"></i> Cetak Disposisi</a>`;
-        } else if (type === "masuk-dewan") {
-          contentHTML = getSuratMasukDetailHTML(data, lampiranLink);
-          footerHTML = `<a href="/cetak-disposisi-dewan?id=${data.id}" target="_blank" class="inline-flex items-center text-white bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg text-sm"><i class="fas fa-print mr-2"></i> Cetak Disposisi</a>`;
+          const cetakUrl =
+            type === "masuk-dewan"
+              ? `/cetak-disposisi-dewan?id=${data.id}`
+              : `/cetak-disposisi?id=${data.id}`;
+          footerHTML = `<a href="${cetakUrl}" target="_blank" class="inline-flex items-center text-white bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg text-sm"><i class="fas fa-print mr-2"></i> Cetak Disposisi</a>`;
         } else if (type === "keluar" || type === "keluar-dewan") {
           contentHTML = getSuratKeluarDetailHTML(data, lampiranLink);
         }
@@ -511,7 +512,18 @@ function getSuratMasukDewanRowHTML(surat) {
     </tr>`;
 }
 
+// ===== MODIFIKASI DIMULAI DI SINI =====
 function getSuratMasukDetailHTML(data, lampiranLink) {
+  // Cek apakah properti 'diteruskan_kepada' ada dan tidak kosong
+  const diteruskanHtml = data.diteruskan_kepada
+    ? `
+        <div class="col-span-1 text-gray-500 self-start">Diteruskan Kepada</div>
+        <div class="col-span-2 text-gray-700 self-start">: ${escapeHTML(
+          data.diteruskan_kepada
+        )}</div>
+    `
+    : "";
+
   return `<div class="grid grid-cols-3 gap-x-6 gap-y-4 text-sm">
         <div class="col-span-1 text-gray-500">No. Agenda</div><div class="col-span-2 font-semibold text-gray-800">: ${escapeHTML(
           data.nomor_agenda_lengkap
@@ -535,6 +547,7 @@ function getSuratMasukDetailHTML(data, lampiranLink) {
         <div class="col-span-1 text-gray-500 self-start">Perihal</div><div class="col-span-2 text-gray-700 self-start">: ${escapeHTML(
           data.perihal
         )}</div>
+        ${diteruskanHtml}
         <div class="col-span-1 text-gray-500 self-start">Keterangan</div><div class="col-span-2 text-gray-700 self-start">: ${
           escapeHTML(data.keterangan) || "-"
         }</div>
@@ -545,6 +558,7 @@ function getSuratMasukDetailHTML(data, lampiranLink) {
         )}</div>
     </div>`;
 }
+// ===== MODIFIKASI BERAKHIR DI SINI =====
 
 function getSuratKeluarDetailHTML(data, lampiranLink) {
   return `<div class="grid grid-cols-3 gap-x-6 gap-y-4 text-sm">

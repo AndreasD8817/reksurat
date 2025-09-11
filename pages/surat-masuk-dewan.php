@@ -46,6 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat_masuk_de
             $asal_surat = $_POST['asal_surat'];
             $sifat_surat = $_POST['sifat_surat'] ?? 'Biasa';
             $perihal = $_POST['perihal'];
+            // TAMBAHKAN: Ambil data dari input baru
+            $diteruskan_kepada = $_POST['diteruskan_kepada'];
             $keterangan = $_POST['keterangan'];
             $tgl_surat = $_POST['tanggal_surat'];
             $tgl_diterima = $_POST['tanggal_diterima'];
@@ -53,10 +55,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat_masuk_de
             $tahun = date('Y', strtotime($tgl_diterima));
             $nomor_agenda_lengkap = sprintf("%s/%s/436.5/%s", $agenda_klas, $agenda_urut, $tahun);
 
+            // MODIFIKASI: Tambahkan kolom `diteruskan_kepada` ke query INSERT
             $stmt = $pdo->prepare(
-                "INSERT INTO surat_masuk_dewan (agenda_klasifikasi, agenda_urut, nomor_agenda_lengkap, nomor_surat_lengkap, tanggal_surat, tanggal_diterima, asal_surat, sifat_surat, perihal, keterangan, file_lampiran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                "INSERT INTO surat_masuk_dewan (agenda_klasifikasi, agenda_urut, nomor_agenda_lengkap, nomor_surat_lengkap, tanggal_surat, tanggal_diterima, asal_surat, sifat_surat, perihal, diteruskan_kepada, keterangan, file_lampiran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
-            $stmt->execute([$agenda_klas, $agenda_urut, $nomor_agenda_lengkap, $nomor_surat_lengkap, $tgl_surat, $tgl_diterima, $asal_surat, $sifat_surat, $perihal, $keterangan, $fileLampiran]);
+            $stmt->execute([$agenda_klas, $agenda_urut, $nomor_agenda_lengkap, $nomor_surat_lengkap, $tgl_surat, $tgl_diterima, $asal_surat, $sifat_surat, $perihal, $diteruskan_kepada, $keterangan, $fileLampiran]);
 
             $_SESSION['success_message'] = "Surat masuk dewan berhasil disimpan.";
         }
@@ -132,6 +135,19 @@ require_once 'templates/header.php';
                 <label class="block text-sm font-medium text-gray-700 mb-2">Perihal</label>
                 <textarea name="perihal" class="w-full px-4 py-3 rounded-xl border border-gray-300 h-24" required></textarea>
             </div>
+            
+            <!-- ===== TAMBAHKAN INPUT BARU DI SINI ===== -->
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Diteruskan Kepada</label>
+                <input type="text" name="diteruskan_kepada" class="w-full px-4 py-3 rounded-xl border border-gray-300" placeholder="Contoh: Ketua Komisi A, Fraksi PDI Perjuangan, dll.">
+            </div>
+            <!-- ======================================= -->
+
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Keterangan</label>
+                <textarea name="keterangan" class="w-full px-4 py-3 rounded-xl border border-gray-300 h-24"></textarea>
+            </div>
+
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-2">File Lampiran <span class="text-gray-400 font-normal">(PDF/JPG, maks 5MB)</span></label>
                 <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-primary cursor-pointer relative group">
@@ -146,10 +162,7 @@ require_once 'templates/header.php';
                     </div>
                 </div>
             </div>
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Keterangan</label>
-                <textarea name="keterangan" class="w-full px-4 py-3 rounded-xl border border-gray-300 h-24"></textarea>
-            </div>
+
         </div>
         <div class="mt-8 flex justify-end">
             <button type="submit" name="simpan_surat_masuk_dewan" class="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl shadow-md hover:shadow-lg">
@@ -199,7 +212,6 @@ require_once 'templates/header.php';
                         <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($surat['tgl_terima_formatted']); ?></td>
                         <td class="px-6 py-4">
                             <?php if ($surat['file_lampiran']): ?>
-                                <!-- UBAH: Arahkan link lampiran ke folder 'uploads-dewan' -->
                                 <a href="/uploads-dewan/<?php echo htmlspecialchars($surat['file_lampiran']); ?>" target="_blank" class="inline-flex items-center text-primary hover:text-secondary">
                                     <i class="fas fa-file-alt mr-1"></i> Lihat
                                 </a>
@@ -232,4 +244,3 @@ require_once 'templates/header.php';
 </div>
 
 <?php require_once 'templates/footer.php'; ?>
-

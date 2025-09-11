@@ -1,6 +1,7 @@
 <?php
 // pages/edit-surat-masuk-dewan.php
 
+// Keamanan: Pastikan hanya admin yang bisa mengakses
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     $_SESSION['error_message'] = "Anda tidak memiliki izin untuk mengakses halaman ini.";
     header('Location: /surat-masuk-dewan');
@@ -13,6 +14,7 @@ if (!$id) {
     exit;
 }
 
+// Ambil data surat yang akan diedit dari database
 $stmt = $pdo->prepare("SELECT * FROM surat_masuk_dewan WHERE id = ?");
 $stmt->execute([$id]);
 $surat = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -23,6 +25,7 @@ if (!$surat) {
     exit;
 }
 
+// Fungsi handleFileUpload (tidak perlu diubah)
 function handleFileUpload($fileInputName, $subDirectory) {
     if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES[$fileInputName];
@@ -50,6 +53,7 @@ function handleFileUpload($fileInputName, $subDirectory) {
     return null;
 }
 
+// Logika untuk memproses update data
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk_dewan'])) {
     $agenda_klas = $_POST['agenda_klasifikasi'];
     $agenda_urut = $_POST['agenda_urut'];
@@ -57,6 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk_de
     $asal_surat = $_POST['asal_surat'];
     $sifat_surat = $_POST['sifat_surat'];
     $perihal = $_POST['perihal'];
+    // TAMBAHKAN: Ambil data 'diteruskan_kepada' dari form
+    $diteruskan_kepada = $_POST['diteruskan_kepada'];
     $keterangan = $_POST['keterangan'];
     $tgl_surat = $_POST['tanggal_surat'];
     $tgl_diterima = $_POST['tanggal_diterima'];
@@ -75,10 +81,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk_de
         }
     }
 
+    // MODIFIKASI: Tambahkan kolom `diteruskan_kepada` ke query UPDATE
     $stmt = $pdo->prepare(
-        "UPDATE surat_masuk_dewan SET agenda_klasifikasi = ?, agenda_urut = ?, nomor_agenda_lengkap = ?, nomor_surat_lengkap = ?, tanggal_surat = ?, tanggal_diterima = ?, asal_surat = ?, sifat_surat = ?, perihal = ?, keterangan = ?, file_lampiran = ? WHERE id = ?"
+        "UPDATE surat_masuk_dewan SET agenda_klasifikasi = ?, agenda_urut = ?, nomor_agenda_lengkap = ?, nomor_surat_lengkap = ?, tanggal_surat = ?, tanggal_diterima = ?, asal_surat = ?, sifat_surat = ?, perihal = ?, diteruskan_kepada = ?, keterangan = ?, file_lampiran = ? WHERE id = ?"
     );
-    $stmt->execute([$agenda_klas, $agenda_urut, $nomor_agenda_lengkap, $nomor_surat_lengkap, $tgl_surat, $tgl_diterima, $asal_surat, $sifat_surat, $perihal, $keterangan, $namaFileBaru, $id]);
+    $stmt->execute([$agenda_klas, $agenda_urut, $nomor_agenda_lengkap, $nomor_surat_lengkap, $tgl_surat, $tgl_diterima, $asal_surat, $sifat_surat, $perihal, $diteruskan_kepada, $keterangan, $namaFileBaru, $id]);
     
     $_SESSION['success_message'] = "Data surat masuk dewan berhasil diperbarui.";
     header("Location: /surat-masuk-dewan");
@@ -133,6 +140,14 @@ require_once 'templates/header.php';
                 <label class="block text-sm font-medium text-gray-700 mb-2">Perihal</label>
                 <textarea name="perihal" class="w-full px-4 py-3 rounded-xl border border-gray-300 h-24" required><?php echo htmlspecialchars($surat['perihal']); ?></textarea>
             </div>
+
+            <!-- ===== TAMBAHKAN INPUT BARU DI SINI ===== -->
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Diteruskan Kepada</label>
+                <input type="text" name="diteruskan_kepada" class="w-full px-4 py-3 rounded-xl border border-gray-300" placeholder="Contoh: Ketua Komisi A, Fraksi PDI Perjuangan, dll." value="<?php echo htmlspecialchars($surat['diteruskan_kepada'] ?? ''); ?>">
+            </div>
+            <!-- ======================================= -->
+
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Keterangan</label>
                 <textarea name="keterangan" class="w-full px-4 py-3 rounded-xl border border-gray-300 h-24"><?php echo htmlspecialchars($surat['keterangan']); ?></textarea>
