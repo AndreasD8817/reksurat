@@ -21,38 +21,45 @@ function escapeHTML(str) {
 }
 
 /**
- * Menampilkan dialog konfirmasi sebelum menghapus item.
- * @param {string} type Tipe surat ('masuk', 'keluar', dll).
- * @param {number} id ID surat yang akan dihapus.
+ * Menampilkan dialog konfirmasi sebelum menghapus atau membatalkan.
+ * @param {string} type Tipe data ('masuk', 'keluar', 'disposisi-sekwan', dll).
+ * @param {number} id ID item yang akan dihapus/dibatalkan.
  */
 export function confirmDelete(type, id) {
+  const isDisposisi = type.includes("disposisi");
+  const title = isDisposisi ? "Batalkan Disposisi Ini?" : "Anda Yakin?";
+  const text = isDisposisi
+    ? "Surat ini akan kembali ke daftar surat yang belum didisposisi."
+    : "Data surat ini akan dihapus secara permanen!";
+  const confirmButtonText = isDisposisi ? "Ya, Batalkan!" : "Ya, Hapus!";
+
   Swal.fire({
-    title: "Anda Yakin?",
-    text: "Data surat ini akan dihapus secara permanen!",
+    title: title,
+    text: text,
     icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#d33",
     cancelButtonColor: "#3085d6",
-    confirmButtonText: "Ya, Hapus!",
-    cancelButtonText: "Batal",
+    confirmButtonText: confirmButtonText,
+    cancelButtonText: "Tidak",
   }).then((result) => {
     if (result.isConfirmed) {
-      window.location.href = `/hapus-surat-${type}?id=${id}`;
+      window.location.href = `/hapus-${type}?id=${id}`;
     }
   });
 }
 
 /**
- * Memperbarui tampilan kontrol paginasi.
- * @param {object} pagination Objek data paginasi dari server.
- * @param {string} formId ID form pencarian terkait.
+ * Memperbarui tampilan pagination di halaman.
+ * @param {object} pagination Objek data pagination dari server.
+ * @param {string} formId ID dari form pencarian.
  */
 export function updatePagination(pagination, formId) {
   const containerId = `paginationContainer${formId.replace("searchForm", "")}`;
   const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = "";
-  if (pagination.total_pages <= 1) return;
+  if (!pagination || pagination.total_pages <= 1) return;
 
   let paginationHTML = `<div class="flex items-center justify-between"><div class="text-sm text-gray-600">Halaman ${pagination.current_page} dari ${pagination.total_pages}</div><div class="flex space-x-1">`;
   if (pagination.current_page > 1) {
@@ -69,15 +76,10 @@ export function updatePagination(pagination, formId) {
   container.innerHTML = paginationHTML;
 }
 
-/**
- * Fungsi generik untuk me-render baris-baris tabel.
- * @param {HTMLElement} tableBody Elemen tbody dari tabel.
- * @param {Array} list Daftar data untuk ditampilkan.
- * @param {Function} rowRenderer Fungsi untuk membuat HTML satu baris.
- */
+// --- FUNGSI RENDER TABEL ---
 function renderTableRows(tableBody, list, rowRenderer) {
   if (!tableBody) return;
-  if (list.length === 0) {
+  if (!list || list.length === 0) {
     tableBody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500"><p>Data tidak ditemukan.</p></td></tr>`;
   } else {
     tableBody.innerHTML = list.map(rowRenderer).join("");
@@ -85,13 +87,6 @@ function renderTableRows(tableBody, list, rowRenderer) {
 }
 
 const isAdmin = document.body.dataset.userRole === "admin";
-
-/**
- * Menghasilkan HTML untuk tombol aksi (edit/hapus).
- * @param {string} type Tipe surat.
- * @param {number} id ID surat.
- * @returns {string} HTML untuk kolom aksi.
- */
 function getActionButtons(type, id) {
   if (!isAdmin) return "";
   return `
@@ -103,7 +98,8 @@ function getActionButtons(type, id) {
     </td>`;
 }
 
-// --- FUNGSI UPDATE TABEL ---
+// --- FUNGSI UPDATE & RENDER SPESIFIK UNTUK SETIAP HALAMAN ---
+
 export function updateTableSuratKeluar(suratList) {
   renderTableRows(
     document.getElementById("tableBodyKeluar"),
@@ -111,29 +107,6 @@ export function updateTableSuratKeluar(suratList) {
     getSuratKeluarRowHTML
   );
 }
-export function updateTableSuratKeluarDewan(suratList) {
-  renderTableRows(
-    document.getElementById("tableBodyKeluarDewan"),
-    suratList,
-    getSuratKeluarDewanRowHTML
-  );
-}
-export function updateTableSuratMasuk(suratList) {
-  renderTableRows(
-    document.getElementById("tableBodyMasuk"),
-    suratList,
-    getSuratMasukRowHTML
-  );
-}
-export function updateTableSuratMasukDewan(suratList) {
-  renderTableRows(
-    document.getElementById("tableBodyMasukDewan"),
-    suratList,
-    getSuratMasukDewanRowHTML
-  );
-}
-
-// --- FUNGSI RENDER BARIS TABEL ---
 function getSuratKeluarRowHTML(surat) {
   const lampiranHtml = surat.file_lampiran
     ? `<a href="/uploads/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
@@ -150,6 +123,13 @@ function getSuratKeluarRowHTML(surat) {
     </tr>`;
 }
 
+export function updateTableSuratKeluarDewan(suratList) {
+  renderTableRows(
+    document.getElementById("tableBodyKeluarDewan"),
+    suratList,
+    getSuratKeluarDewanRowHTML
+  );
+}
 function getSuratKeluarDewanRowHTML(surat) {
   const lampiranHtml = surat.file_lampiran
     ? `<a href="/uploads-dewan/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
@@ -166,6 +146,13 @@ function getSuratKeluarDewanRowHTML(surat) {
     </tr>`;
 }
 
+export function updateTableSuratMasuk(suratList) {
+  renderTableRows(
+    document.getElementById("tableBodyMasuk"),
+    suratList,
+    getSuratMasukRowHTML
+  );
+}
 function getSuratMasukRowHTML(surat) {
   const lampiranHtml = surat.file_lampiran
     ? `<a href="/uploads/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
@@ -182,6 +169,13 @@ function getSuratMasukRowHTML(surat) {
     </tr>`;
 }
 
+export function updateTableSuratMasukDewan(suratList) {
+  renderTableRows(
+    document.getElementById("tableBodyMasukDewan"),
+    suratList,
+    getSuratMasukDewanRowHTML
+  );
+}
 function getSuratMasukDewanRowHTML(surat) {
   const lampiranHtml = surat.file_lampiran
     ? `<a href="/uploads-dewan/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
@@ -198,8 +192,41 @@ function getSuratMasukDewanRowHTML(surat) {
     </tr>`;
 }
 
-// --- FUNGSI RENDER DETAIL SURAT ---
+// **BARU**: Untuk tabel disposisi
+export function updateTableDisposisi(disposisiList) {
+  const tableBody = document.getElementById("tableBodyDisposisi");
+  renderTableRows(tableBody, disposisiList, getDisposisiRowHTML);
+}
+function getDisposisiRowHTML(disposisi) {
+  const lampiranHtml = disposisi.file_lampiran
+    ? `<a href="/uploads/disposisi_sekwan/${disposisi.file_lampiran}" target="_blank" class="text-indigo-600 hover:text-indigo-900">Lihat File</a>`
+    : "-";
+  let actionButton = "";
+  if (isAdmin) {
+    actionButton = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="window.confirmDelete('disposisi-sekwan', ${disposisi.id})" class="text-red-600 hover:text-red-900">Batalkan</button>
+                      </td>`;
+  }
+
+  return `<tr class="hover:bg-gray-50">
+        <td class="px-6 py-4 whitespace-nowrap font-medium text-primary">${escapeHTML(
+          disposisi.nomor_agenda_lengkap
+        )}</td>
+        <td class="px-6 py-4">${escapeHTML(disposisi.perihal)}</td>
+        <td class="px-6 py-4 whitespace-nowrap">${escapeHTML(
+          disposisi.nama_pegawai
+        )}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(
+          disposisi.tgl_disposisi_formatted
+        )}</td>
+        <td class="px-6 py-4 whitespace-nowrap">${lampiranHtml}</td>
+        ${actionButton}
+    </tr>`;
+}
+
+// --- FUNGSI RENDER DETAIL MODAL ---
 export function getSuratMasukDetailHTML(data, lampiranLink) {
+  // ... (kode ini tidak berubah)
   const diteruskanHtml = data.diteruskan_kepada
     ? `<div class="col-span-1 text-gray-500 self-start">Diteruskan Kepada</div><div class="col-span-2 text-gray-700 self-start">: ${escapeHTML(
         data.diteruskan_kepada
@@ -239,38 +266,38 @@ export function getSuratMasukDetailHTML(data, lampiranLink) {
         )}</div>
     </div>`;
 }
-
 export function getSuratKeluarDetailHTML(data, lampiranLink) {
+  // ... (kode ini tidak berubah)
   return `<div class="grid grid-cols-3 gap-x-6 gap-y-4 text-sm">
-        <div class="col-span-1 text-gray-500">No. Surat</div><div class="col-span-2 font-semibold text-gray-800">: ${escapeHTML(
-          data.nomor_surat_lengkap
-        )}</div>
-        <div class="col-span-1 text-gray-500">Tujuan</div><div class="col-span-2 text-gray-700">: ${escapeHTML(
-          data.tujuan
-        )}</div>
-        <div class="col-span-1 text-gray-500">Sifat Surat</div><div class="col-span-2 text-gray-700">: <span class="font-semibold px-2 py-1 bg-blue-100 text-blue-700 rounded-full">${escapeHTML(
-          data.sifat_surat
-        )}</span></div>
-        <div class="col-span-1 text-gray-500">Tanggal Surat</div><div class="col-span-2 text-gray-700">: ${escapeHTML(
-          data.tgl_surat_formatted
-        )}</div>
-        <div class="col-span-1 text-gray-500">Konseptor</div><div class="col-span-2 text-gray-700">: ${
-          escapeHTML(data.konseptor) || "-"
-        }</div>
-        <div class="col-span-3 pt-2 mt-2 border-t"></div>
-        <div class="col-span-1 text-gray-500 self-start">Perihal</div><div class="col-span-2 text-gray-700 self-start">: ${escapeHTML(
-          data.perihal
-        )}</div>
-        <div class="col-span-1 text-gray-500 self-start">Keterangan</div><div class="col-span-2 text-gray-700 self-start">: ${
-          escapeHTML(data.keterangan) || "-"
-        }</div>
-        <div class="col-span-1 text-gray-500 self-start">Hub. dgn Surat No.</div><div class="col-span-2 text-gray-700 self-start">: ${
-          escapeHTML(data.hub_surat_no) || "-"
-        }</div>
-        <div class="col-span-3 pt-2 mt-2 border-t"></div>
-        <div class="col-span-1 text-gray-500">Lampiran</div><div class="col-span-2">${lampiranLink}</div>
-        <div class="col-span-1 text-gray-500 mt-2">Dicatat pada</div><div class="col-span-2 text-gray-500 mt-2">: ${escapeHTML(
-          data.tgl_input_formatted
-        )}</div>
-    </div>`;
+          <div class="col-span-1 text-gray-500">No. Surat</div><div class="col-span-2 font-semibold text-gray-800">: ${escapeHTML(
+            data.nomor_surat_lengkap
+          )}</div>
+          <div class="col-span-1 text-gray-500">Tujuan</div><div class="col-span-2 text-gray-700">: ${escapeHTML(
+            data.tujuan
+          )}</div>
+          <div class="col-span-1 text-gray-500">Sifat Surat</div><div class="col-span-2 text-gray-700">: <span class="font-semibold px-2 py-1 bg-blue-100 text-blue-700 rounded-full">${escapeHTML(
+            data.sifat_surat
+          )}</span></div>
+          <div class="col-span-1 text-gray-500">Tanggal Surat</div><div class="col-span-2 text-gray-700">: ${escapeHTML(
+            data.tgl_surat_formatted
+          )}</div>
+          <div class="col-span-1 text-gray-500">Konseptor</div><div class="col-span-2 text-gray-700">: ${
+            escapeHTML(data.konseptor) || "-"
+          }</div>
+          <div class="col-span-3 pt-2 mt-2 border-t"></div>
+          <div class="col-span-1 text-gray-500 self-start">Perihal</div><div class="col-span-2 text-gray-700 self-start">: ${escapeHTML(
+            data.perihal
+          )}</div>
+          <div class="col-span-1 text-gray-500 self-start">Keterangan</div><div class="col-span-2 text-gray-700 self-start">: ${
+            escapeHTML(data.keterangan) || "-"
+          }</div>
+          <div class="col-span-1 text-gray-500 self-start">Hub. dgn Surat No.</div><div class="col-span-2 text-gray-700 self-start">: ${
+            escapeHTML(data.hub_surat_no) || "-"
+          }</div>
+          <div class="col-span-3 pt-2 mt-2 border-t"></div>
+          <div class="col-span-1 text-gray-500">Lampiran</div><div class="col-span-2">${lampiranLink}</div>
+          <div class="col-span-1 text-gray-500 mt-2">Dicatat pada</div><div class="col-span-2 text-gray-500 mt-2">: ${escapeHTML(
+            data.tgl_input_formatted
+          )}</div>
+      </div>`;
 }

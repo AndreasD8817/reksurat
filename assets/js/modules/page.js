@@ -25,7 +25,7 @@ export function setupPageFunctionality(config) {
         icon.classList.replace("fa-chevron-up", "fa-chevron-down");
         localStorage.setItem(config.localStorageKey, "true");
       } else {
-        formBody.style.maxHeight = "1500px";
+        formBody.style.maxHeight = "1500px"; // Cukup besar untuk mengakomodasi form
         formBody.style.opacity = "1";
         formBody.style.overflow = "visible";
         formBody.style.paddingTop = "";
@@ -119,8 +119,14 @@ export function setupPageFunctionality(config) {
       fetch(url)
         .then((response) => response.json())
         .then((data) => {
-          config.updateTable(data.surat_list);
-          updatePagination(data.pagination, config.searchFormId);
+          // --- PERBAIKAN UTAMA DI SINI ---
+          // Cek apakah data yang datang itu 'disposisi_list' atau 'surat_list'
+          const listData = data.disposisi_list || data.surat_list;
+          config.updateTable(listData);
+
+          if (data.pagination) {
+            updatePagination(data.pagination, config.searchFormId);
+          }
         })
         .catch(() => {
           tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-red-500">Gagal memuat data.</td></tr>`;

@@ -1,42 +1,49 @@
 <?php
-// pages/ajax-search-surat-keluar.php
+// pages/ajax-search-disposisi-sekwan.php
 
-// Pastikan hanya user yang sudah login yang bisa akses
+// Pastikan user sudah login
 if (!isset($_SESSION['user_id'])) {
-    http_response_code(403); // Forbidden
+    http_response_code(403);
     echo json_encode(['error' => 'Akses ditolak']);
     exit;
 }
 
 // Pengaturan Pagination & Pencarian
-$limit = 10; 
+$limit = 10;
 $page = isset($_GET['p']) ? (int)$_GET['p'] : 1;
 $offset = ($page > 0) ? ($page - 1) * $limit : 0;
 $search = $_GET['search'] ?? '';
 
-// Siapkan query
+// Siapkan query pencarian
 $sql_where = "";
 $params = [];
-
 if (!empty($search)) {
-    // --- PERBAIKAN: Menambahkan kolom 'tujuan' dalam pencarian ---
-    $sql_where = "WHERE nomor_surat_lengkap LIKE ? OR perihal LIKE ? OR tujuan LIKE ?";
+    $sql_where = "WHERE sm.nomor_agenda_lengkap LIKE ? OR sm.perihal LIKE ? OR ds.nama_pegawai LIKE ?";
     $search_param = "%$search%";
     $params = [$search_param, $search_param, $search_param];
 }
 
 // Hitung total data untuk pagination
-$stmt_count = $pdo->prepare("SELECT COUNT(id) FROM surat_keluar " . $sql_where);
+$stmt_count = $pdo->prepare(
+    "SELECT COUNT(ds.id) 
+     FROM disposisi_sekwan ds 
+     JOIN surat_masuk sm ON ds.surat_masuk_id = sm.id " . $sql_where
+);
 $stmt_count->execute($params);
 $total_records = $stmt_count->fetchColumn();
 $total_pages = ceil($total_records / $limit);
 
-// Ambil data surat
-$params_data = $params;
-$params_data[] = $limit;
-$params_data[] = $offset;
+// Ambil data disposisi yang sudah digabung dengan surat masuk
+$query = "SELECT ds.id, ds.nama_pegawai, ds.file_lampiran,
+                 DATE_FORMAT(ds.tanggal_disposisi, '%d-%m-%Y %H:%i') as tgl_disposisi_formatted,
+                 sm.nomor_agenda_lengkap, sm.perihal
+          FROM disposisi_sekwan ds
+          JOIN surat_masuk sm ON ds.surat_masuk_id = sm.id " 
+          . $sql_where . " ORDER BY ds.id DESC LIMIT ? OFFSET ?";
+          
+$stmt_data = $pdo->prepare($query);
 
-$stmt_data = $pdo->prepare("SELECT *, DATE_FORMAT(tanggal_surat, '%d-%m-%Y') as tgl_formatted FROM surat_keluar " . $sql_where . " ORDER BY id DESC LIMIT ? OFFSET ?");
+// Bind parameter secara dinamis
 $param_index = 1;
 foreach ($params as $param) {
     $stmt_data->bindValue($param_index++, $param, PDO::PARAM_STR);
@@ -44,11 +51,11 @@ foreach ($params as $param) {
 $stmt_data->bindValue($param_index++, $limit, PDO::PARAM_INT);
 $stmt_data->bindValue($param_index, $offset, PDO::PARAM_INT);
 $stmt_data->execute();
-$surat_keluar_list = $stmt_data->fetchAll(PDO::FETCH_ASSOC);
+$disposisi_list = $stmt_data->fetchAll(PDO::FETCH_ASSOC);
 
-// Siapkan data respons dalam bentuk array
+// Siapkan respons JSON
 $response = [
-    'surat_list' => $surat_keluar_list,
+    'disposisi_list' => $disposisi_list,
     'pagination' => [
         'current_page' => $page,
         'total_pages' => $total_pages,
@@ -56,6 +63,6 @@ $response = [
     ]
 ];
 
-// Set header sebagai JSON dan kirim data
 header('Content-Type: application/json');
 echo json_encode($response);
+?>

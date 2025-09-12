@@ -6,6 +6,7 @@ import {
   updateTableSuratKeluarDewan,
   updateTableSuratMasuk,
   updateTableSuratMasukDewan,
+  updateTableDisposisi, // <- Impor fungsi baru
   confirmDelete,
 } from "./modules/ui.js";
 
@@ -114,6 +115,28 @@ document.addEventListener("DOMContentLoaded", () => {
       paginationContainerId: "paginationContainerMasukDewan",
       searchUrl: "/ajax-search-surat-masuk-dewan",
       updateTable: updateTableSuratMasukDewan,
+    });
+  }
+
+  // **BARU**: Inisialisasi untuk halaman Disposisi Sekwan
+  if (document.getElementById("searchFormDisposisi")) {
+    setupPageFunctionality({
+      toggleBtnId: null,
+      formBodyId: null,
+      listContainerId: null,
+      localStorageKey: null,
+      fileInputId: "file-upload-disposisi",
+      fileNameId: "file-name-disposisi",
+      checkBtnId: null,
+      urutInputId: null,
+      urutLabel: null,
+      checkUrl: null,
+      searchFormId: "searchFormDisposisi",
+      searchInputId: "searchInputDisposisi",
+      tableBodyId: "tableBodyDisposisi",
+      paginationContainerId: "paginationContainerDisposisi",
+      searchUrl: "/ajax-search-disposisi-sekwan",
+      updateTable: updateTableDisposisi,
     });
   }
 });
