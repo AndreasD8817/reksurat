@@ -3,7 +3,7 @@
 
 // Jika sudah login, langsung arahkan ke dashboard
 if (isLoggedIn()) {
-    header('Location: /surat-keluar');
+    header('Location: /dashboard');
     exit;
 }
 
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_nama'] = $user['nama'];
         $_SESSION['user_role'] = $user['role'];
-        header('Location: /surat-keluar'); // Arahkan ke halaman surat keluar
+        header('Location: /dashboard'); // Arahkan ke halaman surat keluar
         exit;
     } else {
         // ---- PERUBAHAN 3: Memperbarui pesan error ----

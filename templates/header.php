@@ -96,6 +96,10 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
             <p class="text-sm text-indigo-100">Dashboard Penomoran</p>
         </div>
         <nav class="mt-6">
+            
+            <a href="/dashboard" class="block py-3 px-5 mx-2 rounded-lg transition-all duration-200 <?php echo ($_GET['page'] ?? '') === 'dashboard' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                <i class="fas fa-tachometer-alt mr-3"></i> Dashboard
+            </a>
             <div class="px-5 mb-2">
                 <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Sekretariat</p>
             </div>
@@ -107,7 +111,7 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
             </a>
             <!-- MENU BARU DITAMBAHKAN DI SINI -->
             <a href="/disposisi-sekwan" class="block py-3 px-5 mx-2 rounded-lg transition-all duration-200 <?php echo ($_GET['page'] ?? '') === 'disposisi-sekwan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
-                <i class="fas fa-share-square mr-3"></i> Disposisi Sekwan
+                <i class="fas fa-share-square mr-3"></i> Disposisi Setwan
             </a>
 
             <div class="px-5 mt-6 mb-2">
