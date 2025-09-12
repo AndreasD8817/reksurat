@@ -6,14 +6,12 @@ import {
   updateTableSuratKeluarDewan,
   updateTableSuratMasuk,
   updateTableSuratMasukDewan,
-  updateTableDisposisi, // <- Impor fungsi baru
+  updateTableDisposisi,
   confirmDelete,
 } from "./modules/ui.js";
 
-// Membuat fungsi confirmDelete bisa diakses secara global (dari atribut onclick di HTML)
 window.confirmDelete = confirmDelete;
 
-// Event listener utama yang berjalan setelah semua elemen HTML dimuat
 document.addEventListener("DOMContentLoaded", () => {
   // Inisialisasi Sidebar Mobile
   const menuToggle = document.getElementById("menu-toggle");
@@ -30,10 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Inisialisasi semua fungsionalitas modal
   initModal();
 
-  // Inisialisasi fungsionalitas spesifik berdasarkan halaman yang aktif
+  // Inisialisasi Fungsionalitas Halaman
   if (document.getElementById("form-keluar-container")) {
     setupPageFunctionality({
       toggleBtnId: "toggle-form-btn",
@@ -118,13 +115,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // **BARU**: Inisialisasi untuk halaman Disposisi Sekwan
+  // **PERUBAHAN DI SINI**: Inisialisasi untuk halaman Disposisi Sekwan
   if (document.getElementById("searchFormDisposisi")) {
     setupPageFunctionality({
-      toggleBtnId: null,
-      formBodyId: null,
-      listContainerId: null,
-      localStorageKey: null,
+      // Konfigurasi untuk fitur minimize
+      toggleBtnId: "toggle-form-disposisi-btn",
+      formBodyId: "form-disposisi-body",
+      listContainerId: "list-disposisi-container",
+      localStorageKey: "formDisposisiMinimized",
+
+      // Konfigurasi lainnya
       fileInputId: "file-upload-disposisi",
       fileNameId: "file-name-disposisi",
       checkBtnId: null,
