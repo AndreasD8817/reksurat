@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: "nomor_urut_keluar",
       urutLabel: "No. Urut",
       checkUrl: "/ajax-check-nomor-keluar",
+      dateInputName: "tanggal_surat", // MODIFIKASI: Tambahkan nama input tanggal
       searchFormId: "searchFormKeluar",
       searchInputId: "searchInputKeluar",
       tableBodyId: "tableBodyKeluar",
@@ -64,6 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: "agenda_urut",
       urutLabel: "No. Urut Agenda",
       checkUrl: "/ajax-check-nomor",
+      dateInputName: "tanggal_diterima", // MODIFIKASI: Tambahkan nama input tanggal
       searchFormId: "searchFormMasuk",
       searchInputId: "searchInputMasuk",
       tableBodyId: "tableBodyMasuk",
@@ -85,6 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: "nomor_urut_keluar_dewan",
       urutLabel: "No. Urut",
       checkUrl: "/ajax-check-nomor-keluar-dewan",
+      dateInputName: "tanggal_surat", // MODIFIKASI: Tambahkan nama input tanggal
       searchFormId: "searchFormKeluarDewan",
       searchInputId: "searchInputKeluarDewan",
       tableBodyId: "tableBodyKeluarDewan",
@@ -106,6 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: "agenda_urut_dewan",
       urutLabel: "No. Urut Agenda",
       checkUrl: "/ajax-check-nomor-agenda-dewan",
+      dateInputName: "tanggal_diterima", // MODIFIKASI: Tambahkan nama input tanggal
       searchFormId: "searchFormMasukDewan",
       searchInputId: "searchInputMasukDewan",
       tableBodyId: "tableBodyMasukDewan",
@@ -115,22 +119,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // **PERUBAHAN DI SINI**: Inisialisasi untuk halaman Disposisi Sekwan
+  // Inisialisasi untuk halaman Disposisi Sekwan
   if (document.getElementById("searchFormDisposisi")) {
     setupPageFunctionality({
-      // Konfigurasi untuk fitur minimize
       toggleBtnId: "toggle-form-disposisi-btn",
       formBodyId: "form-disposisi-body",
       listContainerId: "list-disposisi-container",
       localStorageKey: "formDisposisiMinimized",
-
-      // Konfigurasi lainnya
       fileInputId: "file-upload-disposisi",
       fileNameId: "file-name-disposisi",
       checkBtnId: null,
       urutInputId: null,
       urutLabel: null,
       checkUrl: null,
+      dateInputName: null, // Tidak ada pengecekan nomor di halaman ini
       searchFormId: "searchFormDisposisi",
       searchInputId: "searchInputDisposisi",
       tableBodyId: "tableBodyDisposisi",

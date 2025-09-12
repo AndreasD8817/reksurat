@@ -33,19 +33,25 @@ function handleFileUpload($fileInputName, $subDirectory) {
 // Logika untuk menyimpan surat baru
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat'])) {
     $nomor_urut = $_POST['nomor_urut'];
-    // UBAH: Cek nomor urut ke tabel surat_keluar_dewan
-    $stmt_check = $pdo->prepare("SELECT COUNT(id) FROM surat_keluar_dewan WHERE nomor_urut = ?");
-    $stmt_check->execute([$nomor_urut]);
+    
+    // --- MODIFIKASI DIMULAI ---
+    // Ambil tahun dari tanggal surat untuk pengecekan
+    $tgl_surat = $_POST['tanggal_surat'];
+    $tahun_cek = date('Y', strtotime($tgl_surat));
+
+    // Cek nomor urut ke tabel surat_keluar_dewan pada TAHUN YANG SAMA
+    $stmt_check = $pdo->prepare("SELECT COUNT(id) FROM surat_keluar_dewan WHERE nomor_urut = ? AND YEAR(tanggal_surat) = ?");
+    $stmt_check->execute([$nomor_urut, $tahun_cek]);
+    // --- MODIFIKASI SELESAI ---
+
     $is_exists = $stmt_check->fetchColumn() > 0;
 
     if ($is_exists) {
-        $_SESSION['error_message'] = "Nomor Urut '{$nomor_urut}' sudah terdaftar.";
+        $_SESSION['error_message'] = "Nomor Urut '{$nomor_urut}' untuk tahun {$tahun_cek} sudah terdaftar.";
     } else {
-        // UBAH: Simpan file ke sub-direktori surat_keluar_dewan
         $fileLampiran = handleFileUpload('file_lampiran', 'surat_keluar_dewan');
         if (!isset($_SESSION['error_message'])) {
             $kode_klas = $_POST['kode_klasifikasi'];
-            $tgl_surat = $_POST['tanggal_surat'];
             $tujuan = $_POST['tujuan'];
             $sifat_surat = $_POST['sifat_surat'] ?? 'Biasa';
             $perihal = $_POST['perihal'];
@@ -53,11 +59,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat'])) {
             $konseptor = $_POST['konseptor'];
             $keterangan = $_POST['keterangan'];
 
-            $tahun = date('Y', strtotime($tgl_surat));
-            // UBAH: Format penomoran dewan mungkin berbeda, untuk saat ini kita samakan dulu
-            $nomor_lengkap = sprintf("%s/%s/436.5/%s", $kode_klas, $nomor_urut, $tahun);
+            $tahun_nomor = date('Y', strtotime($tgl_surat));
+            $nomor_lengkap = sprintf("%s/%s/436.5/%s", $kode_klas, $nomor_urut, $tahun_nomor);
             
-            // UBAH: Insert data ke tabel surat_keluar_dewan
             $stmt = $pdo->prepare("INSERT INTO surat_keluar_dewan (kode_klasifikasi, nomor_urut, nomor_surat_lengkap, tanggal_surat, tujuan, sifat_surat, perihal, hub_surat_no, konseptor, keterangan, file_lampiran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$kode_klas, $nomor_urut, $nomor_lengkap, $tgl_surat, $tujuan, $sifat_surat, $perihal, $hub_surat, $konseptor, $keterangan, $fileLampiran]);
             
@@ -65,25 +69,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat'])) {
         }
     }
     
-    // UBAH: Redirect ke halaman surat-keluar-dewan
     header("Location: /surat-keluar-dewan");
     exit;
 }
 
 // Logika untuk menampilkan data awal di tabel
 $limit = 10;
-// UBAH: Ambil data dari tabel surat_keluar_dewan
 $stmt_data = $pdo->prepare("SELECT *, DATE_FORMAT(tanggal_surat, '%d-%m-%Y') as tgl_formatted FROM surat_keluar_dewan ORDER BY id DESC LIMIT ?");
 $stmt_data->bindValue(1, $limit, PDO::PARAM_INT);
 $stmt_data->execute();
 $surat_keluar_list = $stmt_data->fetchAll(PDO::FETCH_ASSOC);
 
-// UBAH: Hitung total record dari tabel surat_keluar_dewan
 $stmt_count = $pdo->query("SELECT COUNT(id) FROM surat_keluar_dewan");
 $total_records = $stmt_count->fetchColumn();
 $total_pages = ceil($total_records / $limit);
 
-// UBAH: Set judul halaman
 $pageTitle = 'Surat Keluar Dewan';
 require_once 'templates/header.php';
 ?>

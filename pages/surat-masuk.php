@@ -32,12 +32,20 @@ function handleFileUpload($fileInputName, $subDirectory) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat_masuk'])) {
     $agenda_urut = $_POST['agenda_urut'];
     
-    $stmt_check = $pdo->prepare("SELECT COUNT(id) FROM surat_masuk WHERE agenda_urut = ?");
-    $stmt_check->execute([$agenda_urut]);
+    // --- MODIFIKASI DIMULAI ---
+    // Ambil tahun dari tanggal diterima untuk pengecekan
+    $tgl_diterima = $_POST['tanggal_diterima'];
+    $tahun_cek = date('Y', strtotime($tgl_diterima));
+
+    // Cek apakah nomor urut agenda sudah ada di TAHUN YANG SAMA
+    $stmt_check = $pdo->prepare("SELECT COUNT(id) FROM surat_masuk WHERE agenda_urut = ? AND YEAR(tanggal_diterima) = ?");
+    $stmt_check->execute([$agenda_urut, $tahun_cek]);
+    // --- MODIFIKASI SELESAI ---
+    
     $is_exists = $stmt_check->fetchColumn() > 0;
 
     if ($is_exists) {
-        $_SESSION['error_message'] = "Nomor Urut Agenda '{$agenda_urut}' sudah terdaftar.";
+        $_SESSION['error_message'] = "Nomor Urut Agenda '{$agenda_urut}' untuk tahun {$tahun_cek} sudah terdaftar.";
     } else {
         $fileLampiran = handleFileUpload('file_lampiran', 'surat_masuk'); 
         
@@ -45,17 +53,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat_masuk'])
             $agenda_klas = $_POST['agenda_klasifikasi'];
             $nomor_surat_lengkap = $_POST['nomor_surat_lengkap'];
             $asal_surat = $_POST['asal_surat'];
-            // --- PERUBAHAN 1: Mengambil data sifat_surat dari form ---
             $sifat_surat = $_POST['sifat_surat'] ?? 'Biasa'; 
             $perihal = $_POST['perihal'];
             $keterangan = $_POST['keterangan'];
             $tgl_surat = $_POST['tanggal_surat'];
-            $tgl_diterima = $_POST['tanggal_diterima'];
             
-            $tahun = date('Y', strtotime($tgl_diterima));
-            $nomor_agenda_lengkap = sprintf("%s/%s/436.5/%s", $agenda_klas, $agenda_urut, $tahun);
+            // Tahun untuk penomoran tetap sama
+            $tahun_nomor = date('Y', strtotime($tgl_diterima));
+            $nomor_agenda_lengkap = sprintf("%s/%s/436.5/%s", $agenda_klas, $agenda_urut, $tahun_nomor);
     
-            // --- PERUBAHAN 2: Menambahkan 'sifat_surat' ke dalam query INSERT ---
             $stmt = $pdo->prepare(
                 "INSERT INTO surat_masuk (agenda_klasifikasi, agenda_urut, nomor_agenda_lengkap, nomor_surat_lengkap, tanggal_surat, tanggal_diterima, asal_surat, sifat_surat, perihal, keterangan, file_lampiran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );

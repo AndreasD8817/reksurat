@@ -31,17 +31,24 @@ function handleFileUpload($fileInputName, $subDirectory) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat'])) {
     $nomor_urut = $_POST['nomor_urut'];
-    $stmt_check = $pdo->prepare("SELECT COUNT(id) FROM surat_keluar WHERE nomor_urut = ?");
-    $stmt_check->execute([$nomor_urut]);
+    // --- MODIFIKASI DIMULAI ---
+    // Ambil tahun dari tanggal surat untuk pengecekan
+    $tgl_surat = $_POST['tanggal_surat'];
+    $tahun_cek = date('Y', strtotime($tgl_surat));
+
+    // Cek apakah nomor urut sudah ada di TAHUN YANG SAMA
+    $stmt_check = $pdo->prepare("SELECT COUNT(id) FROM surat_keluar WHERE nomor_urut = ? AND YEAR(tanggal_surat) = ?");
+    $stmt_check->execute([$nomor_urut, $tahun_cek]);
+    // --- MODIFIKASI SELESAI ---
+    
     $is_exists = $stmt_check->fetchColumn() > 0;
 
     if ($is_exists) {
-        $_SESSION['error_message'] = "Nomor Urut '{$nomor_urut}' sudah terdaftar.";
+        $_SESSION['error_message'] = "Nomor Urut '{$nomor_urut}' untuk tahun {$tahun_cek} sudah terdaftar.";
     } else {
         $fileLampiran = handleFileUpload('file_lampiran', 'surat_keluar');
         if (!isset($_SESSION['error_message'])) {
             $kode_klas = $_POST['kode_klasifikasi'];
-            $tgl_surat = $_POST['tanggal_surat'];
             $tujuan = $_POST['tujuan'];
             $sifat_surat = $_POST['sifat_surat'] ?? 'Biasa';
             $perihal = $_POST['perihal'];
@@ -49,8 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat'])) {
             $konseptor = $_POST['konseptor'];
             $keterangan = $_POST['keterangan'];
 
-            $tahun = date('Y', strtotime($tgl_surat));
-            $nomor_lengkap = sprintf("%s/%s/436.5/%s", $kode_klas, $nomor_urut, $tahun);
+            // Tahun untuk penomoran tetap sama
+            $tahun_nomor = date('Y', strtotime($tgl_surat));
+            $nomor_lengkap = sprintf("%s/%s/436.5/%s", $kode_klas, $nomor_urut, $tahun_nomor);
             
             $stmt = $pdo->prepare("INSERT INTO surat_keluar (kode_klasifikasi, nomor_urut, nomor_surat_lengkap, tanggal_surat, tujuan, sifat_surat, perihal, hub_surat_no, konseptor, keterangan, file_lampiran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$kode_klas, $nomor_urut, $nomor_lengkap, $tgl_surat, $tujuan, $sifat_surat, $perihal, $hub_surat, $konseptor, $keterangan, $fileLampiran]);

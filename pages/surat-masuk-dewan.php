@@ -31,12 +31,20 @@ function handleFileUpload($fileInputName, $subDirectory) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat_masuk_dewan'])) {
     $agenda_urut = $_POST['agenda_urut'];
 
-    $stmt_check = $pdo->prepare("SELECT COUNT(id) FROM surat_masuk_dewan WHERE agenda_urut = ?");
-    $stmt_check->execute([$agenda_urut]);
+    // --- MODIFIKASI DIMULAI ---
+    // Ambil tahun dari tanggal diterima untuk pengecekan
+    $tgl_diterima = $_POST['tanggal_diterima'];
+    $tahun_cek = date('Y', strtotime($tgl_diterima));
+
+    // Cek apakah nomor urut agenda sudah ada di TAHUN YANG SAMA
+    $stmt_check = $pdo->prepare("SELECT COUNT(id) FROM surat_masuk_dewan WHERE agenda_urut = ? AND YEAR(tanggal_diterima) = ?");
+    $stmt_check->execute([$agenda_urut, $tahun_cek]);
+    // --- MODIFIKASI SELESAI ---
+
     $is_exists = $stmt_check->fetchColumn() > 0;
 
     if ($is_exists) {
-        $_SESSION['error_message'] = "Nomor Urut Agenda '{$agenda_urut}' sudah terdaftar.";
+        $_SESSION['error_message'] = "Nomor Urut Agenda '{$agenda_urut}' untuk tahun {$tahun_cek} sudah terdaftar.";
     } else {
         $fileLampiran = handleFileUpload('file_lampiran', 'surat_masuk_dewan');
 
@@ -46,16 +54,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat_masuk_de
             $asal_surat = $_POST['asal_surat'];
             $sifat_surat = $_POST['sifat_surat'] ?? 'Biasa';
             $perihal = $_POST['perihal'];
-            // TAMBAHKAN: Ambil data dari input baru
             $diteruskan_kepada = $_POST['diteruskan_kepada'];
             $keterangan = $_POST['keterangan'];
             $tgl_surat = $_POST['tanggal_surat'];
-            $tgl_diterima = $_POST['tanggal_diterima'];
 
-            $tahun = date('Y', strtotime($tgl_diterima));
-            $nomor_agenda_lengkap = sprintf("%s/%s/436.5/%s", $agenda_klas, $agenda_urut, $tahun);
+            $tahun_nomor = date('Y', strtotime($tgl_diterima));
+            $nomor_agenda_lengkap = sprintf("%s/%s/436.5/%s", $agenda_klas, $agenda_urut, $tahun_nomor);
 
-            // MODIFIKASI: Tambahkan kolom `diteruskan_kepada` ke query INSERT
             $stmt = $pdo->prepare(
                 "INSERT INTO surat_masuk_dewan (agenda_klasifikasi, agenda_urut, nomor_agenda_lengkap, nomor_surat_lengkap, tanggal_surat, tanggal_diterima, asal_surat, sifat_surat, perihal, diteruskan_kepada, keterangan, file_lampiran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
@@ -136,12 +141,10 @@ require_once 'templates/header.php';
                 <textarea name="perihal" class="w-full px-4 py-3 rounded-xl border border-gray-300 h-24" required></textarea>
             </div>
             
-            <!-- ===== TAMBAHKAN INPUT BARU DI SINI ===== -->
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Diteruskan Kepada</label>
                 <input type="text" name="diteruskan_kepada" class="w-full px-4 py-3 rounded-xl border border-gray-300" placeholder="Contoh: Ketua Komisi A, Fraksi PDI Perjuangan, dll.">
             </div>
-            <!-- ======================================= -->
 
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Keterangan</label>
