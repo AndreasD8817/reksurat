@@ -1,0 +1,140 @@
+// assets/js/modules/page.js
+import { updatePagination } from "./ui.js";
+
+/**
+ * Mengatur semua fungsionalitas interaktif untuk sebuah halaman (form, pencarian, dll).
+ * @param {object} config Objek konfigurasi berisi ID elemen dan URL.
+ */
+export function setupPageFunctionality(config) {
+  const toggleBtn = document.getElementById(config.toggleBtnId);
+  const formBody = document.getElementById(config.formBodyId);
+  const listContainer = document.getElementById(config.listContainerId);
+
+  // Logika untuk minimize/expand form
+  if (toggleBtn && formBody && listContainer) {
+    const icon = toggleBtn.querySelector("i");
+    const applyState = (isMinimized) => {
+      if (isMinimized) {
+        formBody.style.maxHeight = "0";
+        formBody.style.opacity = "0";
+        formBody.style.overflow = "hidden";
+        formBody.style.paddingTop = "0";
+        formBody.style.paddingBottom = "0";
+        formBody.style.marginTop = "0";
+        listContainer.style.marginTop = "-1rem";
+        icon.classList.replace("fa-chevron-up", "fa-chevron-down");
+        localStorage.setItem(config.localStorageKey, "true");
+      } else {
+        formBody.style.maxHeight = "1500px";
+        formBody.style.opacity = "1";
+        formBody.style.overflow = "visible";
+        formBody.style.paddingTop = "";
+        formBody.style.paddingBottom = "";
+        formBody.style.marginTop = "";
+        listContainer.style.marginTop = "2rem";
+        icon.classList.replace("fa-chevron-down", "fa-chevron-up");
+        localStorage.setItem(config.localStorageKey, "false");
+      }
+    };
+    toggleBtn.addEventListener("click", () =>
+      applyState(localStorage.getItem(config.localStorageKey) !== "true")
+    );
+    applyState(localStorage.getItem(config.localStorageKey) === "true");
+  }
+
+  // Logika untuk menampilkan nama file yang di-upload
+  const fileInput = document.getElementById(config.fileInputId);
+  if (fileInput) {
+    fileInput.addEventListener("change", (e) => {
+      const fileName = e.target.files[0]
+        ? e.target.files[0].name
+        : "Belum ada file dipilih";
+      document.getElementById(config.fileNameId).textContent = fileName;
+    });
+  }
+
+  // Logika untuk tombol cek ketersediaan nomor
+  const checkBtn = document.getElementById(config.checkBtnId);
+  if (checkBtn) {
+    checkBtn.addEventListener("click", () => {
+      const urut = document.getElementById(config.urutInputId).value.trim();
+      if (!urut) {
+        Swal.fire({
+          icon: "error",
+          title: "Input Kosong",
+          text: `Isi "${config.urutLabel}" yang ingin dicek.`,
+        });
+        return;
+      }
+      fetch(config.checkUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `nomor_urut=${encodeURIComponent(urut)}`,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.exists) {
+            Swal.fire({
+              icon: "warning",
+              title: "Nomor Urut Sudah Ada!",
+              html: `${config.urutLabel} <strong>${data.nomor}</strong> sudah terdaftar.`,
+            });
+          } else {
+            Swal.fire({
+              icon: "success",
+              title: "Nomor Urut Tersedia!",
+              html: `${config.urutLabel} <strong>${data.nomor}</strong> dapat digunakan.`,
+            });
+          }
+        })
+        .catch(() =>
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Gagal mengecek nomor urut.",
+          })
+        );
+    });
+  }
+
+  // Logika untuk pencarian data
+  const searchForm = document.getElementById(config.searchFormId);
+  if (searchForm) {
+    const searchInput = document.getElementById(config.searchInputId);
+    const tableBody = document.getElementById(config.tableBodyId);
+    let debounceTimer;
+
+    const fetchData = (page = 1) => {
+      const query = searchInput.value;
+      const url = `${config.searchUrl}?search=${encodeURIComponent(
+        query
+      )}&p=${page}`;
+      tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8"><i class="fas fa-spinner fa-spin text-primary text-3xl"></i></td></tr>`;
+
+      const paginationContainer = document.getElementById(
+        config.paginationContainerId
+      );
+      if (paginationContainer) paginationContainer.innerHTML = "";
+
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          config.updateTable(data.surat_list);
+          updatePagination(data.pagination, config.searchFormId);
+        })
+        .catch(() => {
+          tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-red-500">Gagal memuat data.</td></tr>`;
+        });
+    };
+
+    searchForm.fetchData = fetchData;
+    searchInput.addEventListener("input", () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => fetchData(1), 300);
+    });
+    searchForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      fetchData(1);
+    });
+  }
+}
