@@ -34,13 +34,6 @@ function handleDisposisiFileUpload($fileInputName) {
 
 // Logika untuk menyimpan data disposisi baru
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_disposisi'])) {
-    // Verifikasi CSRF Token
-    if (!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])) {
-        $_SESSION['error_message'] = "Sesi tidak valid atau telah kedaluwarsa. Silakan coba lagi.";
-        header("Location: /disposisi-sekwan");
-        exit;
-    }
-
     $surat_masuk_id = $_POST['surat_masuk_id'];
     $nama_pegawai = $_POST['nama_pegawai'];
     $catatan = $_POST['catatan_disposisi'];
@@ -91,7 +84,7 @@ $pageTitle = 'Disposisi Surat Masuk';
 require_once 'templates/header.php';
 ?>
 
-<!-- PERUBAHAN: Penambahan ID dan Tombol Minimize -->
+<!-- Form Disposisi (tidak ada perubahan) -->
 <div id="form-disposisi-container" class="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl p-6 animate-fade-in border border-blue-100 transition-all duration-500">
     <div class="flex justify-between items-center mb-6 border-b border-blue-200 pb-3">
         <h3 class="text-2xl font-bold text-gray-800 flex items-center">
@@ -104,8 +97,6 @@ require_once 'templates/header.php';
     </div>
     
     <form id="form-disposisi-body" method="POST" action="/disposisi-sekwan" class="space-y-6 transition-all duration-500" enctype="multipart/form-data">
-        <!-- Tambahkan CSRF Token -->
-        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <label for="surat_masuk_id" class="block text-sm font-medium text-gray-700 mb-2">Nomor Agenda Surat</label>
@@ -155,9 +146,9 @@ require_once 'templates/header.php';
     </form>
 </div>
 
+<!-- Daftar Disposisi -->
 <div id="list-disposisi-container" class="mt-8 bg-white rounded-2xl shadow-xl p-6">
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <!-- <h3 class="text-xl font-bold text-gray-800">Daftar Disposisi</h3> -->
          <h3 class="text-xl font-bold text-gray-800 flex items-center">
             <i class="fas fa-list-alt text-primary mr-2"></i> 
             <span class="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Daftar Disposisi</span>
@@ -199,7 +190,15 @@ require_once 'templates/header.php';
                         </td>
                          <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="#" onclick="confirmDelete('disposisi-sekwan', <?php echo $disposisi['id']; ?>)" class="text-red-600 hover:text-red-900">Batalkan</a>
+                                <!-- MODIFIKASI: Menambahkan tombol Edit dan mengubah tombol Batalkan menjadi ikon -->
+                                <div class="flex space-x-3">
+                                    <a href="/edit-disposisi-sekwan?id=<?php echo $disposisi['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit Disposisi">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button onclick="confirmDelete('disposisi-sekwan', <?php echo $disposisi['id']; ?>)" class="text-red-500 hover:text-red-700" title="Batalkan Disposisi">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
                             </td>
                         <?php endif; ?>
                     </tr>

@@ -91,9 +91,9 @@ function getActionButtons(type, id) {
   if (!isAdmin) return "";
   return `
     <td class="px-6 py-4">
-        <div class="flex space-x-2">
+        <div class="flex space-x-3">
             <a href="/edit-surat-${type}?id=${id}" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
-            <button onclick="window.confirmDelete('${type}', ${id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+            <button onclick="window.confirmDelete('${type}', ${id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash-alt"></i></button>
         </div>
     </td>`;
 }
@@ -192,7 +192,7 @@ function getSuratMasukDewanRowHTML(surat) {
     </tr>`;
 }
 
-// **BARU**: Untuk tabel disposisi
+// **MODIFIKASI**: Memperbarui render baris tabel disposisi
 export function updateTableDisposisi(disposisiList) {
   const tableBody = document.getElementById("tableBodyDisposisi");
   renderTableRows(tableBody, disposisiList, getDisposisiRowHTML);
@@ -201,11 +201,19 @@ function getDisposisiRowHTML(disposisi) {
   const lampiranHtml = disposisi.file_lampiran
     ? `<a href="/uploads/disposisi_sekwan/${disposisi.file_lampiran}" target="_blank" class="text-indigo-600 hover:text-indigo-900">Lihat File</a>`
     : "-";
-  let actionButton = "";
+  let actionButtons = "";
   if (isAdmin) {
-    actionButton = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button onclick="window.confirmDelete('disposisi-sekwan', ${disposisi.id})" class="text-red-600 hover:text-red-900">Batalkan</button>
-                      </td>`;
+    actionButtons = `
+      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          <div class="flex space-x-3">
+              <a href="/edit-disposisi-sekwan?id=${disposisi.id}" class="text-blue-500 hover:text-blue-700" title="Edit Disposisi">
+                  <i class="fas fa-edit"></i>
+              </a>
+              <button onclick="window.confirmDelete('disposisi-sekwan', ${disposisi.id})" class="text-red-500 hover:text-red-700" title="Batalkan Disposisi">
+                  <i class="fas fa-trash-alt"></i>
+              </button>
+          </div>
+      </td>`;
   }
 
   return `<tr class="hover:bg-gray-50">
@@ -220,13 +228,12 @@ function getDisposisiRowHTML(disposisi) {
           disposisi.tgl_disposisi_formatted
         )}</td>
         <td class="px-6 py-4 whitespace-nowrap">${lampiranHtml}</td>
-        ${actionButton}
+        ${actionButtons}
     </tr>`;
 }
 
-// --- FUNGSI RENDER DETAIL MODAL ---
+// --- FUNGSI RENDER DETAIL MODAL (Tidak ada perubahan) ---
 export function getSuratMasukDetailHTML(data, lampiranLink) {
-  // ... (kode ini tidak berubah)
   const diteruskanHtml = data.diteruskan_kepada
     ? `<div class="col-span-1 text-gray-500 self-start">Diteruskan Kepada</div><div class="col-span-2 text-gray-700 self-start">: ${escapeHTML(
         data.diteruskan_kepada
@@ -267,7 +274,6 @@ export function getSuratMasukDetailHTML(data, lampiranLink) {
     </div>`;
 }
 export function getSuratKeluarDetailHTML(data, lampiranLink) {
-  // ... (kode ini tidak berubah)
   return `<div class="grid grid-cols-3 gap-x-6 gap-y-4 text-sm">
           <div class="col-span-1 text-gray-500">No. Surat</div><div class="col-span-2 font-semibold text-gray-800">: ${escapeHTML(
             data.nomor_surat_lengkap
