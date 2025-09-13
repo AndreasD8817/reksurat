@@ -18,11 +18,47 @@ $stmt = $pdo->prepare(
 $stmt->execute();
 $surat_belum_disposisi = $stmt->fetchColumn();
 
+// Ambil data untuk line chart dari database
+$bulan_terakhir = 6; // Jumlah bulan terakhir yang ingin ditampilkan
+$line_chart_labels = [];
+$line_chart_masuk = [];
+$line_chart_keluar = [];
 
-// Data untuk 6 bulan terakhir (contoh statis)
-$line_chart_labels = json_encode(['Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep']);
-$line_chart_masuk = json_encode([210, 225, 240, 230, 250, 248]);
-$line_chart_keluar = json_encode([180, 175, 190, 185, 195, 192]);
+$current_month = date('n'); // Ambil bulan saat ini (angka)
+$current_year = date('Y');  // Ambil tahun saat ini
+
+for ($i = $bulan_terakhir - 1; $i >= 0; $i--) {
+    $month = $current_month - $i;
+    $year = $current_year;
+
+    // Jika bulan kurang dari 1, sesuaikan tahun dan bulan
+    if ($month < 1) {
+        $month += 12;
+        $year--;
+    }
+
+    $line_chart_labels[] = date('M', mktime(0, 0, 0, $month, 1, $year)); // Format nama bulan
+
+    // Query untuk surat masuk
+    $stmt = $pdo->prepare("SELECT COUNT(id) FROM surat_masuk WHERE MONTH(tanggal_diterima) = ? AND YEAR(tanggal_diterima) = ?");
+    $stmt->execute([$month, $year]);
+    $line_chart_masuk[] = (int)$stmt->fetchColumn();
+
+    // Query untuk surat keluar
+    $stmt = $pdo->prepare("SELECT COUNT(id) FROM surat_keluar WHERE MONTH(tanggal_surat) = ? AND YEAR(tanggal_surat) = ?");
+    $stmt->execute([$month, $year]);
+    $line_chart_keluar[] = (int)$stmt->fetchColumn();
+}
+
+// Balik array agar urutan bulan sesuai
+$line_chart_labels = array_reverse($line_chart_labels);
+$line_chart_masuk = array_reverse($line_chart_masuk);
+$line_chart_keluar = array_reverse($line_chart_keluar);
+
+// Encode ke JSON
+$line_chart_labels = json_encode($line_chart_labels);
+$line_chart_masuk = json_encode($line_chart_masuk);
+$line_chart_keluar = json_encode($line_chart_keluar);
 
 
 $pageTitle = 'Dashboard';
