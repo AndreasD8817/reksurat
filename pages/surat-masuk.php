@@ -31,21 +31,16 @@ function handleFileUpload($fileInputName, $subDirectory) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat_masuk'])) {
     $agenda_urut = $_POST['agenda_urut'];
+    // Ambil tahun dari dropdown
+    $tahun = $_POST['tahun_penomoran'];
     
-    // --- MODIFIKASI DIMULAI ---
-    // Ambil tahun dari tanggal diterima untuk pengecekan
-    $tgl_diterima = $_POST['tanggal_diterima'];
-    $tahun_cek = date('Y', strtotime($tgl_diterima));
-
-    // Cek apakah nomor urut agenda sudah ada di TAHUN YANG SAMA
+    // Cek duplikasi nomor agenda berdasarkan tahun
     $stmt_check = $pdo->prepare("SELECT COUNT(id) FROM surat_masuk WHERE agenda_urut = ? AND YEAR(tanggal_diterima) = ?");
-    $stmt_check->execute([$agenda_urut, $tahun_cek]);
-    // --- MODIFIKASI SELESAI ---
-    
+    $stmt_check->execute([$agenda_urut, $tahun]);
     $is_exists = $stmt_check->fetchColumn() > 0;
 
     if ($is_exists) {
-        $_SESSION['error_message'] = "Nomor Urut Agenda '{$agenda_urut}' untuk tahun {$tahun_cek} sudah terdaftar.";
+        $_SESSION['error_message'] = "Nomor Urut Agenda '{$agenda_urut}' untuk tahun {$tahun} sudah terdaftar.";
     } else {
         $fileLampiran = handleFileUpload('file_lampiran', 'surat_masuk'); 
         
@@ -57,10 +52,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat_masuk'])
             $perihal = $_POST['perihal'];
             $keterangan = $_POST['keterangan'];
             $tgl_surat = $_POST['tanggal_surat'];
+            $tgl_diterima = $_POST['tanggal_diterima'];
             
-            // Tahun untuk penomoran tetap sama
-            $tahun_nomor = date('Y', strtotime($tgl_diterima));
-            $nomor_agenda_lengkap = sprintf("%s/%s/436.5/%s", $agenda_klas, $agenda_urut, $tahun_nomor);
+            // Gunakan tahun dari dropdown untuk nomor agenda
+            $nomor_agenda_lengkap = sprintf("%s/%s/436.5/%s", $agenda_klas, $agenda_urut, $tahun);
     
             $stmt = $pdo->prepare(
                 "INSERT INTO surat_masuk (agenda_klasifikasi, agenda_urut, nomor_agenda_lengkap, nomor_surat_lengkap, tanggal_surat, tanggal_diterima, asal_surat, sifat_surat, perihal, keterangan, file_lampiran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
@@ -104,12 +99,19 @@ require_once 'templates/header.php';
     <form id="form-masuk-body" method="POST" action="/surat-masuk" enctype="multipart/form-data" class="space-y-6 transition-all duration-500">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Nomor Agenda</label>
+                <!-- MODIFIKASI: Mengubah label dan struktur input nomor -->
+                <label class="block text-sm font-medium text-gray-700 mb-2">Klasifikasi / No. Urut Agenda / Tahun</label>
                 <div class="flex items-center space-x-2">
-                    <input type="text" id="agenda_klasifikasi" name="agenda_klasifikasi" class="w-full px-4 py-3 rounded-xl border border-gray-300" placeholder="Klasifikasi">
+                    <input type="text" id="agenda_klasifikasi" name="agenda_klasifikasi" class="flex-1 px-4 py-3 rounded-xl border border-gray-300" placeholder="Klasifikasi">
                     <span class="text-gray-500 pt-2">/</span>
-                    <input type="text" id="agenda_urut" name="agenda_urut" class="w-full px-4 py-3 rounded-xl border border-gray-300" placeholder="No. Urut">
-                    <button type="button" id="checkAgendaBtn" class="px-4 py-3 bg-indigo-100 text-indigo-600 rounded-xl hover:bg-indigo-200" title="Cek ketersediaan No. Urut">
+                    <input type="text" id="agenda_urut" name="agenda_urut" class="w-24 px-4 py-3 rounded-xl border border-gray-300 text-center" placeholder="No. Urut">
+                    <span class="text-gray-500 pt-2">/</span>
+                    <!-- Dropdown Tahun -->
+                    <select name="tahun_penomoran" class="w-28 px-4 py-3 rounded-xl border border-gray-300 bg-white">
+                        <option value="2025" <?php echo (date('Y') == '2025') ? 'selected' : ''; ?>>2025</option>
+                        <option value="2026" <?php echo (date('Y') == '2026') ? 'selected' : ''; ?>>2026</option>
+                    </select>
+                    <button type="button" id="checkAgendaBtn" class="px-4 py-3 bg-indigo-100 text-indigo-600 rounded-xl hover:bg-indigo-200" title="Cek ketersediaan No. Urut Agenda">
                         <i class="fas fa-check"></i>
                     </button>
                 </div>
@@ -182,6 +184,7 @@ require_once 'templates/header.php';
     </form>
 </div>
 
+<!-- Bagian tabel daftar surat (tidak ada perubahan) -->
 <div id="list-masuk-container" class="mt-8 bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl p-6 animate-fade-in border border-blue-100 transition-all duration-500">
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <h3 class="text-xl font-bold text-gray-800 flex items-center">
@@ -254,3 +257,4 @@ require_once 'templates/header.php';
 </div>
 
 <?php require_once 'templates/footer.php'; ?>
+

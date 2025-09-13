@@ -1,6 +1,15 @@
 <?php
 // pages/dashboard.php
 
+function get_total_surat(PDO $pdo, string $table): int {
+    try {
+        $stmt = $pdo->query("SELECT COUNT(id) FROM $table");
+        return (int)$stmt->fetchColumn();
+    } catch (PDOException $e) {
+        error_log("Error getting total surat from $table: " . $e->getMessage());
+        return 0;
+    }
+}
 // Ambil data statistik untuk ditampilkan di kartu
 $total_surat_masuk = $pdo->query("SELECT COUNT(id) FROM surat_masuk")->fetchColumn();
 $total_surat_keluar = $pdo->query("SELECT COUNT(id) FROM surat_keluar")->fetchColumn();
@@ -12,7 +21,7 @@ $total_disposisi = $pdo->query("SELECT COUNT(id) FROM disposisi_sekwan")->fetchC
 $stmt = $pdo->prepare(
     "SELECT COUNT(sm.id)
      FROM surat_masuk sm
-     LEFT JOIN disposisi_sekwan ds ON sm.id = ds.surat_masuk_id
+     LEFT JOIN disposisi_sekwan ds ON sm.id = ds.surat_masuk_id 
      WHERE ds.id IS NULL"
 );
 $stmt->execute();
@@ -83,11 +92,11 @@ require_once 'templates/header.php';
         
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); 
         }
         
         .chart-container {
-            position: relative;
+            position: relative; 
             height: 300px;
             padding: 1rem;
         }
@@ -132,19 +141,19 @@ require_once 'templates/header.php';
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
             <div class="card p-6 text-center">
-                <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Masuk Setwan</h3>
+                <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Masuk Setwan</h3> 
                 <div class="stats-number"><?php echo $total_surat_masuk; ?></div>
             </div>
             <div class="card p-6 text-center">
-                <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Keluar Setwan</h3>
+                <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Keluar Setwan</h3> 
                 <div class="stats-number"><?php echo $total_surat_keluar; ?></div>
             </div>
             <div class="card p-6 text-center">
-                <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Masuk Dewan</h3>
+                <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Masuk Dewan</h3> 
                 <div class="stats-number"><?php echo $total_surat_masuk_dewan; ?></div>
             </div>
             <div class="card p-6 text-center">
-                <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Keluar Dewan</h3>
+                <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Keluar Dewan</h3> 
                 <div class="stats-number"><?php echo $total_surat_keluar_dewan; ?></div>
             </div>
             <div class="card p-6 text-center">
@@ -219,7 +228,7 @@ require_once 'templates/header.php';
                         label: 'Jumlah Surat',
                         data: [totalSuratMasuk, totalSuratKeluar, totalSuratMasukDewan, totalSuratKeluarDewan],
                         backgroundColor: ['#4f46e5', '#6366f1', '#f59e0b', '#10b981'],
-                        borderRadius: 5
+                        borderRadius: 5 
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
@@ -233,7 +242,7 @@ require_once 'templates/header.php';
                     labels: ['Surat Masuk Setwan', 'Surat Keluar Setwan', 'Surat Masuk Dewan', 'Surat Keluar Dewan'],
                     datasets: [{
                         data: [totalSuratMasuk, totalSuratKeluar, totalSuratMasukDewan, totalSuratKeluarDewan],
-                        backgroundColor: ['#4f46e5', '#6366f1', '#f59e0b', '#10b981']
+                        backgroundColor: ['#4f46e5', '#6366f1', '#f59e0b', '#10b981'] 
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
@@ -249,14 +258,14 @@ require_once 'templates/header.php';
                         {
                             label: 'Surat Masuk',
                             data: lineChartMasuk,
-                            borderColor: '#ef4444',
+                            borderColor: '#ef4444', 
                             backgroundColor: 'rgba(239, 68, 68, 0.1)',
                             tension: 0.4,
                             fill: true
                         },
                         {
                             label: 'Surat Keluar',
-                            data: lineChartKeluar,
+                            data: lineChartKeluar, 
                             borderColor: '#3b82f6',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
                             tension: 0.4,

@@ -6,7 +6,6 @@ function handleFileUpload($fileInputName, $subDirectory) {
     if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES[$fileInputName];
         $fileName = time() . '_' . basename($file['name']);
-        // UBAH: Sesuaikan sub-direktori untuk file dewan
         $mainUploadDir = realpath(dirname(__FILE__) . '/../uploads-dewan');
         $targetDir = $mainUploadDir . DIRECTORY_SEPARATOR . $subDirectory;
         if (!file_exists($targetDir)) {
@@ -33,25 +32,19 @@ function handleFileUpload($fileInputName, $subDirectory) {
 // Logika untuk menyimpan surat baru
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat'])) {
     $nomor_urut = $_POST['nomor_urut'];
+    $tahun = $_POST['tahun_penomoran'];
     
-    // --- MODIFIKASI DIMULAI ---
-    // Ambil tahun dari tanggal surat untuk pengecekan
-    $tgl_surat = $_POST['tanggal_surat'];
-    $tahun_cek = date('Y', strtotime($tgl_surat));
-
-    // Cek nomor urut ke tabel surat_keluar_dewan pada TAHUN YANG SAMA
     $stmt_check = $pdo->prepare("SELECT COUNT(id) FROM surat_keluar_dewan WHERE nomor_urut = ? AND YEAR(tanggal_surat) = ?");
-    $stmt_check->execute([$nomor_urut, $tahun_cek]);
-    // --- MODIFIKASI SELESAI ---
-
+    $stmt_check->execute([$nomor_urut, $tahun]);
     $is_exists = $stmt_check->fetchColumn() > 0;
 
     if ($is_exists) {
-        $_SESSION['error_message'] = "Nomor Urut '{$nomor_urut}' untuk tahun {$tahun_cek} sudah terdaftar.";
+        $_SESSION['error_message'] = "Nomor Urut '{$nomor_urut}' untuk tahun {$tahun} sudah terdaftar.";
     } else {
         $fileLampiran = handleFileUpload('file_lampiran', 'surat_keluar_dewan');
         if (!isset($_SESSION['error_message'])) {
             $kode_klas = $_POST['kode_klasifikasi'];
+            $tgl_surat = $_POST['tanggal_surat'];
             $tujuan = $_POST['tujuan'];
             $sifat_surat = $_POST['sifat_surat'] ?? 'Biasa';
             $perihal = $_POST['perihal'];
@@ -59,8 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat'])) {
             $konseptor = $_POST['konseptor'];
             $keterangan = $_POST['keterangan'];
 
-            $tahun_nomor = date('Y', strtotime($tgl_surat));
-            $nomor_lengkap = sprintf("%s/%s/436.5/%s", $kode_klas, $nomor_urut, $tahun_nomor);
+            $nomor_lengkap = sprintf("%s/%s/436.5/%s", $kode_klas, $nomor_urut, $tahun);
             
             $stmt = $pdo->prepare("INSERT INTO surat_keluar_dewan (kode_klasifikasi, nomor_urut, nomor_surat_lengkap, tanggal_surat, tujuan, sifat_surat, perihal, hub_surat_no, konseptor, keterangan, file_lampiran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$kode_klas, $nomor_urut, $nomor_lengkap, $tgl_surat, $tujuan, $sifat_surat, $perihal, $hub_surat, $konseptor, $keterangan, $fileLampiran]);
@@ -103,11 +95,18 @@ require_once 'templates/header.php';
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Kode Klasifikasi & No. Urut</label>
+                    <!-- MODIFIKASI: Mengubah label dan struktur input nomor -->
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Klasifikasi / Nomor Urut / Tahun</label>
                     <div class="flex items-center space-x-2">
                         <input type="text" name="kode_klasifikasi" class="flex-1 px-4 py-3 rounded-xl border border-gray-300" placeholder="Klasifikasi" required />
                         <span class="text-gray-500 pt-2">/</span>
-                        <input type="number" id="nomor_urut_keluar_dewan" name="nomor_urut" class="w-full px-4 py-3 rounded-xl border border-gray-300 text-center" placeholder="No. Urut" required />
+                        <input type="number" id="nomor_urut_keluar_dewan" name="nomor_urut" class="w-24 px-4 py-3 rounded-xl border border-gray-300 text-center" placeholder="No. Urut" required />
+                        <span class="text-gray-500 pt-2">/</span>
+                        <!-- Dropdown Tahun -->
+                        <select name="tahun_penomoran" class="w-28 px-4 py-3 rounded-xl border border-gray-300 bg-white">
+                           <option value="2025" <?php echo (date('Y') == '2025') ? 'selected' : ''; ?>>2025</option>
+                           <option value="2026" <?php echo (date('Y') == '2026') ? 'selected' : ''; ?>>2026</option>
+                        </select>
                         <button type="button" id="checkNomorKeluarDewanBtn" class="px-4 py-3 bg-indigo-100 text-indigo-600 rounded-xl hover:bg-indigo-200" title="Cek ketersediaan No. Urut">
                             <i class="fas fa-check"></i>
                         </button>
@@ -187,6 +186,7 @@ require_once 'templates/header.php';
     </form>
 </div>
 
+<!-- Bagian tabel daftar surat (tidak ada perubahan) -->
 <div id="list-keluar-dewan-container" class="mt-8 bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl p-6 animate-fade-in border border-blue-100 transition-all duration-500">
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <h3 class="text-xl font-bold text-gray-800 flex items-center">
@@ -260,3 +260,4 @@ require_once 'templates/header.php';
 </div>
 
 <?php require_once 'templates/footer.php'; ?>
+

@@ -59,22 +59,14 @@ export function setupPageFunctionality(config) {
     checkBtn.addEventListener("click", () => {
       const urut = document.getElementById(config.urutInputId).value.trim();
 
-      // --- MODIFIKASI DIMULAI DI SINI ---
-      // Cari form terdekat dari tombol yang diklik
+      // --- MODIFIKASI: Mengambil tahun dari dropdown manual ---
       const form = checkBtn.closest("form");
-      // Cari input tanggal berdasarkan 'name' yang ada di config
-      const dateInput = form.querySelector(
-        `input[name="${config.dateInputName}"]`
-      );
-      let tahun = new Date().getFullYear().toString(); // Default ke tahun ini sebagai string
-
-      if (dateInput && dateInput.value) {
-        // Cek jika value adalah tanggal valid
-        if (!isNaN(new Date(dateInput.value))) {
-          tahun = new Date(dateInput.value).getFullYear().toString();
-        }
-      }
-      // --- MODIFIKASI SELESAI --
+      // Cari dropdown tahun berdasarkan 'name'
+      const yearSelect = form.querySelector('select[name="tahun_penomoran"]');
+      const tahun = yearSelect
+        ? yearSelect.value
+        : new Date().getFullYear().toString();
+      // --- AKHIR MODIFIKASI ---
 
       if (!urut) {
         Swal.fire({
@@ -87,7 +79,7 @@ export function setupPageFunctionality(config) {
       fetch(config.checkUrl, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        // --- MODIFIKASI: Kirim juga tahun ---
+        // Kirim nomor urut dan tahun yang dipilih
         body: `nomor_urut=${encodeURIComponent(
           urut
         )}&tahun=${encodeURIComponent(tahun)}`,
