@@ -23,9 +23,9 @@ $surat = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if ($surat && $surat['file_lampiran']) {
     // Path lengkap ke file. Menggunakan __DIR__ relatif terhadap index.php sekarang.
-    $filePath = 'uploads/' . $surat['file_lampiran'];
+    $filePath = realpath(__DIR__ . '/../uploads/' . $surat['file_lampiran']);
     // Hapus file jika ada
-    if (file_exists($filePath)) {
+    if ($filePath && file_exists($filePath)) {
         unlink($filePath);
     }
 }

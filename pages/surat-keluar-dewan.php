@@ -252,7 +252,7 @@ require_once 'templates/header.php';
          if ($total_pages > 1) {
              echo '<div class="flex items-center justify-between">';
              echo '<div class="text-sm text-gray-600">Halaman 1 dari ' . $total_pages . '</div>';
-             echo '<div><button onclick="fetchData(2)" class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-primary hover:bg-gray-50">Selanjutnya <i class="fas fa-arrow-right ml-1"></i></button></div>';
+             echo '<div><button onclick="fetchDataKeluarDewan(2)" class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-primary hover:bg-gray-50">Selanjutnya <i class="fas fa-arrow-right ml-1"></i></button></div>';
              echo '</div>';
          }
          ?>
@@ -260,4 +260,3 @@ require_once 'templates/header.php';
 </div>
 
 <?php require_once 'templates/footer.php'; ?>
-

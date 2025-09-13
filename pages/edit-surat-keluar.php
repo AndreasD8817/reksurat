@@ -49,8 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat'])) {
         $fileBaru = handleFileUpload('file_lampiran', 'surat_keluar');
         if ($fileBaru) {
             // Jika unggah berhasil, hapus file lama (jika ada)
-            if ($surat['file_lampiran'] && file_exists('uploads/' . $surat['file_lampiran'])) {
-                unlink('uploads/' . $surat['file_lampiran']);
+            $pathFileLama = realpath(__DIR__ . '/../uploads/' . $surat['file_lampiran']);
+            if ($surat['file_lampiran'] && $pathFileLama && file_exists($pathFileLama)) {
+                unlink($pathFileLama);
             }
             $namaFileBaru = $fileBaru; // Gunakan nama file baru
         }

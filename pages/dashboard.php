@@ -11,11 +11,11 @@ function get_total_surat(PDO $pdo, string $table): int {
     }
 }
 // Ambil data statistik untuk ditampilkan di kartu
-$total_surat_masuk = $pdo->query("SELECT COUNT(id) FROM surat_masuk")->fetchColumn();
-$total_surat_keluar = $pdo->query("SELECT COUNT(id) FROM surat_keluar")->fetchColumn();
-$total_surat_masuk_dewan = $pdo->query("SELECT COUNT(id) FROM surat_masuk_dewan")->fetchColumn();
-$total_surat_keluar_dewan = $pdo->query("SELECT COUNT(id) FROM surat_keluar_dewan")->fetchColumn();
-$total_disposisi = $pdo->query("SELECT COUNT(id) FROM disposisi_sekwan")->fetchColumn();
+$total_surat_masuk = get_total_surat($pdo, 'surat_masuk');
+$total_surat_keluar = get_total_surat($pdo, 'surat_keluar');
+$total_surat_masuk_dewan = get_total_surat($pdo, 'surat_masuk_dewan');
+$total_surat_keluar_dewan = get_total_surat($pdo, 'surat_keluar_dewan');
+$total_disposisi = get_total_surat($pdo, 'disposisi_sekwan');
 
 // BARU: Query untuk menghitung surat masuk setwan yang belum didisposisi
 $stmt = $pdo->prepare(

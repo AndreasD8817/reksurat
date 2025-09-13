@@ -74,8 +74,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk_de
     if (isset($_FILES['file_lampiran']) && $_FILES['file_lampiran']['error'] === UPLOAD_ERR_OK) {
         $fileBaru = handleFileUpload('file_lampiran', 'surat_masuk_dewan');
         if ($fileBaru) {
-            if ($surat['file_lampiran'] && file_exists('uploads-dewan/' . $surat['file_lampiran'])) {
-                unlink('uploads-dewan/' . $surat['file_lampiran']);
+            $pathFileLama = realpath(__DIR__ . '/../uploads-dewan/' . $surat['file_lampiran']);
+            if ($surat['file_lampiran'] && $pathFileLama && file_exists($pathFileLama)) {
+                unlink($pathFileLama);
             }
             $namaFileBaru = $fileBaru;
         }
