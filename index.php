@@ -1,8 +1,21 @@
 <?php
 // reksurat/index.php
 
+// --- KONFIGURASI ERROR LOGGING ---
+// 1. Nonaktifkan tampilan error ke pengguna untuk keamanan
+ini_set('display_errors', 0);
+// 2. Aktifkan logging error ke dalam file
+ini_set('log_errors', 1);
+// 3. Tentukan nama dan lokasi file log
+ini_set('error_log', __DIR__ . DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR . 'error_php.log');
+// 4. Atur agar semua jenis error (kecuali notice) tercatat
+error_reporting(E_ALL & ~E_NOTICE);
+
+
 // Mulai session untuk manajemen login
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Panggil file koneksi database
 require_once 'config/database.php';
@@ -12,8 +25,27 @@ function isLoggedIn() {
     return isset($_SESSION['user_id']);
 }
 
+// --- FUNGSI KEAMANAN CSRF ---
+function generate_csrf_token() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function verify_csrf_token($token) {
+    if (isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token)) {
+        // Token valid, hapus token lama agar tidak bisa digunakan lagi (opsional tapi lebih aman)
+        unset($_SESSION['csrf_token']);
+        return true;
+    }
+    return false;
+}
+
+// Generate token untuk digunakan di form
+$csrf_token = generate_csrf_token();
+
 // Ambil halaman yang diminta dari URL, defaultnya 'login'
-// Contoh: http://reksurat.test/?page=surat-keluar
 $page = $_GET['page'] ?? 'login';
 
 // Routing sederhana
@@ -26,13 +58,12 @@ if (!isLoggedIn() && $page !== 'login') {
 // Tentukan file halaman yang akan dimuat
 $pageFile = "pages/{$page}.php";
 
-// Jika file halaman ada, muat file tersebut. Jika tidak, tampilkan error 404.
+// Jika file halaman ada, muat file tersebut. Jika tidak, tampilkan halaman 404.
 if (file_exists($pageFile)) {
     require_once $pageFile;
 } else {
-    // Halaman tidak ditemukan
+    // Halaman tidak ditemukan, tampilkan halaman 404 kustom
     http_response_code(404);
-    echo "<h1>404 - Halaman Tidak Ditemukan</h1>";
-    echo "Maaf, halaman yang Anda cari tidak ada.";
+    require_once 'pages/404.php';
 }
 ?>

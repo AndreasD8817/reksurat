@@ -55,6 +55,13 @@ function handleFileUpload($fileInputName, $subDirectory) {
 
 // Logika untuk memproses update data
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat'])) {
+    // Verifikasi CSRF Token
+    if (!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])) {
+        $_SESSION['error_message'] = "Sesi tidak valid atau telah kedaluwarsa. Silakan coba lagi.";
+        header("Location: /edit-surat-keluar-dewan?id=" . $id);
+        exit;
+    }
+
     $kode_klas = $_POST['kode_klasifikasi'];
     $nomor_urut = $_POST['nomor_urut'];
     $tgl_surat = $_POST['tanggal_surat'];
@@ -99,6 +106,8 @@ require_once 'templates/header.php';
     </h3>
     
     <form method="POST" action="/edit-surat-keluar-dewan?id=<?php echo $surat['id']; ?>" class="space-y-6" enctype="multipart/form-data">
+        <!-- Tambahkan CSRF Token -->
+        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-5">
                 <div>

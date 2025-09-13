@@ -34,6 +34,13 @@ function handleDisposisiFileUpload($fileInputName) {
 
 // Logika untuk menyimpan data disposisi baru
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_disposisi'])) {
+    // Verifikasi CSRF Token
+    if (!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])) {
+        $_SESSION['error_message'] = "Sesi tidak valid atau telah kedaluwarsa. Silakan coba lagi.";
+        header("Location: /disposisi-sekwan");
+        exit;
+    }
+
     $surat_masuk_id = $_POST['surat_masuk_id'];
     $nama_pegawai = $_POST['nama_pegawai'];
     $catatan = $_POST['catatan_disposisi'];
@@ -97,6 +104,8 @@ require_once 'templates/header.php';
     </div>
     
     <form id="form-disposisi-body" method="POST" action="/disposisi-sekwan" class="space-y-6 transition-all duration-500" enctype="multipart/form-data">
+        <!-- Tambahkan CSRF Token -->
+        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <label for="surat_masuk_id" class="block text-sm font-medium text-gray-700 mb-2">Nomor Agenda Surat</label>
@@ -206,4 +215,3 @@ require_once 'templates/header.php';
 <?php
 require_once 'templates/footer.php';
 ?>
-

@@ -28,6 +28,13 @@ if (!$surat) {
 
 // --- LOGIKA UPDATE DATA (TERMASUK FILE) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat'])) {
+    // Verifikasi CSRF Token
+    if (!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])) {
+        $_SESSION['error_message'] = "Sesi tidak valid atau telah kedaluwarsa. Silakan coba lagi.";
+        header("Location: /edit-surat-keluar?id=" . $id);
+        exit;
+    }
+
     // 1. Ambil semua data teks dari form
     $kode_klas = $_POST['kode_klasifikasi'];
     $nomor_urut = $_POST['nomor_urut'];

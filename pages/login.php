@@ -10,6 +10,13 @@ if (isLoggedIn()) {
 $error = '';
 // Cek jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verifikasi CSRF Token
+    if (!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])) {
+        // Jangan berikan pesan error yang terlalu spesifik
+        $error = 'Terjadi kesalahan. Silakan coba lagi.';
+        // Regenerate token untuk form
+        $csrf_token = generate_csrf_token();
+    } else {
     // ---- PERUBAHAN 1: Mengambil 'username' dari POST ----
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
@@ -30,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // ---- PERUBAHAN 3: Memperbarui pesan error ----
         $error = 'Username atau kata sandi salah!';
+    }
     }
 }
 ?>
@@ -60,7 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <form class="space-y-6" method="POST" action="/login">
-                
+                <!-- Tambahkan CSRF Token -->
+                <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                 <div>
                     <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
                     <div class="relative">
