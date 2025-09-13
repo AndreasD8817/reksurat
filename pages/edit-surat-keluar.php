@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION[
 }
 
 $id = $_GET['id'] ?? null;
-if (!$id) {
+if (!$id || !is_numeric($id)) {
     header('Location: /surat-keluar');
     exit;
 }
@@ -25,6 +25,33 @@ if (!$surat) {
     exit;
 }
 
+// Fungsi untuk menangani unggahan file (dipindahkan dari surat-keluar.php agar bisa dipakai di sini)
+function handleFileUpload($fileInputName, $subDirectory) {
+    if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
+        $file = $_FILES[$fileInputName];
+        $fileName = time() . '_' . basename($file['name']);
+        $mainUploadDir = realpath(dirname(__FILE__) . '/../uploads');
+        $targetDir = $mainUploadDir . DIRECTORY_SEPARATOR . $subDirectory;
+        if (!file_exists($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
+        $targetPath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
+        $allowedTypes = ['application/pdf', 'image/jpeg'];
+        $maxSize = 5 * 1024 * 1024;
+        if (!in_array($file['type'], $allowedTypes)) {
+            $_SESSION['error_message'] = 'Tipe file tidak valid. Hanya PDF dan JPG.';
+            return null;
+        }
+        if ($file['size'] > $maxSize) {
+            $_SESSION['error_message'] = 'Ukuran file terlalu besar. Maksimal 5 MB.';
+            return null;
+        }
+        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+            return $subDirectory . '/' . $fileName;
+        }
+    }
+    return null;
+}
 
 // --- LOGIKA UPDATE DATA (TERMASUK FILE) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat'])) {
@@ -45,8 +72,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat'])) {
     $hub_surat = $_POST['hub_surat_no'];
     $konseptor = $_POST['konseptor'];
     $keterangan = $_POST['keterangan'];
+    // Ambil tahun dari dropdown baru
+    $tahun = $_POST['tahun_penomoran'];
     
-    $tahun = date('Y', strtotime($tgl_surat));
+    // Bentuk nomor lengkap menggunakan tahun dari dropdown
     $nomor_lengkap = sprintf("%s/%s/436.5/%s", $kode_klas, $nomor_urut, $tahun);
     
     // 2. Cek apakah ada file baru yang diunggah
@@ -73,6 +102,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat'])) {
     exit;
 }
 
+// Ambil tahun dari tanggal surat untuk default dropdown
+$tahun_surat = date('Y', strtotime($surat['tanggal_surat']));
 
 $pageTitle = 'Edit Surat Keluar';
 require_once 'templates/header.php';
@@ -85,28 +116,48 @@ require_once 'templates/header.php';
     </h3>
     
     <form method="POST" action="/edit-surat-keluar?id=<?php echo $surat['id']; ?>" class="space-y-6" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Kode Klasifikasi & No. Urut</label>
+                    <!-- 1. Kolom Tahun(drop down) dan fungsi cek nomor -->
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Klasifikasi / Nomor Urut / Tahun</label>
                     <div class="flex items-center space-x-2">
-                        <input type="text" name="kode_klasifikasi" value="<?php echo htmlspecialchars($surat['kode_klasifikasi']); ?>" class="flex-1 px-4 py-3 rounded-xl border border-gray-300" required />
+                        <input type="text" name="kode_klasifikasi" value="<?php echo htmlspecialchars($surat['kode_klasifikasi']); ?>" class="flex-1 px-4 py-3 rounded-xl border border-gray-300" placeholder="Klasifikasi" required />
                         <span class="text-gray-500 pt-2">/</span>
-                        <input type="number" name="nomor_urut" value="<?php echo htmlspecialchars($surat['nomor_urut']); ?>" class="w-full px-4 py-3 rounded-xl border border-gray-300 text-center" required />
+                        <input type="number" id="nomor_urut_edit" name="nomor_urut" value="<?php echo htmlspecialchars($surat['nomor_urut']); ?>" class="w-24 px-4 py-3 rounded-xl border border-gray-300 text-center" placeholder="No. Urut" required />
+                        <span class="text-gray-500 pt-2">/</span>
+                        <select id="tahun_penomoran_edit" name="tahun_penomoran" class="w-28 px-4 py-3 rounded-xl border border-gray-300 bg-white">
+                            <?php
+                            $tahun_sekarang = date('Y');
+                            for ($i = $tahun_sekarang + 1; $i >= $tahun_sekarang - 5; $i--) {
+                                $selected = ($i == $tahun_surat) ? 'selected' : '';
+                                echo "<option value='$i' $selected>$i</option>";
+                            }
+                            ?>
+                        </select>
+                        <button type="button" id="checkNomorKeluarBtnEdit" class="px-4 py-3 bg-indigo-100 text-indigo-600 rounded-xl hover:bg-indigo-200" title="Cek ketersediaan No. Urut">
+                            <i class="fas fa-check"></i>
+                        </button>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Surat</label>
-                    <input type="date" name="tanggal_surat" value="<?php echo htmlspecialchars($surat['tanggal_surat']); ?>" class="w-full px-4 py-3 rounded-xl border border-gray-300" required />
-                </div>
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Tujuan</label>
                     <input type="text" name="tujuan" value="<?php echo htmlspecialchars($surat['tujuan']); ?>" class="w-full px-4 py-3 rounded-xl border border-gray-300" required />
                 </div>
+                
+                <!-- 3. Urutan Sesuai Gambar -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Surat</label>
+                    <input type="date" name="tanggal_surat" value="<?php echo htmlspecialchars($surat['tanggal_surat']); ?>" class="w-full px-4 py-3 rounded-xl border border-gray-300" required />
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Konseptor</label>
                     <input type="text" name="konseptor" value="<?php echo htmlspecialchars($surat['konseptor']); ?>" class="w-full px-4 py-3 rounded-xl border border-gray-300" />
                 </div>
+                
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Sifat Surat</label>
                     <div class="flex items-center space-x-6 pt-2">

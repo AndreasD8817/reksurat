@@ -1,0 +1,60 @@
+/* assets/css/custom-form.css */
+
+/* Menghilangkan panah default pada input tanggal dan dropdown */
+input[type="date"]::-webkit-calendar-picker-indicator,
+select::-ms-expand {
+  display: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Styling umum untuk input dan select agar seragam */
+.custom-input,
+.custom-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.custom-input input,
+.custom-select select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0.75rem; /* rounded-xl */
+  border-width: 1px;
+  border-color: #d1d5db; /* border-gray-300 */
+  padding: 0.75rem 1rem; /* px-4 py-3 */
+  width: 100%;
+  background-color: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.custom-input input:focus,
+.custom-select select:focus {
+  outline: none;
+  border-color: #4f46e5; /* primary color */
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+/* Ikon kustom untuk input tanggal dan select */
+.custom-input::after,
+.custom-select::after {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  position: absolute;
+  right: 1rem;
+  pointer-events: none;
+  color: #9ca3af; /* gray-400 */
+}
+
+/* Ikon kalender untuk input tanggal */
+.custom-input.date::after {
+  content: "\f073"; /* fa-calendar-alt */
+}
+
+/* Ikon panah bawah untuk select */
+.custom-select::after {
+  content: "\f078"; /* fa-chevron-down */
+}

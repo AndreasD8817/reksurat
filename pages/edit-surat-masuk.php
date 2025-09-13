@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION[
 }
 
 $id = $_GET['id'] ?? null;
-if (!$id) {
+if (!$id || !is_numeric($id)) {
     header('Location: /surat-masuk');
     exit;
 }
@@ -38,13 +38,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk'])
     $keterangan = $_POST['keterangan'];
     $tgl_surat = $_POST['tanggal_surat'];
     $tgl_diterima = $_POST['tanggal_diterima'];
+    $tahun = $_POST['tahun_penomoran'];
 
-    $tahun = date('Y', strtotime($tgl_diterima));
     $nomor_agenda_lengkap = sprintf("%s/%s/436.5/%s", $agenda_klas, $agenda_urut, $tahun);
 
     // 2. Cek apakah ada file baru yang diunggah
     $namaFileBaru = $surat['file_lampiran']; // Defaultnya adalah nama file lama
     if (isset($_FILES['file_lampiran']) && $_FILES['file_lampiran']['error'] === UPLOAD_ERR_OK) {
+        // Asumsi fungsi handleFileUpload ada dari file surat-masuk.php atau di-include terpisah
+        // Jika belum, pindahkan fungsinya ke sini juga
         $fileBaru = handleFileUpload('file_lampiran', 'surat_masuk');
         if ($fileBaru) {
             $pathFileLama = realpath(__DIR__ . '/../uploads/' . $surat['file_lampiran']);
@@ -66,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk'])
     exit;
 }
 
-
+$tahun_surat = date('Y', strtotime($surat['tanggal_diterima']));
 $pageTitle = 'Edit Surat Masuk';
 require_once 'templates/header.php';
 ?>
@@ -80,11 +82,24 @@ require_once 'templates/header.php';
     <form method="POST" action="/edit-surat-masuk?id=<?php echo $surat['id']; ?>" class="space-y-6" enctype="multipart/form-data">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Nomor Agenda</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Klasifikasi / No. Urut Agenda / Tahun</label>
                 <div class="flex items-center space-x-2">
-                    <input type="text" name="agenda_klasifikasi" value="<?php echo htmlspecialchars($surat['agenda_klasifikasi']); ?>" class="w-full px-4 py-3 rounded-xl border border-gray-300">
+                    <input type="text" name="agenda_klasifikasi" value="<?php echo htmlspecialchars($surat['agenda_klasifikasi']); ?>" class="flex-1 px-4 py-3 rounded-xl border border-gray-300" placeholder="Klasifikasi">
                     <span class="text-gray-500 pt-2">/</span>
-                    <input type="text" name="agenda_urut" value="<?php echo htmlspecialchars($surat['agenda_urut']); ?>" class="w-full px-4 py-3 rounded-xl border border-gray-300">
+                    <input type="text" id="agenda_urut_edit" name="agenda_urut" value="<?php echo htmlspecialchars($surat['agenda_urut']); ?>" class="w-24 px-4 py-3 rounded-xl border border-gray-300 text-center" placeholder="No. Urut">
+                    <span class="text-gray-500 pt-2">/</span>
+                    <select id="tahun_penomoran_edit_masuk" name="tahun_penomoran" class="w-28 px-4 py-3 rounded-xl border border-gray-300 bg-white">
+                        <?php
+                        $tahun_sekarang = date('Y');
+                        for ($i = $tahun_sekarang + 1; $i >= $tahun_sekarang - 5; $i--) {
+                            $selected = ($i == $tahun_surat) ? 'selected' : '';
+                            echo "<option value='$i' $selected>$i</option>";
+                        }
+                        ?>
+                    </select>
+                    <button type="button" id="checkAgendaBtnEdit" class="px-4 py-3 bg-indigo-100 text-indigo-600 rounded-xl hover:bg-indigo-200" title="Cek ketersediaan No. Urut Agenda">
+                        <i class="fas fa-check"></i>
+                    </button>
                 </div>
             </div>
             <div>

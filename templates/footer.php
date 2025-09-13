@@ -30,8 +30,75 @@
         </div> 
     </div>
     
-    <!-- PENTING: Ubah cara pemanggilan script menjadi module -->
     <script src="/assets/js/app.js" type="module"></script>
+
+    <!-- SCRIPT KHUSUS UNTUK FUNGSI CEK NOMOR DI HALAMAN EDIT -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        function setupCheckButton(buttonId, urutInputId, tahunSelectId, checkUrl, errorText) {
+            const checkBtn = document.getElementById(buttonId);
+            if (!checkBtn) return;
+
+            checkBtn.addEventListener('click', function() {
+                const nomorUrutInput = document.getElementById(urutInputId);
+                const tahunSelect = document.getElementById(tahunSelectId);
+                const urlParams = new URLSearchParams(window.location.search);
+                const idSurat = urlParams.get('id');
+
+                const nomorUrut = nomorUrutInput.value.trim();
+                const tahun = tahunSelect.value;
+
+                if (!nomorUrut) {
+                    Swal.fire({ icon: 'error', title: 'Input Kosong', text: errorText });
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('nomor_urut', nomorUrut);
+                formData.append('tahun', tahun);
+                formData.append('id', idSurat);
+
+                fetch(checkUrl, {
+                    method: 'POST',
+                    body: new URLSearchParams(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Nomor Urut Sudah Digunakan!',
+                            html: `Nomor Urut <strong>${data.nomor}</strong> untuk tahun <strong>${data.tahun}</strong> sudah terdaftar pada surat lain.`
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Nomor Urut Tersedia!',
+                            html: `Nomor Urut <strong>${data.nomor}</strong> untuk tahun <strong>${data.tahun}</strong> dapat digunakan.`
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({ icon: 'error', title: 'Terjadi Kesalahan', text: 'Gagal melakukan pengecekan.' });
+                });
+            });
+        }
+
+        // Setup untuk Edit Surat Keluar
+        setupCheckButton('checkNomorKeluarBtnEdit', 'nomor_urut_edit', 'tahun_penomoran_edit', '/ajax-check-nomor-keluar-edit', 'Silakan isi Nomor Urut yang ingin dicek.');
+        
+        // Setup untuk Edit Surat Keluar Dewan
+        setupCheckButton('checkNomorKeluarDewanBtnEdit', 'nomor_urut_edit_dewan', 'tahun_penomoran_edit_dewan', '/ajax-check-nomor-keluar-dewan-edit', 'Silakan isi Nomor Urut yang ingin dicek.');
+        
+        // Setup untuk Edit Surat Masuk
+        setupCheckButton('checkAgendaBtnEdit', 'agenda_urut_edit', 'tahun_penomoran_edit_masuk', '/ajax-check-nomor-edit', 'Silakan isi No. Urut Agenda yang ingin dicek.');
+
+        // Setup untuk Edit Surat Masuk Dewan
+        setupCheckButton('checkAgendaDewanBtnEdit', 'agenda_urut_edit_dewan', 'tahun_penomoran_edit_dewan', '/ajax-check-nomor-agenda-dewan-edit', 'Silakan isi No. Urut Agenda yang ingin dicek.');
+    });
+    </script>
     
 <?php
 // Logika untuk menampilkan notifikasi SweetAlert dari session PHP
@@ -64,3 +131,4 @@ if (isset($_SESSION['success_message'])) {
 ?>
 </body>
 </html>
+

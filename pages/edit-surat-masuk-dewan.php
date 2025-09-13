@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION[
 }
 
 $id = $_GET['id'] ?? null;
-if (!$id) {
+if (!$id || !is_numeric($id)) {
     header('Location: /surat-masuk-dewan');
     exit;
 }
@@ -55,7 +55,6 @@ function handleFileUpload($fileInputName, $subDirectory) {
 
 // Logika untuk memproses update data
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk_dewan'])) {
-    // Verifikasi CSRF Token
     if (!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])) {
         $_SESSION['error_message'] = "Sesi tidak valid atau telah kedaluwarsa. Silakan coba lagi.";
         header("Location: /edit-surat-masuk-dewan?id=" . $id);
@@ -68,13 +67,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk_de
     $asal_surat = $_POST['asal_surat'];
     $sifat_surat = $_POST['sifat_surat'];
     $perihal = $_POST['perihal'];
-    // TAMBAHKAN: Ambil data 'diteruskan_kepada' dari form
     $diteruskan_kepada = $_POST['diteruskan_kepada'];
     $keterangan = $_POST['keterangan'];
     $tgl_surat = $_POST['tanggal_surat'];
     $tgl_diterima = $_POST['tanggal_diterima'];
+    $tahun = $_POST['tahun_penomoran'];
 
-    $tahun = date('Y', strtotime($tgl_diterima));
     $nomor_agenda_lengkap = sprintf("%s/%s/436.5/%s", $agenda_klas, $agenda_urut, $tahun);
 
     $namaFileBaru = $surat['file_lampiran'];
@@ -89,7 +87,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk_de
         }
     }
 
-    // MODIFIKASI: Tambahkan kolom `diteruskan_kepada` ke query UPDATE
     $stmt = $pdo->prepare(
         "UPDATE surat_masuk_dewan SET agenda_klasifikasi = ?, agenda_urut = ?, nomor_agenda_lengkap = ?, nomor_surat_lengkap = ?, tanggal_surat = ?, tanggal_diterima = ?, asal_surat = ?, sifat_surat = ?, perihal = ?, diteruskan_kepada = ?, keterangan = ?, file_lampiran = ? WHERE id = ?"
     );
@@ -100,6 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk_de
     exit;
 }
 
+$tahun_surat = date('Y', strtotime($surat['tanggal_diterima']));
 $pageTitle = 'Edit Surat Masuk Dewan';
 require_once 'templates/header.php';
 ?>
@@ -111,15 +109,27 @@ require_once 'templates/header.php';
     </h3>
     
     <form method="POST" action="/edit-surat-masuk-dewan?id=<?php echo $surat['id']; ?>" class="space-y-6" enctype="multipart/form-data">
-        <!-- Tambahkan CSRF Token -->
         <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Nomor Agenda</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Klasifikasi / No. Urut Agenda / Tahun</label>
                 <div class="flex items-center space-x-2">
-                    <input type="text" name="agenda_klasifikasi" value="<?php echo htmlspecialchars($surat['agenda_klasifikasi']); ?>" class="w-full px-4 py-3 rounded-xl border border-gray-300">
+                    <input type="text" name="agenda_klasifikasi" value="<?php echo htmlspecialchars($surat['agenda_klasifikasi']); ?>" class="flex-1 px-4 py-3 rounded-xl border border-gray-300" placeholder="Klasifikasi">
                     <span class="text-gray-500 pt-2">/</span>
-                    <input type="text" name="agenda_urut" value="<?php echo htmlspecialchars($surat['agenda_urut']); ?>" class="w-full px-4 py-3 rounded-xl border border-gray-300">
+                    <input type="text" id="agenda_urut_edit_dewan" name="agenda_urut" value="<?php echo htmlspecialchars($surat['agenda_urut']); ?>" class="w-24 px-4 py-3 rounded-xl border border-gray-300 text-center" placeholder="No. Urut">
+                    <span class="text-gray-500 pt-2">/</span>
+                    <select id="tahun_penomoran_edit_dewan" name="tahun_penomoran" class="w-28 px-4 py-3 rounded-xl border border-gray-300 bg-white">
+                        <?php
+                        $tahun_sekarang = date('Y');
+                        for ($i = $tahun_sekarang + 1; $i >= $tahun_sekarang - 5; $i--) {
+                            $selected = ($i == $tahun_surat) ? 'selected' : '';
+                            echo "<option value='$i' $selected>$i</option>";
+                        }
+                        ?>
+                    </select>
+                    <button type="button" id="checkAgendaDewanBtnEdit" class="px-4 py-3 bg-indigo-100 text-indigo-600 rounded-xl hover:bg-indigo-200" title="Cek ketersediaan No. Urut Agenda">
+                        <i class="fas fa-check"></i>
+                    </button>
                 </div>
             </div>
             <div>
@@ -150,14 +160,10 @@ require_once 'templates/header.php';
                 <label class="block text-sm font-medium text-gray-700 mb-2">Perihal</label>
                 <textarea name="perihal" class="w-full px-4 py-3 rounded-xl border border-gray-300 h-24" required><?php echo htmlspecialchars($surat['perihal']); ?></textarea>
             </div>
-
-            <!-- ===== TAMBAHKAN INPUT BARU DI SINI ===== -->
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Diteruskan Kepada</label>
                 <input type="text" name="diteruskan_kepada" class="w-full px-4 py-3 rounded-xl border border-gray-300" placeholder="Contoh: Ketua Komisi A, Fraksi PDI Perjuangan, dll." value="<?php echo htmlspecialchars($surat['diteruskan_kepada'] ?? ''); ?>">
             </div>
-            <!-- ======================================= -->
-
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Keterangan</label>
                 <textarea name="keterangan" class="w-full px-4 py-3 rounded-xl border border-gray-300 h-24"><?php echo htmlspecialchars($surat['keterangan']); ?></textarea>

@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION[
 }
 
 $id = $_GET['id'] ?? null;
-if (!$id) {
+if (!$id || !is_numeric($id)) {
     header('Location: /surat-keluar-dewan');
     exit;
 }
@@ -25,7 +25,7 @@ if (!$surat) {
     exit;
 }
 
-// Logika untuk menangani unggahan file
+// Fungsi handleFileUpload (tidak perlu diubah)
 function handleFileUpload($fileInputName, $subDirectory) {
     if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES[$fileInputName];
@@ -71,8 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat'])) {
     $hub_surat = $_POST['hub_surat_no'];
     $konseptor = $_POST['konseptor'];
     $keterangan = $_POST['keterangan'];
+    $tahun = $_POST['tahun_penomoran'];
     
-    $tahun = date('Y', strtotime($tgl_surat));
     $nomor_lengkap = sprintf("%s/%s/436.5/%s", $kode_klas, $nomor_urut, $tahun);
     
     $namaFileBaru = $surat['file_lampiran'];
@@ -95,6 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat'])) {
     exit;
 }
 
+$tahun_surat = date('Y', strtotime($surat['tanggal_surat']));
 $pageTitle = 'Edit Surat Keluar Dewan';
 require_once 'templates/header.php';
 ?>
@@ -106,25 +107,37 @@ require_once 'templates/header.php';
     </h3>
     
     <form method="POST" action="/edit-surat-keluar-dewan?id=<?php echo $surat['id']; ?>" class="space-y-6" enctype="multipart/form-data">
-        <!-- Tambahkan CSRF Token -->
         <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Kode Klasifikasi & No. Urut</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Klasifikasi / Nomor Urut / Tahun</label>
                     <div class="flex items-center space-x-2">
                         <input type="text" name="kode_klasifikasi" value="<?php echo htmlspecialchars($surat['kode_klasifikasi']); ?>" class="flex-1 px-4 py-3 rounded-xl border border-gray-300" required />
                         <span class="text-gray-500 pt-2">/</span>
-                        <input type="number" name="nomor_urut" value="<?php echo htmlspecialchars($surat['nomor_urut']); ?>" class="w-full px-4 py-3 rounded-xl border border-gray-300 text-center" required />
+                        <input type="number" id="nomor_urut_edit_dewan" name="nomor_urut" value="<?php echo htmlspecialchars($surat['nomor_urut']); ?>" class="w-24 px-4 py-3 rounded-xl border border-gray-300 text-center" required />
+                        <span class="text-gray-500 pt-2">/</span>
+                        <select id="tahun_penomoran_edit_dewan" name="tahun_penomoran" class="w-28 px-4 py-3 rounded-xl border border-gray-300 bg-white">
+                             <?php
+                            $tahun_sekarang = date('Y');
+                            for ($i = $tahun_sekarang + 1; $i >= $tahun_sekarang - 5; $i--) {
+                                $selected = ($i == $tahun_surat) ? 'selected' : '';
+                                echo "<option value='$i' $selected>$i</option>";
+                            }
+                            ?>
+                        </select>
+                        <button type="button" id="checkNomorKeluarDewanBtnEdit" class="px-4 py-3 bg-indigo-100 text-indigo-600 rounded-xl hover:bg-indigo-200" title="Cek ketersediaan No. Urut">
+                            <i class="fas fa-check"></i>
+                        </button>
                     </div>
+                </div>
+                 <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tujuan</label>
+                    <input type="text" name="tujuan" value="<?php echo htmlspecialchars($surat['tujuan']); ?>" class="w-full px-4 py-3 rounded-xl border border-gray-300" required />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Surat</label>
                     <input type="date" name="tanggal_surat" value="<?php echo htmlspecialchars($surat['tanggal_surat']); ?>" class="w-full px-4 py-3 rounded-xl border border-gray-300" required />
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Tujuan</label>
-                    <input type="text" name="tujuan" value="<?php echo htmlspecialchars($surat['tujuan']); ?>" class="w-full px-4 py-3 rounded-xl border border-gray-300" required />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Konseptor</label>
@@ -175,7 +188,7 @@ require_once 'templates/header.php';
                     </div>
                 <?php endif; ?>
                 <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-primary cursor-pointer relative group">
-                    <input id="file-upload-keluar" name="file_lampiran" type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                    <input id="file-upload-keluar-dewan" name="file_lampiran" type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                     <div class="space-y-1 text-center">
                          <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 group-hover:text-primary"></i>
                         <div class="flex text-sm text-gray-600">
@@ -184,7 +197,7 @@ require_once 'templates/header.php';
                             </span>
                             <p class="pl-1">atau tarik dan lepas</p>
                         </div>
-                        <p class="text-xs text-gray-500" id="file-name-keluar">Belum ada file dipilih</p>
+                        <p class="text-xs text-gray-500" id="file-name-keluar-dewan">Belum ada file dipilih</p>
                     </div>
                 </div>
             </div>
