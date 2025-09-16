@@ -202,7 +202,6 @@ require_once 'templates/header.php';
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Asal Surat</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Perihal</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Tgl Diterima</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Lampiran</th>
                     <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
                     <?php endif; ?>
@@ -219,15 +218,6 @@ require_once 'templates/header.php';
                         <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($surat['asal_surat']); ?></td>
                         <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($surat['perihal']); ?></td>
                         <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($surat['tgl_terima_formatted']); ?></td>
-                        <td class="px-6 py-4">
-                            <?php if ($surat['file_lampiran']): ?>
-                                <a href="/uploads-dewan/<?php echo htmlspecialchars($surat['file_lampiran']); ?>" target="_blank" class="inline-flex items-center text-primary hover:text-secondary">
-                                    <i class="fas fa-file-alt mr-1"></i> Lihat
-                                </a>
-                            <?php else: ?>
-                                <span class="text-gray-400">-</span>
-                            <?php endif; ?>
-                        </td>
                         <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
                             <td class="px-6 py-4">
                                 <div class="flex space-x-2">
