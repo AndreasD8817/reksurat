@@ -36,7 +36,7 @@ $total_pages = ceil($total_records / $limit);
 // Ambil data disposisi yang sudah digabung dengan surat masuk
 $query = "SELECT ds.id, ds.nama_pegawai, ds.file_lampiran,
                  DATE_FORMAT(ds.tanggal_disposisi, '%d-%m-%Y %H:%i') as tgl_disposisi_formatted,
-                 sm.nomor_agenda_lengkap, sm.perihal
+                 sm.nomor_agenda_lengkap, sm.perihal, sm.file_lampiran as surat_masuk_file
           FROM disposisi_sekwan ds
           JOIN surat_masuk sm ON ds.surat_masuk_id = sm.id " 
           . $sql_where . " ORDER BY ds.id DESC LIMIT ? OFFSET ?";

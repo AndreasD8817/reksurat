@@ -29,6 +29,27 @@
             </div>
         </div> 
     </div>
+
+    <!-- Modal untuk PDF Viewer -->
+    <div id="pdf-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 hidden transition-opacity duration-300 opacity-0">
+        <div id="pdf-modal-content" class="bg-white rounded-2xl shadow-xl w-full max-w-4xl h-[90vh] flex flex-col transform transition-transform duration-300 scale-95">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 rounded-t-2xl">
+                <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                    <i class="fas fa-file-pdf text-red-500 mr-3"></i>
+                    <span id="pdf-modal-title">Tampilan Lampiran</span>
+                </h3>
+                <button id="close-pdf-modal-btn" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <div class="flex-grow p-2 bg-gray-200">
+                <embed id="pdf-embed" src="" type="application/pdf" width="100%" height="100%">
+            </div>
+            <div class="p-3 bg-gray-50 rounded-b-2xl border-t flex justify-end">
+                <a id="pdf-download-link" href="#" download class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary text-sm"><i class="fas fa-download mr-2"></i>Unduh PDF</a>
+            </div>
+        </div>
+    </div>
     
     <script src="/assets/js/app.js" type="module"></script>
 
@@ -131,4 +152,3 @@ if (isset($_SESSION['success_message'])) {
 ?>
 </body>
 </html>
-

@@ -66,8 +66,8 @@ $surat_untuk_disposisi = $pdo->query(
 $limit = 10;
 $stmt_data = $pdo->prepare(
     "SELECT ds.id, ds.nama_pegawai, ds.file_lampiran,
-            DATE_FORMAT(ds.tanggal_disposisi, '%d-%m-%Y %H:%i') as tgl_disposisi_formatted,
-            sm.nomor_agenda_lengkap, sm.perihal
+            DATE_FORMAT(ds.tanggal_disposisi, '%d-%m-%Y %H:%i') as tgl_disposisi_formatted, 
+            sm.nomor_agenda_lengkap, sm.perihal, sm.file_lampiran as surat_masuk_file
      FROM disposisi_sekwan ds
      JOIN surat_masuk sm ON ds.surat_masuk_id = sm.id
      ORDER BY ds.id DESC LIMIT ?"
@@ -168,7 +168,6 @@ require_once 'templates/header.php';
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Perihal</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pegawai Tertuju</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Disposisi</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lampiran</th>
                     <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     <?php endif; ?>
@@ -177,18 +176,20 @@ require_once 'templates/header.php';
             <tbody id="tableBodyDisposisi" class="bg-white divide-y divide-gray-200">
                 <?php foreach ($disposisi_list as $disposisi): ?>
                     <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap font-medium text-primary"><?php echo htmlspecialchars($disposisi['nomor_agenda_lengkap']); ?></td>
+                        <td class="px-6 py-4 whitespace-nowrap font-medium">
+                            <?php if ($disposisi['file_lampiran']): ?>
+                                <a href="#" class="text-primary hover:underline pdf-modal-trigger" data-pdf-src="/uploads/disposisi_sekwan/<?php echo htmlspecialchars($disposisi['file_lampiran']); ?>" data-agenda-no="<?php echo htmlspecialchars($disposisi['nomor_agenda_lengkap']); ?>">
+                                    <?php echo htmlspecialchars($disposisi['nomor_agenda_lengkap']); ?>
+                                </a>
+                            <?php else: ?>
+                                <span class="text-gray-500"><?php echo htmlspecialchars($disposisi['nomor_agenda_lengkap']); ?></span>
+                            <?php endif; ?>
+                        </td>
                         <td class="px-6 py-4"><?php echo htmlspecialchars($disposisi['perihal']); ?></td>
                         <td class="px-6 py-4 whitespace-nowrap"><?php echo htmlspecialchars($disposisi['nama_pegawai']); ?></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($disposisi['tgl_disposisi_formatted']); ?></td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <?php if ($disposisi['file_lampiran']): ?>
-                                <a href="/uploads/disposisi_sekwan/<?php echo htmlspecialchars($disposisi['file_lampiran']); ?>" target="_blank" class="text-indigo-600 hover:text-indigo-900">Lihat File</a>
-                            <?php else: ?>
-                                -
-                            <?php endif; ?>
-                        </td>
-                         <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                        
+                        <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <!-- MODIFIKASI: Menambahkan tombol Edit dan mengubah tombol Batalkan menjadi ikon -->
                                 <div class="flex space-x-3">

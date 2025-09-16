@@ -108,9 +108,6 @@ export function updateTableSuratKeluar(suratList) {
   );
 }
 function getSuratKeluarRowHTML(surat) {
-  const lampiranHtml = surat.file_lampiran
-    ? `<a href="/uploads/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
-    : '<span class="text-gray-400">-</span>';
   return `<tr class="hover:bg-gray-50">
         <td class="px-6 py-4 font-medium"><a href="#" class="text-primary hover:underline detail-link-keluar" data-id="${
           surat.id
@@ -118,7 +115,6 @@ function getSuratKeluarRowHTML(surat) {
         <td class="px-6 py-4">${escapeHTML(surat.tgl_formatted)}</td>
         <td class="px-6 py-4">${escapeHTML(surat.perihal)}</td>
         <td class="px-6 py-4">${escapeHTML(surat.tujuan)}</td>
-        <td class="px-6 py-4">${lampiranHtml}</td>
         ${getActionButtons("keluar", surat.id)}
     </tr>`;
 }
@@ -131,9 +127,6 @@ export function updateTableSuratKeluarDewan(suratList) {
   );
 }
 function getSuratKeluarDewanRowHTML(surat) {
-  const lampiranHtml = surat.file_lampiran
-    ? `<a href="/uploads-dewan/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
-    : '<span class="text-gray-400">-</span>';
   return `<tr class="hover:bg-gray-50">
         <td class="px-6 py-4 font-medium"><a href="#" class="text-primary hover:underline detail-link-keluar-dewan" data-id="${
           surat.id
@@ -141,7 +134,6 @@ function getSuratKeluarDewanRowHTML(surat) {
         <td class="px-6 py-4">${escapeHTML(surat.tgl_formatted)}</td>
         <td class="px-6 py-4">${escapeHTML(surat.perihal)}</td>
         <td class="px-6 py-4">${escapeHTML(surat.tujuan)}</td>
-        <td class="px-6 py-4">${lampiranHtml}</td>
         ${getActionButtons("keluar-dewan", surat.id)}
     </tr>`;
 }
@@ -154,9 +146,6 @@ export function updateTableSuratMasuk(suratList) {
   );
 }
 function getSuratMasukRowHTML(surat) {
-  const lampiranHtml = surat.file_lampiran
-    ? `<a href="/uploads/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
-    : '<span class="text-gray-400">-</span>';
   return `<tr class="hover:bg-gray-50">
         <td class="px-6 py-4 font-semibold"><a href="#" class="text-primary hover:underline detail-link" data-id="${
           surat.id
@@ -164,7 +153,6 @@ function getSuratMasukRowHTML(surat) {
         <td class="px-6 py-4">${escapeHTML(surat.asal_surat)}</td>
         <td class="px-6 py-4">${escapeHTML(surat.perihal)}</td>
         <td class="px-6 py-4">${escapeHTML(surat.tgl_terima_formatted)}</td>
-        <td class="px-6 py-4">${lampiranHtml}</td>
         ${getActionButtons("masuk", surat.id)}
     </tr>`;
 }
@@ -177,9 +165,6 @@ export function updateTableSuratMasukDewan(suratList) {
   );
 }
 function getSuratMasukDewanRowHTML(surat) {
-  const lampiranHtml = surat.file_lampiran
-    ? `<a href="/uploads-dewan/${surat.file_lampiran}" target="_blank" class="text-primary hover:underline"><i class="fas fa-file-alt"></i> Lihat</a>`
-    : '<span class="text-gray-400">-</span>';
   return `<tr class="hover:bg-gray-50">
         <td class="px-6 py-4 font-semibold"><a href="#" class="text-primary hover:underline detail-link-masuk-dewan" data-id="${
           surat.id
@@ -187,7 +172,6 @@ function getSuratMasukDewanRowHTML(surat) {
         <td class="px-6 py-4">${escapeHTML(surat.asal_surat)}</td>
         <td class="px-6 py-4">${escapeHTML(surat.perihal)}</td>
         <td class="px-6 py-4">${escapeHTML(surat.tgl_terima_formatted)}</td>
-        <td class="px-6 py-4">${lampiranHtml}</td>
         ${getActionButtons("masuk-dewan", surat.id)}
     </tr>`;
 }
@@ -198,9 +182,15 @@ export function updateTableDisposisi(disposisiList) {
   renderTableRows(tableBody, disposisiList, getDisposisiRowHTML);
 }
 function getDisposisiRowHTML(disposisi) {
-  const lampiranHtml = disposisi.file_lampiran
-    ? `<a href="/uploads/disposisi_sekwan/${disposisi.file_lampiran}" target="_blank" class="text-indigo-600 hover:text-indigo-900">Lihat File</a>`
-    : "-";
+  const noAgendaHtml = disposisi.file_lampiran
+    ? `<a href="#" class="text-primary hover:underline pdf-modal-trigger" data-pdf-src="/uploads/disposisi_sekwan/${escapeHTML(
+        disposisi.file_lampiran
+      )}" data-agenda-no="${escapeHTML(disposisi.nomor_agenda_lengkap)}">
+          ${escapeHTML(disposisi.nomor_agenda_lengkap)}
+       </a>`
+    : `<span class="text-gray-500">${escapeHTML(
+        disposisi.nomor_agenda_lengkap
+      )}</span>`;
   let actionButtons = "";
   if (isAdmin) {
     actionButtons = `
@@ -217,9 +207,9 @@ function getDisposisiRowHTML(disposisi) {
   }
 
   return `<tr class="hover:bg-gray-50">
-        <td class="px-6 py-4 whitespace-nowrap font-medium text-primary">${escapeHTML(
-          disposisi.nomor_agenda_lengkap
-        )}</td>
+        <td class="px-6 py-4 whitespace-nowrap font-medium">
+            ${noAgendaHtml}
+        </td>
         <td class="px-6 py-4">${escapeHTML(disposisi.perihal)}</td>
         <td class="px-6 py-4 whitespace-nowrap">${escapeHTML(
           disposisi.nama_pegawai
@@ -227,7 +217,6 @@ function getDisposisiRowHTML(disposisi) {
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(
           disposisi.tgl_disposisi_formatted
         )}</td>
-        <td class="px-6 py-4 whitespace-nowrap">${lampiranHtml}</td>
         ${actionButtons}
     </tr>`;
 }

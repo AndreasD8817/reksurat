@@ -30,6 +30,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initModal();
 
+  // Inisialisasi PDF Modal
+  const pdfModal = document.getElementById("pdf-modal");
+  if (pdfModal) {
+    const closePdfModalBtn = document.getElementById("close-pdf-modal-btn");
+    const pdfModalContent = document.getElementById("pdf-modal-content");
+    const pdfEmbed = document.getElementById("pdf-embed");
+    const pdfModalTitle = document.getElementById("pdf-modal-title");
+    const pdfDownloadLink = document.getElementById("pdf-download-link");
+
+    const openPdfModal = (pdfSrc, agendaNo) => {
+      pdfEmbed.src = pdfSrc;
+      pdfModalTitle.textContent = `Lampiran Surat - No. Agenda: ${agendaNo}`;
+      pdfDownloadLink.href = pdfSrc;
+      pdfModal.classList.remove("hidden");
+      setTimeout(() => {
+        pdfModal.classList.remove("opacity-0");
+        pdfModalContent.classList.remove("scale-95");
+      }, 10);
+    };
+
+    const closePdfModal = () => {
+      pdfModal.classList.add("opacity-0");
+      pdfModalContent.classList.add("scale-95");
+      setTimeout(() => {
+        pdfModal.classList.add("hidden");
+        pdfEmbed.src = ""; // Kosongkan src untuk menghentikan pemuatan
+      }, 300);
+    };
+
+    closePdfModalBtn.addEventListener("click", closePdfModal);
+    pdfModal.addEventListener("click", (e) => {
+      if (e.target === pdfModal) closePdfModal();
+    });
+
+    document.body.addEventListener("click", (e) => {
+      const trigger = e.target.closest(".pdf-modal-trigger");
+      if (!trigger) return;
+      e.preventDefault();
+      openPdfModal(trigger.dataset.pdfSrc, trigger.dataset.agendaNo);
+    });
+  }
+
   // Inisialisasi Fungsionalitas Halaman
   if (document.getElementById("form-keluar-container")) {
     setupPageFunctionality({
