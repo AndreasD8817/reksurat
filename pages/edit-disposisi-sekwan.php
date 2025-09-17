@@ -1,6 +1,8 @@
 <?php
 // pages/edit-disposisi-sekwan.php
 
+require_once 'helpers.php';
+
 // Keamanan: Pastikan hanya admin yang bisa mengakses
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     $_SESSION['error_message'] = "Anda tidak memiliki izin untuk mengakses halaman ini.";
@@ -88,6 +90,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_disposisi'])) 
     );
     $stmt->execute([$nama_pegawai, $catatan, $namaFileBaru, $id]);
     
+    // Catat aktivitas
+    log_activity($pdo, "Mengedit disposisi untuk surat '{$disposisi['nomor_agenda_lengkap']}' (ID Disposisi: {$id})");
+
     $_SESSION['success_message'] = "Data disposisi berhasil diperbarui.";
     header("Location: /disposisi-sekwan");
     exit;

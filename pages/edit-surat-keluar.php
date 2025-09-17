@@ -1,6 +1,8 @@
 <?php
 // pages/edit-surat-keluar.php
 
+require_once 'helpers.php';
+
 // Keamanan: Pastikan hanya admin yang bisa mengakses
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     $_SESSION['error_message'] = "Anda tidak memiliki izin untuk mengakses halaman ini.";
@@ -97,6 +99,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat'])) {
     $stmt = $pdo->prepare("UPDATE surat_keluar SET kode_klasifikasi = ?, nomor_urut = ?, nomor_surat_lengkap = ?, tanggal_surat = ?, tujuan = ?, sifat_surat = ?, perihal = ?, hub_surat_no = ?, konseptor = ?, keterangan = ?, file_lampiran = ? WHERE id = ?");
     $stmt->execute([$kode_klas, $nomor_urut, $nomor_lengkap, $tgl_surat, $tujuan, $sifat_surat, $perihal, $hub_surat, $konseptor, $keterangan, $namaFileBaru, $id]);
     
+    // Catat aktivitas
+    log_activity($pdo, "Mengedit Surat Keluar dengan nomor '{$nomor_lengkap}' (ID: {$id})");
+
     $_SESSION['success_message'] = "Data surat keluar berhasil diperbarui.";
     header("Location: /surat-keluar");
     exit;

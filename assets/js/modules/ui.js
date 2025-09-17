@@ -55,7 +55,10 @@ export function confirmDelete(type, id) {
  * @param {string} formId ID dari form pencarian.
  */
 export function updatePagination(pagination, formId) {
-  const containerId = `paginationContainer${formId.replace("searchForm", "")}`;
+  const formIdentifier = formId.replace("searchForm", "");
+  const containerId = `paginationContainer${
+    formIdentifier === "Log" ? "Log" : formIdentifier
+  }`;
   const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = "";
@@ -218,6 +221,32 @@ function getDisposisiRowHTML(disposisi) {
           disposisi.tgl_disposisi_formatted
         )}</td>
         ${actionButtons}
+    </tr>`;
+}
+
+export function updateTableLog(logs) {
+  const tableBody = document.getElementById("tableBodyLog");
+  if (!tableBody) return;
+  if (!logs || logs.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500"><p>Data log tidak ditemukan.</p></td></tr>`;
+  } else {
+    let rowNumber =
+      (document.getElementById("searchFormLog").currentPage - 1) * 15 + 1;
+    tableBody.innerHTML = logs
+      .map((log) => getLogRowHTML(log, rowNumber++))
+      .join("");
+  }
+}
+
+function getLogRowHTML(log, no) {
+  return `<tr class="hover:bg-blue-50">
+      <td class="px-6 py-4 font-medium text-gray-500">${no}</td>
+      <td class="px-6 py-4 font-semibold text-gray-800">${escapeHTML(
+        log.user_nama
+      )}</td>
+      <td class="px-6 py-4 text-gray-600">${escapeHTML(log.kegiatan)}</td>
+      <td class="px-6 py-4 text-gray-600">${escapeHTML(log.tanggal)}</td>
+      <td class="px-6 py-4 text-gray-600">${escapeHTML(log.jam)}</td>
     </tr>`;
 }
 

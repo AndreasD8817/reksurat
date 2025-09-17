@@ -1,6 +1,8 @@
 <?php
 // pages/edit-surat-masuk.php
 
+require_once 'helpers.php';
+
 // Keamanan: Pastikan hanya admin yang bisa mengakses
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     $_SESSION['error_message'] = "Anda tidak memiliki izin untuk mengakses halaman ini.";
@@ -90,6 +92,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk'])
     $stmt->execute([$agenda_klas, $agenda_urut, $nomor_agenda_lengkap, $nomor_surat_lengkap, $tgl_surat, $tgl_diterima, $asal_surat, $sifat_surat, $perihal, $keterangan, $namaFileBaru, $id]);
     
     $_SESSION['success_message'] = "Data surat masuk berhasil diperbarui.";
+    // Catat aktivitas
+    log_activity($pdo, "Mengedit Surat Masuk dengan nomor agenda '{$nomor_agenda_lengkap}' (ID: {$id})");
+
     header("Location: /surat-masuk");
     exit;
 }

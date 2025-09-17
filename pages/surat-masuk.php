@@ -1,6 +1,8 @@
 <?php
 // pages/surat-masuk.php
 
+require_once 'helpers.php';
+
 // Fungsi handleFileUpload tidak berubah
 function handleFileUpload($fileInputName, $subDirectory) {
     if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
@@ -63,6 +65,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat_masuk'])
             $stmt->execute([$agenda_klas, $agenda_urut, $nomor_agenda_lengkap, $nomor_surat_lengkap, $tgl_surat, $tgl_diterima, $asal_surat, $sifat_surat, $perihal, $keterangan, $fileLampiran]);
             
             $_SESSION['success_message'] = "Surat masuk berhasil disimpan.";
+
+            // Catat aktivitas
+            log_activity($pdo, "Menambah Surat Masuk dengan nomor agenda '{$nomor_agenda_lengkap}'");
         }
     }
     

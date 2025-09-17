@@ -1,6 +1,8 @@
 <?php
 // pages/surat-keluar-dewan.php
 
+require_once 'helpers.php';
+
 // Fungsi untuk menangani unggahan file
 function handleFileUpload($fileInputName, $subDirectory) {
     if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
@@ -57,6 +59,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat'])) {
             $stmt = $pdo->prepare("INSERT INTO surat_keluar_dewan (kode_klasifikasi, nomor_urut, nomor_surat_lengkap, tanggal_surat, tujuan, sifat_surat, perihal, hub_surat_no, konseptor, keterangan, file_lampiran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$kode_klas, $nomor_urut, $nomor_lengkap, $tgl_surat, $tujuan, $sifat_surat, $perihal, $hub_surat, $konseptor, $keterangan, $fileLampiran]);
             
+            // Catat aktivitas
+            log_activity($pdo, "Menambah Surat Keluar Dewan dengan nomor '{$nomor_lengkap}'");
+
             $_SESSION['success_message'] = "Surat keluar Dewan berhasil disimpan.";
         }
     }

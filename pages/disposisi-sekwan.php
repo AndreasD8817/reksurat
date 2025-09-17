@@ -1,6 +1,8 @@
 <?php
 // pages/disposisi-sekwan.php
 
+require_once 'helpers.php';
+
 // Fungsi untuk menangani unggahan file
 function handleDisposisiFileUpload($fileInputName) {
     if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
@@ -45,6 +47,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_disposisi'])) 
             "INSERT INTO disposisi_sekwan (surat_masuk_id, nama_pegawai, catatan_disposisi, file_lampiran) VALUES (?, ?, ?, ?)"
         );
         $stmt->execute([$surat_masuk_id, $nama_pegawai, $catatan, $fileLampiran]);
+
+        // Ambil nomor agenda untuk log
+        $stmt_get_no = $pdo->prepare("SELECT nomor_agenda_lengkap FROM surat_masuk WHERE id = ?");
+        $stmt_get_no->execute([$surat_masuk_id]);
+        $no_agenda = $stmt_get_no->fetchColumn();
+        log_activity($pdo, "Membuat disposisi untuk surat '{$no_agenda}' kepada '{$nama_pegawai}'");
         
         $_SESSION['success_message'] = "Disposisi berhasil disimpan.";
     }

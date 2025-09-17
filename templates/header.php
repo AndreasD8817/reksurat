@@ -130,6 +130,9 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
                 <a href="/users" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'users' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                     <i class="fas fa-users-cog mr-3 w-5 text-center"></i> Manajemen User
                 </a>
+                <a href="/log-user" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'log-user' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                    <i class="fas fa-history mr-3 w-5 text-center"></i> Log User
+                </a>
             <?php endif; ?>
             <a href="/logout" class="block py-3 px-5 mx-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-primary ">
                 <i class="fas fa-sign-out-alt mr-3 w-5 text-center"></i> Keluar
@@ -159,4 +162,3 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
 
         <div class="main-container">
             <main class="p-6">
-
