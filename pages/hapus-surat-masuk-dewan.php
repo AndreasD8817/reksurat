@@ -21,11 +21,7 @@ $surat = $stmt->fetch(PDO::FETCH_ASSOC);
 $nomor_agenda_untuk_log = $surat['nomor_agenda_lengkap'] ?? "ID: {$id}";
 
 if ($surat && !empty($surat['file_lampiran'])) {
-    // Arahkan ke folder 'uploads-dewan'
-    $filePath = 'uploads-dewan/' . $surat['file_lampiran'];
-    if (file_exists($filePath)) {
-        unlink($filePath);
-    }
+    delete_file($surat['file_lampiran'], 'uploads-dewan');
 }
 
 $stmt_delete = $pdo->prepare("DELETE FROM surat_masuk_dewan WHERE id = ?");

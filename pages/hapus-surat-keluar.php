@@ -23,12 +23,7 @@ $surat = $stmt->fetch(PDO::FETCH_ASSOC);
 $nomor_surat_untuk_log = $surat['nomor_surat_lengkap'] ?? "ID: {$id}";
 
 if ($surat && !empty($surat['file_lampiran'])) {
-    // Path lengkap ke file. Menggunakan __DIR__ relatif terhadap index.php sekarang.
-    $filePath = realpath(__DIR__ . '/../uploads/' . $surat['file_lampiran']);
-    // Hapus file jika ada
-    if ($filePath && file_exists($filePath)) {
-        unlink($filePath);
-    }
+    delete_file($surat['file_lampiran'], 'uploads');
 }
 
 // Hapus record dari database

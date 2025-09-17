@@ -33,38 +33,6 @@ if (!$disposisi) {
     exit;
 }
 
-// Fungsi handleDisposisiFileUpload di-copy dari halaman disposisi-sekwan.php
-function handleDisposisiFileUpload($fileInputName) {
-    if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
-        $file = $_FILES[$fileInputName];
-        $fileName = time() . '_' . basename($file['name']);
-        
-        $targetDir = realpath(dirname(__FILE__) . '/../uploads/disposisi_sekwan');
-        if (!file_exists($targetDir)) {
-            mkdir($targetDir, 0777, true);
-        }
-        $targetPath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
-
-        $allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-        $maxSize = 5 * 1024 * 1024; // 5 MB
-
-        if (!in_array($file['type'], $allowedTypes)) {
-            $_SESSION['error_message'] = 'Tipe file tidak valid. Hanya PDF, JPG, dan PNG yang diizinkan.';
-            return null;
-        }
-        if ($file['size'] > $maxSize) {
-            $_SESSION['error_message'] = 'Ukuran file terlalu besar. Maksimal 5 MB.';
-            return null;
-        }
-
-        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-            return $fileName;
-        }
-    }
-    return null;
-}
-
-
 // Logika untuk memproses update data
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_disposisi'])) {
     $nama_pegawai = $_POST['nama_pegawai'];
@@ -73,13 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_disposisi'])) 
     $namaFileBaru = $disposisi['file_lampiran']; // Defaultnya adalah nama file lama
     if (isset($_FILES['file_lampiran']) && $_FILES['file_lampiran']['error'] === UPLOAD_ERR_OK) {
         // Ada file baru, proses unggah
-        $fileBaru = handleDisposisiFileUpload('file_lampiran');
+        $fileBaru = handle_file_upload('file_lampiran', 'uploads', 'disposisi_sekwan');
         if ($fileBaru) {
             // Jika unggah berhasil, hapus file lama (jika ada)
-            $pathFileLama = '../uploads/disposisi_sekwan/' . $disposisi['file_lampiran'];
-            if ($disposisi['file_lampiran'] && file_exists($pathFileLama)) {
-                unlink($pathFileLama);
-            }
+            delete_file($disposisi['file_lampiran'], 'uploads');
             $namaFileBaru = $fileBaru; // Gunakan nama file baru
         }
     }

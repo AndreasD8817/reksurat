@@ -96,7 +96,7 @@ function getActionButtons(type, id) {
     <td class="px-6 py-4">
         <div class="flex space-x-3">
             <a href="/edit-surat-${type}?id=${id}" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
-            <button onclick="window.confirmDelete('${type}', ${id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash-alt"></i></button>
+            <button onclick="window.confirmDelete('surat-${type}', ${id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash-alt"></i></button>
         </div>
     </td>`;
 }
@@ -186,7 +186,7 @@ export function updateTableDisposisi(disposisiList) {
 }
 function getDisposisiRowHTML(disposisi) {
   const noAgendaHtml = disposisi.file_lampiran
-    ? `<a href="#" class="text-primary hover:underline pdf-modal-trigger" data-pdf-src="/uploads/disposisi_sekwan/${escapeHTML(
+    ? `<a href="#" class="text-primary hover:underline pdf-modal-trigger" data-pdf-src="/uploads/${escapeHTML(
         disposisi.file_lampiran
       )}" data-agenda-no="${escapeHTML(disposisi.nomor_agenda_lengkap)}">
           ${escapeHTML(disposisi.nomor_agenda_lengkap)}
@@ -269,33 +269,79 @@ export function showLogDetailModal(detailJson) {
     const data = JSON.parse(detailJson);
     const { sebelum, sesudah, perubahan } = data;
 
-    let contentHTML =
-      '<div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">';
-    // Header untuk tabel detail
-    contentHTML += `<div class="md:col-span-1 font-bold text-gray-500 border-b pb-2">Kolom</div>`;
-    contentHTML += `<div class="md:col-span-1 font-bold text-gray-500 border-b pb-2">Sebelum</div>`;
-    contentHTML += `<div class="md:col-span-1 font-bold text-gray-500 border-b pb-2">Sesudah</div>`;
+    let contentHTML = "";
+    let modalTitle = "";
 
-    if (Object.keys(perubahan).length === 0) {
-      contentHTML += `<div class="col-span-3 text-center py-4 text-gray-500">Tidak ada perubahan data yang terdeteksi. Mungkin hanya file yang diubah.</div>`;
-    } else {
-      for (const key in perubahan) {
-        const valSebelum = escapeHTML(sebelum[key] || "-");
-        const valSesudah = escapeHTML(sesudah[key] || "-");
-        contentHTML += `
-          <div class="md:col-span-1 font-semibold text-gray-800 py-2 border-b">${escapeHTML(
-            key
-          )}</div>
-          <div class="md:col-span-1 text-gray-600 py-2 border-b break-words">${valSebelum}</div>
-          <div class="md:col-span-1 text-green-600 font-medium py-2 border-b break-words">${valSesudah}</div>
-        `;
+    // Case 1: Edit action (has 'perubahan')
+    if (perubahan) {
+      modalTitle =
+        '<i class="fas fa-exchange-alt text-primary mr-3"></i> Detail Perubahan Data';
+      contentHTML =
+        '<div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">';
+      contentHTML += `<div class="md:col-span-1 font-bold text-gray-500 border-b pb-2">Kolom</div>`;
+      contentHTML += `<div class="md:col-span-1 font-bold text-gray-500 border-b pb-2">Sebelum</div>`;
+      contentHTML += `<div class="md:col-span-1 font-bold text-gray-500 border-b pb-2">Sesudah</div>`;
+
+      if (Object.keys(perubahan).length === 0) {
+        contentHTML += `<div class="col-span-3 text-center py-4 text-gray-500">Tidak ada perubahan data yang terdeteksi. Mungkin hanya file yang diubah.</div>`;
+      } else {
+        for (const key in perubahan) {
+          const valSebelum = escapeHTML(sebelum[key] || "-");
+          const valSesudah = escapeHTML(sesudah[key] || "-");
+          contentHTML += `
+                  <div class="md:col-span-1 font-semibold text-gray-800 py-2 border-b">${escapeHTML(
+                    key
+                  )}</div>
+                  <div class="md:col-span-1 text-gray-600 py-2 border-b break-words">${valSebelum}</div>
+                  <div class="md:col-span-1 text-green-600 font-medium py-2 border-b break-words">${valSesudah}</div>
+                `;
+        }
       }
+      contentHTML += "</div>";
+    }
+    // Case 2: Add action (only 'sesudah' exists)
+    else if (sesudah) {
+      modalTitle =
+        '<i class="fas fa-plus-circle text-green-500 mr-3"></i> Detail Data Ditambahkan';
+      contentHTML =
+        '<div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">';
+      contentHTML += `<div class="md:col-span-1 font-bold text-gray-500 border-b pb-2">Kolom</div>`;
+      contentHTML += `<div class="md:col-span-2 font-bold text-gray-500 border-b pb-2">Nilai</div>`;
+
+      for (const key in sesudah) {
+        const value = escapeHTML(sesudah[key] || "-");
+        if (value === "-" || value === "") continue; // Skip empty values
+        contentHTML += `<div class="md:col-span-1 font-semibold text-gray-800 py-2 border-b">${escapeHTML(
+          key
+        )}</div><div class="md:col-span-2 text-gray-700 py-2 border-b break-words">${value}</div>`;
+      }
+      contentHTML += "</div>";
+    }
+    // Case 3: Delete action (only 'sebelum' exists)
+    else if (sebelum) {
+      modalTitle =
+        '<i class="fas fa-trash-alt text-red-500 mr-3"></i> Detail Data Dihapus';
+      contentHTML =
+        '<div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">';
+      contentHTML += `<div class="md:col-span-1 font-bold text-gray-500 border-b pb-2">Kolom</div>`;
+      contentHTML += `<div class="md:col-span-2 font-bold text-gray-500 border-b pb-2">Nilai</div>`;
+
+      for (const key in sebelum) {
+        const value = escapeHTML(sebelum[key] || "-");
+        if (value === "-" || value === "") continue; // Skip empty values
+        contentHTML += `<div class="md:col-span-1 font-semibold text-gray-800 py-2 border-b">${escapeHTML(
+          key
+        )}</div><div class="md:col-span-2 text-gray-700 py-2 border-b break-words">${value}</div>`;
+      }
+      contentHTML += "</div>";
+    } else {
+      modalTitle =
+        '<i class="fas fa-info-circle text-gray-500 mr-3"></i> Detail Log';
+      contentHTML =
+        '<div class="text-center py-4 text-gray-500">Tidak ada detail untuk ditampilkan.</div>';
     }
 
-    contentHTML += "</div>";
-
-    document.querySelector("#detail-modal h3").innerHTML =
-      '<i class="fas fa-exchange-alt text-primary mr-3"></i> Detail Perubahan Data';
+    document.querySelector("#detail-modal h3").innerHTML = modalTitle;
     document.getElementById("modal-body-content").innerHTML = contentHTML;
     document.getElementById("modal-footer-content").innerHTML = ""; // Kosongkan footer
 

@@ -27,35 +27,6 @@ if (!$surat) {
     exit;
 }
 
-// Fungsi untuk menangani unggahan file (dipindahkan dari surat-masuk.php agar bisa dipakai di sini)
-function handleFileUpload($fileInputName, $subDirectory) {
-    if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
-        $file = $_FILES[$fileInputName];
-        $fileName = time() . '_' . basename($file['name']);
-        $mainUploadDir = realpath(dirname(__FILE__) . '/../uploads');
-        $targetDir = $mainUploadDir . DIRECTORY_SEPARATOR . $subDirectory;
-        if (!file_exists($targetDir)) {
-            mkdir($targetDir, 0777, true);
-        }
-        $targetPath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
-        $allowedTypes = ['application/pdf', 'image/jpeg'];
-        $maxSize = 5 * 1024 * 1024;
-        if (!in_array($file['type'], $allowedTypes)) {
-            $_SESSION['error_message'] = 'Tipe file tidak valid. Hanya PDF dan JPG.';
-            return null;
-        }
-        if ($file['size'] > $maxSize) {
-            $_SESSION['error_message'] = 'Ukuran file terlalu besar. Maksimal 5 MB.';
-            return null;
-        }
-        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-            return $subDirectory . '/' . $fileName;
-        }
-    }
-    return null;
-}
-
-
 // --- LOGIKA UPDATE DATA (TERMASUK FILE) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk'])) {
     // 1. Ambil data teks dari form
@@ -75,12 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk'])
     // 2. Cek apakah ada file baru yang diunggah
     $namaFileBaru = $surat['file_lampiran']; // Defaultnya adalah nama file lama
     if (isset($_FILES['file_lampiran']) && $_FILES['file_lampiran']['error'] === UPLOAD_ERR_OK) {
-        $fileBaru = handleFileUpload('file_lampiran', 'surat_masuk');
+        $fileBaru = handle_file_upload('file_lampiran', 'uploads', 'surat_masuk');
         if ($fileBaru) {
-            $pathFileLama = '../uploads/' . $surat['file_lampiran'];
-            if ($surat['file_lampiran'] && file_exists($pathFileLama)) {
-                unlink($pathFileLama);
-            }
+            delete_file($surat['file_lampiran'], 'uploads');
             $namaFileBaru = $fileBaru;
         }
     }

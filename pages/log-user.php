@@ -36,8 +36,13 @@ require_once 'templates/header.php';
             <span class="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Log Aktivitas Pengguna</span>
             <i class="fas fa-history ml-3 text-primary"></i>
         </h3>
-        <form id="searchFormLog" class="w-full md:w-auto">
-            <div class="relative w-full md:w-80">
+        <form id="searchFormLog" class="w-full md:w-auto flex flex-col md:flex-row items-center gap-4">
+            <div class="flex items-center gap-2">
+                <input type="date" id="startDateLog" name="start_date" class="px-4 py-3 border border-gray-300 rounded-xl text-sm" title="Tanggal Mulai">
+                <span class="text-gray-500">-</span>
+                <input type="date" id="endDateLog" name="end_date" class="px-4 py-3 border border-gray-300 rounded-xl text-sm" title="Tanggal Selesai">
+            </div>
+            <div class="relative w-full md:w-auto">
                 <input type="text" id="searchInputLog" name="search" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl" placeholder="Cari kegiatan atau user...">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                     <i class="fas fa-search"></i>
@@ -104,6 +109,8 @@ require_once 'templates/header.php';
         searchInputId: 'searchInputLog', // ID input pencarian
         tableBodyId: 'tableBodyLog', // ID <tbody> tabel
         paginationContainerId: 'paginationContainerLog', // ID kontainer pagination
+        startDateId: 'startDateLog', // ID input tanggal mulai
+        endDateId: 'endDateLog', // ID input tanggal selesai
         searchUrl: '/ajax-search-log-user',
         updateTable: updateTableLog,
     });

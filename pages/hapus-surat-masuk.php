@@ -23,12 +23,7 @@ $surat = $stmt->fetch(PDO::FETCH_ASSOC);
 $nomor_agenda_untuk_log = $surat['nomor_agenda_lengkap'] ?? "ID: {$id}";
 
 if ($surat && !empty($surat['file_lampiran'])) {
-    // Path lengkap ke file
-    $filePath = 'uploads/' . $surat['file_lampiran'];
-    // Hapus file jika ada
-    if (file_exists($filePath)) {
-        unlink($filePath);
-    }
+    delete_file($surat['file_lampiran'], 'uploads');
 }
 
 

@@ -29,10 +29,7 @@ $nomor_agenda_untuk_log = $disposisi['nomor_agenda_lengkap'] ?? "ID Disposisi: {
 
 
 if ($disposisi && !empty($disposisi['file_lampiran'])) {
-    $filePath = 'uploads/disposisi_sekwan/' . $disposisi['file_lampiran'];
-    if (file_exists($filePath)) {
-        unlink($filePath);
-    }
+    delete_file($disposisi['file_lampiran'], 'uploads');
 }
 
 // Hapus record dari database

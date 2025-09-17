@@ -237,7 +237,7 @@ require_once 'templates/header.php';
                             <td class="px-6 py-4">
                                 <div class="flex space-x-2">
                                     <a href="/edit-surat-masuk?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
-                                    <button onclick="confirmDelete('masuk', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                    <button onclick="confirmDelete('surat-masuk', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
                                 </div>
                             </td>
                         <?php endif; ?>

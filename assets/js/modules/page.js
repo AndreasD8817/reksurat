@@ -121,12 +121,20 @@ export function setupPageFunctionality(config) {
       // Ambil nilai dari search input dan filter tahun
       const query = searchInput.value;
       const filterTahunEl = document.getElementById(config.filterTahunId);
+      const startDateEl = document.getElementById(config.startDateId);
+      const endDateEl = document.getElementById(config.endDateId);
       const year = filterTahunEl ? filterTahunEl.value : "";
+      const startDate = startDateEl ? startDateEl.value : "";
+      const endDate = endDateEl ? endDateEl.value : "";
 
       // Bangun URL dengan parameter search, page, dan year
       const url = `${config.searchUrl}?search=${encodeURIComponent(
         query
-      )}&p=${page}&year=${encodeURIComponent(year)}`;
+      )}&p=${page}&year=${encodeURIComponent(
+        year
+      )}&start_date=${encodeURIComponent(
+        startDate
+      )}&end_date=${encodeURIComponent(endDate)}`;
 
       tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8"><i class="fas fa-spinner fa-spin text-primary text-3xl"></i></td></tr>`;
 
@@ -138,7 +146,8 @@ export function setupPageFunctionality(config) {
       fetch(url)
         .then((response) => response.json())
         .then((data) => {
-          const listData = data.disposisi_list || data.surat_list;
+          // Modifikasi: Cek berbagai kemungkinan nama properti data
+          const listData = data.logs || data.disposisi_list || data.surat_list;
           config.updateTable(listData);
 
           if (data.pagination) {
@@ -162,6 +171,16 @@ export function setupPageFunctionality(config) {
     const filterTahunEl = document.getElementById(config.filterTahunId);
     if (filterTahunEl) {
       filterTahunEl.addEventListener("change", () => fetchData(1));
+    }
+
+    // Tambahkan event listener untuk filter rentang tanggal
+    const startDateEl = document.getElementById(config.startDateId);
+    const endDateEl = document.getElementById(config.endDateId);
+    if (startDateEl) {
+      startDateEl.addEventListener("change", () => fetchData(1));
+    }
+    if (endDateEl) {
+      endDateEl.addEventListener("change", () => fetchData(1));
     }
 
     searchForm.addEventListener("submit", (e) => {

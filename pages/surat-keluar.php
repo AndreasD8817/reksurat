@@ -1,34 +1,6 @@
 <?php
 // pages/surat-keluar.php
 
-// Fungsi untuk menangani unggahan file
-function handleFileUpload($fileInputName, $subDirectory) {
-    if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
-        $file = $_FILES[$fileInputName];
-        $fileName = time() . '_' . basename($file['name']);
-        $mainUploadDir = realpath(dirname(__FILE__) . '/../uploads');
-        $targetDir = $mainUploadDir . DIRECTORY_SEPARATOR . $subDirectory;
-        if (!file_exists($targetDir)) {
-            mkdir($targetDir, 0777, true);
-        }
-        $targetPath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
-        $allowedTypes = ['application/pdf', 'image/jpeg'];
-        $maxSize = 5 * 1024 * 1024;
-        if (!in_array($file['type'], $allowedTypes)) {
-            $_SESSION['error_message'] = 'Tipe file tidak valid. Hanya PDF dan JPG.';
-            return null;
-        }
-        if ($file['size'] > $maxSize) {
-            $_SESSION['error_message'] = 'Ukuran file terlalu besar. Maksimal 5 MB.';
-            return null;
-        }
-        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-            return $subDirectory . '/' . $fileName; 
-        }
-    }
-    return null;
-}
-
 // Logika untuk menyimpan surat baru
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat'])) {
     $nomor_urut = $_POST['nomor_urut'];
@@ -43,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat'])) {
     if ($is_exists) {
         $_SESSION['error_message'] = "Nomor Urut '{$nomor_urut}' untuk tahun {$tahun} sudah terdaftar.";
     } else {
-        $fileLampiran = handleFileUpload('file_lampiran', 'surat_keluar');
+        $fileLampiran = handle_file_upload('file_lampiran', 'uploads', 'surat_keluar');
         if (!isset($_SESSION['error_message'])) {
             $kode_klas = $_POST['kode_klasifikasi'];
             $tgl_surat = $_POST['tanggal_surat'];
@@ -267,7 +239,7 @@ require_once 'templates/header.php';
                             <td class="px-6 py-4">
                                 <div class="flex space-x-2">
                                     <a href="/edit-surat-keluar?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
-                                    <button onclick="confirmDelete('keluar', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                    <button onclick="confirmDelete('surat-keluar', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
                                 </div>
                             </td>
                         <?php endif; ?>

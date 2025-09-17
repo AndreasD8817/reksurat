@@ -3,44 +3,13 @@
 
 require_once 'helpers.php';
 
-// Fungsi untuk menangani unggahan file
-function handleDisposisiFileUpload($fileInputName) {
-    if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
-        $file = $_FILES[$fileInputName];
-        $fileName = time() . '_' . basename($file['name']);
-        
-        $targetDir = realpath(dirname(__FILE__) . '/../uploads/disposisi_sekwan');
-        if (!file_exists($targetDir)) {
-            mkdir($targetDir, 0777, true);
-        }
-        $targetPath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
-
-        $allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-        $maxSize = 5 * 1024 * 1024; // 5 MB
-
-        if (!in_array($file['type'], $allowedTypes)) {
-            $_SESSION['error_message'] = 'Tipe file tidak valid. Hanya PDF, JPG, dan PNG yang diizinkan.';
-            return null;
-        }
-        if ($file['size'] > $maxSize) {
-            $_SESSION['error_message'] = 'Ukuran file terlalu besar. Maksimal 5 MB.';
-            return null;
-        }
-
-        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-            return $fileName;
-        }
-    }
-    return null;
-}
-
 // Logika untuk menyimpan data disposisi baru
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_disposisi'])) {
     $surat_masuk_id = $_POST['surat_masuk_id'];
     $nama_pegawai = $_POST['nama_pegawai'];
     $catatan = $_POST['catatan_disposisi'];
 
-    $fileLampiran = handleDisposisiFileUpload('file_lampiran');
+    $fileLampiran = handle_file_upload('file_lampiran', 'uploads', 'disposisi_sekwan');
     
     if (!isset($_SESSION['error_message'])) {
         $data_baru = [
@@ -216,8 +185,8 @@ require_once 'templates/header.php';
                 <?php foreach ($disposisi_list as $disposisi): ?>
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap font-medium">
-                            <?php if ($disposisi['file_lampiran']): ?>
-                                <a href="#" class="text-primary hover:underline pdf-modal-trigger" data-pdf-src="/uploads/disposisi_sekwan/<?php echo htmlspecialchars($disposisi['file_lampiran']); ?>" data-agenda-no="<?php echo htmlspecialchars($disposisi['nomor_agenda_lengkap']); ?>">
+                            <?php if (!empty($disposisi['file_lampiran'])): ?>
+                                <a href="#" class="text-primary hover:underline pdf-modal-trigger" data-pdf-src="/uploads/<?php echo htmlspecialchars($disposisi['file_lampiran']); ?>" data-agenda-no="<?php echo htmlspecialchars($disposisi['nomor_agenda_lengkap']); ?>">
                                     <?php echo htmlspecialchars($disposisi['nomor_agenda_lengkap']); ?>
                                 </a>
                             <?php else: ?>

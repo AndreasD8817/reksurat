@@ -11,14 +11,31 @@ $limit = 15;
 $page = isset($_GET['p']) ? (int)$_GET['p'] : 1;
 $offset = ($page > 0) ? ($page - 1) * $limit : 0;
 $search = $_GET['search'] ?? '';
+$startDate = $_GET['start_date'] ?? '';
+$endDate = $_GET['end_date'] ?? '';
 
-$sql_where = "";
+$where_clauses = [];
 $params = [];
 
 if (!empty($search)) {
-    $sql_where = "WHERE u.nama LIKE ? OR l.kegiatan LIKE ?";
+    $where_clauses[] = "(u.nama LIKE ? OR l.kegiatan LIKE ?)";
     $search_param = "%$search%";
     array_push($params, $search_param, $search_param);
+}
+
+if (!empty($startDate)) {
+    $where_clauses[] = "DATE(l.waktu) >= ?";
+    $params[] = $startDate;
+}
+
+if (!empty($endDate)) {
+    $where_clauses[] = "DATE(l.waktu) <= ?";
+    $params[] = $endDate;
+}
+
+$sql_where = "";
+if (!empty($where_clauses)) {
+    $sql_where = "WHERE " . implode(' AND ', $where_clauses);
 }
 
 $query_base = "FROM log_user l JOIN users u ON l.user_id = u.id " . $sql_where;

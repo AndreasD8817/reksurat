@@ -42,3 +42,22 @@ function handle_file_upload(string $fileInputName, string $uploadDir, string $su
     }
     return null;
 }
+
+/**
+ * Menghapus file lampiran dengan aman dari direktori yang ditentukan.
+ *
+ * @param string|null $filePath Path file relatif dari dalam folder uploads (misal: 'surat_masuk/namafile.pdf').
+ * @param string $uploadDir Direktori utama unggahan ('uploads' atau 'uploads-dewan').
+ * @return bool True jika berhasil dihapus atau file tidak ada, false jika gagal.
+ */
+function delete_file(?string $filePath, string $uploadDir): bool
+{
+    if (empty($filePath)) {
+        return true; // Tidak ada file untuk dihapus, anggap berhasil.
+    }
+
+    $absolutePath = realpath(dirname(__FILE__) . "/../{$uploadDir}/" . $filePath);
+
+    // Cek jika path valid dan file ada, lalu hapus.
+    return ($absolutePath && file_exists($absolutePath)) ? unlink($absolutePath) : true;
+}

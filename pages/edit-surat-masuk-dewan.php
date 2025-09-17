@@ -27,34 +27,6 @@ if (!$surat) {
     exit;
 }
 
-// Fungsi handleFileUpload (tidak perlu diubah)
-function handleFileUpload($fileInputName, $subDirectory) {
-    if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
-        $file = $_FILES[$fileInputName];
-        $fileName = time() . '_' . basename($file['name']);
-        $mainUploadDir = realpath(dirname(__FILE__) . '/../uploads-dewan');
-        $targetDir = $mainUploadDir . DIRECTORY_SEPARATOR . $subDirectory;
-        if (!file_exists($targetDir)) {
-            mkdir($targetDir, 0777, true);
-        }
-        $targetPath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
-        $allowedTypes = ['application/pdf', 'image/jpeg'];
-        $maxSize = 5 * 1024 * 1024;
-        if (!in_array($file['type'], $allowedTypes)) {
-            $_SESSION['error_message'] = 'Tipe file tidak valid. Hanya PDF dan JPG.';
-            return null;
-        }
-        if ($file['size'] > $maxSize) {
-            $_SESSION['error_message'] = 'Ukuran file terlalu besar. Maksimal 5 MB.';
-            return null;
-        }
-        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-            return $subDirectory . '/' . $fileName;
-        }
-    }
-    return null;
-}
-
 // Logika untuk memproses update data
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk_dewan'])) {
     if (!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])) {
@@ -79,12 +51,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk_de
 
     $namaFileBaru = $surat['file_lampiran'];
     if (isset($_FILES['file_lampiran']) && $_FILES['file_lampiran']['error'] === UPLOAD_ERR_OK) {
-        $fileBaru = handleFileUpload('file_lampiran', 'surat_masuk_dewan');
+        $fileBaru = handle_file_upload('file_lampiran', 'uploads-dewan', 'surat_masuk_dewan');
         if ($fileBaru) {
-            $pathFileLama = '../uploads-dewan/' . $surat['file_lampiran'];
-            if ($surat['file_lampiran'] && file_exists($pathFileLama)) {
-                unlink($pathFileLama);
-            }
+            delete_file($surat['file_lampiran'], 'uploads-dewan');
             $namaFileBaru = $fileBaru;
         }
     }

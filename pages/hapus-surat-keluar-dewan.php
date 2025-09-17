@@ -23,11 +23,7 @@ $surat = $stmt->fetch(PDO::FETCH_ASSOC);
 $nomor_surat_untuk_log = $surat['nomor_surat_lengkap'] ?? "ID: {$id}";
 
 if ($surat && !empty($surat['file_lampiran'])) {
-    // Arahkan ke folder 'uploads-dewan'
-    $filePath = 'uploads-dewan/' . $surat['file_lampiran'];
-    if (file_exists($filePath)) {
-        unlink($filePath);
-    }
+    delete_file($surat['file_lampiran'], 'uploads-dewan');
 }
 
 // Hapus record dari database dewan
