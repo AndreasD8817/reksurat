@@ -7,12 +7,36 @@ import {
   updateTableSuratMasuk,
   updateTableSuratMasukDewan,
   updateTableDisposisi,
-  confirmDelete,
+  confirmDelete, // Pastikan ini diekspor dari ui.js
 } from "./modules/ui.js";
 
+// Jadikan fungsi confirmDelete global agar bisa diakses dari HTML
 window.confirmDelete = confirmDelete;
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Inisialisasi Toggle Password
+  const initPasswordToggle = () => {
+    const toggleButtons = document.querySelectorAll(".toggle-password");
+    toggleButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        // Cari input password di dalam parent element yang sama
+        const passwordInput = this.parentElement.querySelector("input");
+        const icon = this.querySelector("i");
+
+        if (passwordInput && passwordInput.type === "password") {
+          passwordInput.type = "text";
+          icon.classList.remove("fa-eye");
+          icon.classList.add("fa-eye-slash");
+        } else if (passwordInput) {
+          passwordInput.type = "password";
+          icon.classList.remove("fa-eye-slash");
+          icon.classList.add("fa-eye");
+        }
+      });
+    });
+  };
+  initPasswordToggle();
+
   // Inisialisasi Sidebar Mobile
   const menuToggle = document.getElementById("menu-toggle");
   const sidebar = document.getElementById("sidebar");
@@ -28,6 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Inisialisasi semua modal
   initModal();
 
   // Inisialisasi PDF Modal
@@ -72,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Inisialisasi Fungsionalitas Halaman
+  // Inisialisasi Fungsionalitas Halaman yang ada
   if (document.getElementById("form-keluar-container")) {
     setupPageFunctionality({
       toggleBtnId: "toggle-form-btn",
@@ -85,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: "nomor_urut_keluar",
       urutLabel: "No. Urut",
       checkUrl: "/ajax-check-nomor-keluar",
-      dateInputName: "tanggal_surat", // MODIFIKASI: Tambahkan nama input tanggal
+      dateInputName: "tanggal_surat",
       searchFormId: "searchFormKeluar",
       searchInputId: "searchInputKeluar",
       tableBodyId: "tableBodyKeluar",
@@ -107,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: "agenda_urut",
       urutLabel: "No. Urut Agenda",
       checkUrl: "/ajax-check-nomor",
-      dateInputName: "tanggal_diterima", // MODIFIKASI: Tambahkan nama input tanggal
+      dateInputName: "tanggal_diterima",
       searchFormId: "searchFormMasuk",
       searchInputId: "searchInputMasuk",
       tableBodyId: "tableBodyMasuk",
@@ -129,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: "nomor_urut_keluar_dewan",
       urutLabel: "No. Urut",
       checkUrl: "/ajax-check-nomor-keluar-dewan",
-      dateInputName: "tanggal_surat", // MODIFIKASI: Tambahkan nama input tanggal
+      dateInputName: "tanggal_surat",
       searchFormId: "searchFormKeluarDewan",
       searchInputId: "searchInputKeluarDewan",
       tableBodyId: "tableBodyKeluarDewan",
@@ -151,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: "agenda_urut_dewan",
       urutLabel: "No. Urut Agenda",
       checkUrl: "/ajax-check-nomor-agenda-dewan",
-      dateInputName: "tanggal_diterima", // MODIFIKASI: Tambahkan nama input tanggal
+      dateInputName: "tanggal_diterima",
       searchFormId: "searchFormMasukDewan",
       searchInputId: "searchInputMasukDewan",
       tableBodyId: "tableBodyMasukDewan",
@@ -161,7 +186,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Inisialisasi untuk halaman Disposisi Sekwan
   if (document.getElementById("searchFormDisposisi")) {
     setupPageFunctionality({
       toggleBtnId: "toggle-form-disposisi-btn",
@@ -174,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: null,
       urutLabel: null,
       checkUrl: null,
-      dateInputName: null, // Tidak ada pengecekan nomor di halaman ini
+      dateInputName: null,
       searchFormId: "searchFormDisposisi",
       searchInputId: "searchInputDisposisi",
       tableBodyId: "tableBodyDisposisi",
