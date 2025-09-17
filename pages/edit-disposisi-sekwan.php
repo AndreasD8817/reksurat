@@ -96,7 +96,7 @@ $pageTitle = 'Edit Disposisi Surat';
 require_once 'templates/header.php';
 ?>
 
-<div class="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl p-6 animate-fade-in border border-blue-100">
+<div class="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl p-6 border border-blue-100">
     <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b border-blue-200 pb-3 flex items-center">
         <span class="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Edit Disposisi</span>
         <i class="fas fa-edit ml-3 text-primary"></i>

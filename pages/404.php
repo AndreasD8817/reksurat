@@ -19,7 +19,7 @@
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="text-center p-8 animate-fade-in">
+    <div class="text-center p-8">
         <div class="mb-4">
              
         </div>
