@@ -111,6 +111,8 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: "nomor_urut_keluar",
       urutLabel: "No. Urut",
       checkUrl: "/ajax-check-nomor-keluar",
+      yearSelectId: "tahun_penomoran_keluar", // ID dropdown tahun
+      suratType: "keluar", // Tipe surat untuk AJAX
       dateInputName: "tanggal_surat",
       searchFormId: "searchFormKeluar",
       searchInputId: "searchInputKeluar",
@@ -134,6 +136,8 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: "agenda_urut",
       urutLabel: "No. Urut Agenda",
       checkUrl: "/ajax-check-nomor",
+      yearSelectId: "tahun_penomoran_masuk", // ID dropdown tahun
+      suratType: "masuk", // Tipe surat untuk AJAX
       dateInputName: "tanggal_diterima",
       searchFormId: "searchFormMasuk",
       searchInputId: "searchInputMasuk",
@@ -157,6 +161,8 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: "nomor_urut_keluar_dewan",
       urutLabel: "No. Urut",
       checkUrl: "/ajax-check-nomor-keluar-dewan",
+      yearSelectId: "tahun_penomoran_keluar_dewan", // ID dropdown tahun
+      suratType: "keluar-dewan", // Tipe surat untuk AJAX
       dateInputName: "tanggal_surat",
       searchFormId: "searchFormKeluarDewan",
       searchInputId: "searchInputKeluarDewan",
@@ -180,6 +186,8 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: "agenda_urut_dewan",
       urutLabel: "No. Urut Agenda",
       checkUrl: "/ajax-check-nomor-agenda-dewan",
+      yearSelectId: "tahun_penomoran_masuk_dewan", // ID dropdown tahun
+      suratType: "masuk-dewan", // Tipe surat untuk AJAX
       dateInputName: "tanggal_diterima",
       searchFormId: "searchFormMasukDewan",
       searchInputId: "searchInputMasukDewan",

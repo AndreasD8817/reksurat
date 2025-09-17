@@ -110,6 +110,40 @@ export function setupPageFunctionality(config) {
     });
   }
 
+  // Logika untuk auto-fill nomor urut saat tahun berubah
+  const yearSelect = document.getElementById(config.yearSelectId);
+  if (yearSelect) {
+    yearSelect.addEventListener("change", function () {
+      const selectedYear = this.value;
+      const urutInput = document.getElementById(config.urutInputId);
+      const checkUrl = `/ajax-get-next-nomor?type=${config.suratType}&tahun=${selectedYear}`;
+
+      if (!urutInput || !config.suratType) return;
+
+      // Tampilkan loading di input
+      urutInput.style.opacity = "0.5";
+
+      fetch(checkUrl)
+        .then((response) => {
+          if (!response.ok) throw new Error("Network response was not ok");
+          return response.json();
+        })
+        .then((data) => {
+          if (data.next_nomor) {
+            urutInput.value = data.next_nomor;
+          }
+        })
+        .catch((error) => {
+          console.error("Gagal mengambil nomor urut berikutnya:", error);
+          // Biarkan input kosong atau beri nilai default jika gagal
+          urutInput.value = "1";
+        })
+        .finally(() => {
+          urutInput.style.opacity = "1";
+        });
+    });
+  }
+
   // Logika untuk pencarian data
   const searchForm = document.getElementById(config.searchFormId);
   if (searchForm) {

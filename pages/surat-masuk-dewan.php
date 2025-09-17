@@ -84,6 +84,12 @@ $current_year = date('Y');
 $all_years = array_unique(array_merge($db_years, [$current_year, $current_year + 1]));
 rsort($all_years); // Mengurutkan dari besar ke kecil (descending)
 
+// --- LOGIKA UNTUK NOMOR URUT OTOMATIS ---
+$stmt_next_num = $pdo->prepare("SELECT MAX(CAST(agenda_urut AS UNSIGNED)) FROM surat_masuk_dewan WHERE YEAR(tanggal_diterima) = ?");
+$stmt_next_num->execute([$current_year]);
+$max_num = $stmt_next_num->fetchColumn();
+$next_nomor_urut = $max_num ? (int)$max_num + 1 : 1;
+
 $pageTitle = 'Surat Masuk Dewan';
 require_once 'templates/header.php';
 ?>
@@ -107,10 +113,10 @@ require_once 'templates/header.php';
                 <div class="flex items-center space-x-2">
                     <input type="text" id="agenda_klasifikasi_dewan" name="agenda_klasifikasi" class="flex-1 px-4 py-3 rounded-xl border border-gray-300" placeholder="Klasifikasi">
                     <span class="text-gray-500 pt-2">/</span>
-                    <input type="text" id="agenda_urut_dewan" name="agenda_urut" class="w-24 px-4 py-3 rounded-xl border border-gray-300 text-center" placeholder="No. Urut">
+                    <input type="text" id="agenda_urut_dewan" name="agenda_urut" value="<?php echo $next_nomor_urut; ?>" class="w-24 px-4 py-3 rounded-xl border border-gray-300 text-center" placeholder="No. Urut">
                     <span class="text-gray-500 pt-2">/</span>
                     <!-- Dropdown Tahun -->
-                    <select name="tahun_penomoran" class="w-28 px-4 py-3 rounded-xl border border-gray-300 bg-white" required>
+                    <select id="tahun_penomoran_masuk_dewan" name="tahun_penomoran" class="w-28 px-4 py-3 rounded-xl border border-gray-300 bg-white" required>
                         <?php foreach ($all_years as $year): ?>
                             <option value="<?php echo $year; ?>" <?php echo ($year == $current_year) ? 'selected' : ''; ?>>
                                 <?php echo $year; ?>
