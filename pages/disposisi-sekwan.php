@@ -80,6 +80,18 @@ $stmt_count = $pdo->query("SELECT COUNT(id) FROM disposisi_sekwan");
 $total_records = $stmt_count->fetchColumn();
 $total_pages = ceil($total_records / $limit);
 
+// --- LOGIKA UNTUK DROPDOWN TAHUN DINAMIS (FILTER) ---
+// 1. Ambil tahun-tahun yang sudah ada dari database
+$stmt_years = $pdo->query("SELECT DISTINCT YEAR(tanggal_disposisi) as year FROM disposisi_sekwan WHERE YEAR(tanggal_disposisi) IS NOT NULL ORDER BY year ASC");
+$db_years = $stmt_years->fetchAll(PDO::FETCH_COLUMN);
+
+// 2. Dapatkan tahun saat ini dan tahun depan
+$current_year = date('Y');
+
+// 3. Gabungkan semua tahun, buat unik, dan urutkan dari terbaru ke terlama
+$all_years = array_unique(array_merge($db_years, [$current_year, $current_year + 1]));
+rsort($all_years); // Mengurutkan dari besar ke kecil (descending)
+
 $pageTitle = 'Disposisi Surat Masuk';
 require_once 'templates/header.php';
 ?>
@@ -153,10 +165,22 @@ require_once 'templates/header.php';
             <i class="fas fa-list-alt text-primary mr-2"></i> 
             <span class="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Daftar Disposisi</span>
         </h3>
-        <form id="searchFormDisposisi" class="w-full md:w-80">
-            <div class="relative">
+        <form id="searchFormDisposisi" class="w-full md:w-auto flex items-center gap-4">
+             <!-- Filter Tahun -->
+            <select id="filterTahunDisposisi" name="filter_tahun" class="w-44 px-4 py-3 rounded-xl border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500 transition duration-200">
+                <option value="">Semua Tahun</option>
+                <?php foreach ($all_years as $year): ?>
+                    <option value="<?php echo $year; ?>">
+                        <?php echo $year; ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <!-- Kolom Pencarian -->
+            <div class="relative w-full md:w-80">
                 <input type="text" id="searchInputDisposisi" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl" placeholder="Cari perihal, no agenda...">
-                <i class="fas fa-search absolute left-3 top-4 text-gray-400"></i>
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                    <i class="fas fa-search"></i>
+                </div>
             </div>
         </form>
     </div>

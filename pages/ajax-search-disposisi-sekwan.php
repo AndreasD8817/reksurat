@@ -13,14 +13,26 @@ $limit = 10;
 $page = isset($_GET['p']) ? (int)$_GET['p'] : 1;
 $offset = ($page > 0) ? ($page - 1) * $limit : 0;
 $search = $_GET['search'] ?? '';
+$year = $_GET['year'] ?? '';
 
 // Siapkan query pencarian
 $sql_where = "";
 $params = [];
+$conditions = [];
+
 if (!empty($search)) {
-    $sql_where = "WHERE sm.nomor_agenda_lengkap LIKE ? OR sm.perihal LIKE ? OR ds.nama_pegawai LIKE ?";
+    $conditions[] = "(sm.nomor_agenda_lengkap LIKE ? OR sm.perihal LIKE ? OR ds.nama_pegawai LIKE ?)";
     $search_param = "%$search%";
-    $params = [$search_param, $search_param, $search_param];
+    array_push($params, $search_param, $search_param, $search_param);
+}
+
+if (!empty($year) && is_numeric($year)) {
+    $conditions[] = "YEAR(ds.tanggal_disposisi) = ?";
+    $params[] = $year;
+}
+
+if (!empty($conditions)) {
+    $sql_where = "WHERE " . implode(' AND ', $conditions);
 }
 
 // Hitung total data untuk pagination
@@ -38,8 +50,8 @@ $query = "SELECT ds.id, ds.nama_pegawai, ds.file_lampiran,
                  DATE_FORMAT(ds.tanggal_disposisi, '%d-%m-%Y %H:%i') as tgl_disposisi_formatted,
                  sm.nomor_agenda_lengkap, sm.perihal, sm.file_lampiran as surat_masuk_file
           FROM disposisi_sekwan ds
-          JOIN surat_masuk sm ON ds.surat_masuk_id = sm.id " 
-          . $sql_where . " ORDER BY ds.id DESC LIMIT ? OFFSET ?";
+          JOIN surat_masuk sm ON ds.surat_masuk_id = sm.id "
+          . $sql_where . " ORDER BY ds.tanggal_disposisi DESC, ds.id DESC LIMIT ? OFFSET ?";
           
 $stmt_data = $pdo->prepare($query);
 
@@ -49,7 +61,7 @@ foreach ($params as $param) {
     $stmt_data->bindValue($param_index++, $param, PDO::PARAM_STR);
 }
 $stmt_data->bindValue($param_index++, $limit, PDO::PARAM_INT);
-$stmt_data->bindValue($param_index, $offset, PDO::PARAM_INT);
+$stmt_data->bindValue($param_index++, $offset, PDO::PARAM_INT);
 $stmt_data->execute();
 $disposisi_list = $stmt_data->fetchAll(PDO::FETCH_ASSOC);
 

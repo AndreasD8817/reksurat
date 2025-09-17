@@ -118,10 +118,16 @@ export function setupPageFunctionality(config) {
     let debounceTimer;
 
     const fetchData = (page = 1) => {
+      // Ambil nilai dari search input dan filter tahun
       const query = searchInput.value;
+      const filterTahunEl = document.getElementById(config.filterTahunId);
+      const year = filterTahunEl ? filterTahunEl.value : "";
+
+      // Bangun URL dengan parameter search, page, dan year
       const url = `${config.searchUrl}?search=${encodeURIComponent(
         query
-      )}&p=${page}`;
+      )}&p=${page}&year=${encodeURIComponent(year)}`;
+
       tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8"><i class="fas fa-spinner fa-spin text-primary text-3xl"></i></td></tr>`;
 
       const paginationContainer = document.getElementById(
@@ -149,6 +155,13 @@ export function setupPageFunctionality(config) {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => fetchData(1), 300);
     });
+
+    // Tambahkan event listener untuk filter tahun
+    const filterTahunEl = document.getElementById(config.filterTahunId);
+    if (filterTahunEl) {
+      filterTahunEl.addEventListener("change", () => fetchData(1));
+    }
+
     searchForm.addEventListener("submit", (e) => {
       e.preventDefault();
       fetchData(1);

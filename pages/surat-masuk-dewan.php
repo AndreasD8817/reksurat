@@ -82,6 +82,18 @@ $stmt_count = $pdo->query("SELECT COUNT(id) FROM surat_masuk_dewan");
 $total_records = $stmt_count->fetchColumn();
 $total_pages = ceil($total_records / $limit);
 
+// --- LOGIKA UNTUK DROPDOWN TAHUN DINAMIS ---
+// 1. Ambil tahun-tahun yang sudah ada dari database
+$stmt_years = $pdo->query("SELECT DISTINCT YEAR(tanggal_diterima) as year FROM surat_masuk_dewan WHERE YEAR(tanggal_diterima) IS NOT NULL ORDER BY year ASC");
+$db_years = $stmt_years->fetchAll(PDO::FETCH_COLUMN);
+
+// 2. Dapatkan tahun saat ini dan tahun depan
+$current_year = date('Y');
+
+// 3. Gabungkan semua tahun, buat unik, dan urutkan dari terbaru ke terlama
+$all_years = array_unique(array_merge($db_years, [$current_year, $current_year + 1]));
+rsort($all_years); // Mengurutkan dari besar ke kecil (descending)
+
 $pageTitle = 'Surat Masuk Dewan';
 require_once 'templates/header.php';
 ?>
@@ -108,9 +120,12 @@ require_once 'templates/header.php';
                     <input type="text" id="agenda_urut_dewan" name="agenda_urut" class="w-24 px-4 py-3 rounded-xl border border-gray-300 text-center" placeholder="No. Urut">
                     <span class="text-gray-500 pt-2">/</span>
                     <!-- Dropdown Tahun -->
-                    <select name="tahun_penomoran" class="w-28 px-4 py-3 rounded-xl border border-gray-300 bg-white">
-                        <option value="2025" <?php echo (date('Y') == '2025') ? 'selected' : ''; ?>>2025</option>
-                        <option value="2026" <?php echo (date('Y') == '2026') ? 'selected' : ''; ?>>2026</option>
+                    <select name="tahun_penomoran" class="w-28 px-4 py-3 rounded-xl border border-gray-300 bg-white" required>
+                        <?php foreach ($all_years as $year): ?>
+                            <option value="<?php echo $year; ?>" <?php echo ($year == $current_year) ? 'selected' : ''; ?>>
+                                <?php echo $year; ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                     <button type="button" id="checkAgendaDewanBtn" class="px-4 py-3 bg-indigo-100 text-indigo-600 rounded-xl hover:bg-indigo-200" title="Cek ketersediaan No. Urut Agenda">
                         <i class="fas fa-check"></i>
@@ -187,10 +202,22 @@ require_once 'templates/header.php';
             <i class="fas fa-list-alt text-primary mr-2"></i>
             <span class="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Daftar Surat Masuk Dewan</span>
         </h3>
-        <form id="searchFormMasukDewan" class="w-full md:w-96 relative">
-            <div class="relative">
-                <input type="text" id="searchInputMasukDewan" name="search" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl" placeholder="Cari...">
-                <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+        <form id="searchFormMasukDewan" class="w-full md:w-auto flex items-center gap-4">
+            <!-- Filter Tahun -->
+            <select id="filterTahunMasukDewan" name="filter_tahun" class="w-44 px-4 py-3 rounded-xl border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500 transition duration-200">
+                <option value="">Semua Tahun</option>
+                <?php foreach ($all_years as $year): ?>
+                    <option value="<?php echo $year; ?>">
+                        <?php echo $year; ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <!-- Kolom Pencarian -->
+            <div class="relative w-full md:w-80">
+                <input type="text" id="searchInputMasukDewan" name="search" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl" placeholder="Cari perihal, asal surat...">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                    <i class="fas fa-search"></i>
+                </div>
             </div>
         </form>
     </div>
@@ -243,4 +270,3 @@ require_once 'templates/header.php';
 </div>
 
 <?php require_once 'templates/footer.php'; ?>
-

@@ -117,6 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
       paginationContainerId: "paginationContainerKeluar",
       searchUrl: "/ajax-search-surat-keluar",
       updateTable: updateTableSuratKeluar,
+      filterTahunId: "filterTahunKeluar", // Tambahkan ini
     });
   }
 
@@ -139,6 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
       paginationContainerId: "paginationContainerMasuk",
       searchUrl: "/ajax-search-surat-masuk",
       updateTable: updateTableSuratMasuk,
+      filterTahunId: "filterTahunMasuk", // Tambahkan ini
     });
   }
 
@@ -161,6 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
       paginationContainerId: "paginationContainerKeluarDewan",
       searchUrl: "/ajax-search-surat-keluar-dewan",
       updateTable: updateTableSuratKeluarDewan,
+      filterTahunId: "filterTahunKeluarDewan", // Tambahkan ini
     });
   }
 
@@ -183,6 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
       paginationContainerId: "paginationContainerMasukDewan",
       searchUrl: "/ajax-search-surat-masuk-dewan",
       updateTable: updateTableSuratMasukDewan,
+      filterTahunId: "filterTahunMasukDewan", // Tambahkan ini
     });
   }
 
@@ -205,6 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
       paginationContainerId: "paginationContainerDisposisi",
       searchUrl: "/ajax-search-disposisi-sekwan",
       updateTable: updateTableDisposisi,
+      filterTahunId: "filterTahunDisposisi", // Tambahkan ini
     });
   }
 });
