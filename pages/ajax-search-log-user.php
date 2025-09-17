@@ -30,7 +30,7 @@ $total_records = $stmt_count->fetchColumn();
 $total_pages = ceil($total_records / $limit);
 
 // Ambil data log
-$query_data = "SELECT l.id, u.nama as user_nama, l.kegiatan, 
+$query_data = "SELECT l.id, u.nama as user_nama, l.kegiatan, l.detail,
                       DATE_FORMAT(l.waktu, '%d-%m-%Y') as tanggal,
                       DATE_FORMAT(l.waktu, '%H:%i:%s') as jam "
               . $query_base . " ORDER BY l.id DESC LIMIT ? OFFSET ?";

@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION[
 // Logika untuk memuat data awal
 $limit = 15; // Tampilkan lebih banyak log per halaman
 $stmt_data = $pdo->prepare(
-    "SELECT l.id, u.nama as user_nama, l.kegiatan, 
+    "SELECT l.id, u.nama as user_nama, l.kegiatan, l.detail,
             DATE_FORMAT(l.waktu, '%d-%m-%Y') as tanggal,
             DATE_FORMAT(l.waktu, '%H:%i:%s') as jam
      FROM log_user l
@@ -53,6 +53,7 @@ require_once 'templates/header.php';
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">No</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">User</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Kegiatan</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Detail</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Tanggal</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Jam</th>
                 </tr>
@@ -60,7 +61,7 @@ require_once 'templates/header.php';
             <tbody id="tableBodyLog" class="bg-white divide-y divide-gray-200">
                 <?php if (empty($logs)): ?>
                     <tr>
-                        <td colspan="5" class="text-center py-10 text-gray-500">Belum ada aktivitas yang tercatat.</td>
+                        <td colspan="6" class="text-center py-10 text-gray-500">Belum ada aktivitas yang tercatat.</td>
                     </tr>
                 <?php else: ?>
                     <?php $no = 1; foreach ($logs as $log): ?>
@@ -68,6 +69,11 @@ require_once 'templates/header.php';
                             <td class="px-6 py-4 font-medium text-gray-500"><?php echo $no++; ?></td>
                             <td class="px-6 py-4 font-semibold text-gray-800"><?php echo htmlspecialchars($log['user_nama']); ?></td>
                             <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($log['kegiatan']); ?></td>
+                            <td class="px-6 py-4 text-center">
+                                <?php if ($log['detail']): ?>
+                                    <button class="detail-log-btn text-primary hover:underline text-sm" data-detail='<?php echo htmlspecialchars($log['detail']); ?>'>Lihat</button>
+                                <?php endif; ?>
+                            </td>
                             <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($log['tanggal']); ?></td>
                             <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($log['jam']); ?></td>
                         </tr>
@@ -89,4 +95,17 @@ require_once 'templates/header.php';
     </div>
 </div>
 
+<script type="module">
+    import { setupPageFunctionality } from '/assets/js/modules/page.js';
+    import { updateTableLog } from '/assets/js/modules/ui.js';
+
+    setupPageFunctionality({
+        searchFormId: 'searchFormLog', // ID form pencarian
+        searchInputId: 'searchInputLog', // ID input pencarian
+        tableBodyId: 'tableBodyLog', // ID <tbody> tabel
+        paginationContainerId: 'paginationContainerLog', // ID kontainer pagination
+        searchUrl: '/ajax-search-log-user',
+        updateTable: updateTableLog,
+    });
+</script>
 <?php require_once 'templates/footer.php'; ?>

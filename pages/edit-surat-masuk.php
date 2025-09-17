@@ -85,6 +85,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk'])
         }
     }
 
+    // Siapkan data baru untuk log
+    $data_baru = [
+        'agenda_klasifikasi' => $agenda_klas, 'agenda_urut' => $agenda_urut, 'nomor_agenda_lengkap' => $nomor_agenda_lengkap,
+        'nomor_surat_lengkap' => $nomor_surat_lengkap, 'tanggal_surat' => $tgl_surat, 'tanggal_diterima' => $tgl_diterima,
+        'asal_surat' => $asal_surat, 'sifat_surat' => $sifat_surat, 'perihal' => $perihal,
+        'keterangan' => $keterangan, 'file_lampiran' => $namaFileBaru
+    ];
+
+    // Ambil data lama sebelum diupdate untuk perbandingan log
+    $data_lama = array_intersect_key($surat, $data_baru);
+    $perubahan = array_diff_assoc($data_baru, $data_lama);
+
     // 3. Update data di database
     $stmt = $pdo->prepare(
         "UPDATE surat_masuk SET agenda_klasifikasi = ?, agenda_urut = ?, nomor_agenda_lengkap = ?, nomor_surat_lengkap = ?, tanggal_surat = ?, tanggal_diterima = ?, asal_surat = ?, sifat_surat = ?, perihal = ?, keterangan = ?, file_lampiran = ? WHERE id = ?"
@@ -93,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk'])
     
     $_SESSION['success_message'] = "Data surat masuk berhasil diperbarui.";
     // Catat aktivitas
-    log_activity($pdo, "Mengedit Surat Masuk dengan nomor agenda '{$nomor_agenda_lengkap}' (ID: {$id})");
+    log_activity($pdo, "Mengedit Surat Masuk '{$nomor_agenda_lengkap}'", ['sebelum' => $data_lama, 'sesudah' => $data_baru, 'perubahan' => $perubahan]);
 
     header("Location: /surat-masuk");
     exit;

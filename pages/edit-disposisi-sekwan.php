@@ -84,6 +84,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_disposisi'])) 
         }
     }
 
+    // Siapkan data baru untuk log
+    $data_baru = [
+        'nama_pegawai' => $nama_pegawai,
+        'catatan_disposisi' => $catatan,
+        'file_lampiran' => $namaFileBaru
+    ];
+
+    // Ambil data lama sebelum diupdate untuk perbandingan log
+    $data_lama = array_intersect_key($disposisi, $data_baru);
+    $perubahan = array_diff_assoc($data_baru, $data_lama);
+
     // Update data di database
     $stmt = $pdo->prepare(
         "UPDATE disposisi_sekwan SET nama_pegawai = ?, catatan_disposisi = ?, file_lampiran = ? WHERE id = ?"
@@ -91,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_disposisi'])) 
     $stmt->execute([$nama_pegawai, $catatan, $namaFileBaru, $id]);
     
     // Catat aktivitas
-    log_activity($pdo, "Mengedit disposisi untuk surat '{$disposisi['nomor_agenda_lengkap']}' (ID Disposisi: {$id})");
+    log_activity($pdo, "Mengedit disposisi untuk surat '{$disposisi['nomor_agenda_lengkap']}'", ['sebelum' => $data_lama, 'sesudah' => $data_baru, 'perubahan' => $perubahan]);
 
     $_SESSION['success_message'] = "Data disposisi berhasil diperbarui.";
     header("Location: /disposisi-sekwan");

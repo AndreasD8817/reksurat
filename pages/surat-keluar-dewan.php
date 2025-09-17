@@ -56,11 +56,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat'])) {
 
             $nomor_lengkap = sprintf("%s/%s/436.5/%s", $kode_klas, $nomor_urut, $tahun);
             
+            $data_baru = [
+                'kode_klasifikasi' => $kode_klas, 'nomor_urut' => $nomor_urut, 'nomor_surat_lengkap' => $nomor_lengkap,
+                'tanggal_surat' => $tgl_surat, 'tujuan' => $tujuan, 'sifat_surat' => $sifat_surat,
+                'perihal' => $perihal, 'hub_surat_no' => $hub_surat, 'konseptor' => $konseptor,
+                'keterangan' => $keterangan, 'file_lampiran' => $fileLampiran
+            ];
+
             $stmt = $pdo->prepare("INSERT INTO surat_keluar_dewan (kode_klasifikasi, nomor_urut, nomor_surat_lengkap, tanggal_surat, tujuan, sifat_surat, perihal, hub_surat_no, konseptor, keterangan, file_lampiran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$kode_klas, $nomor_urut, $nomor_lengkap, $tgl_surat, $tujuan, $sifat_surat, $perihal, $hub_surat, $konseptor, $keterangan, $fileLampiran]);
+            $stmt->execute(array_values($data_baru));
             
             // Catat aktivitas
-            log_activity($pdo, "Menambah Surat Keluar Dewan dengan nomor '{$nomor_lengkap}'");
+            log_activity($pdo, "Menambah Surat Keluar Dewan '{$nomor_lengkap}'", ['sesudah' => $data_baru]);
 
             $_SESSION['success_message'] = "Surat keluar Dewan berhasil disimpan.";
         }

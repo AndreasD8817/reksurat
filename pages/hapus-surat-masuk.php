@@ -17,12 +17,12 @@ if (!$id) {
 }
 
 // Ambil nama file lampiran sebelum menghapus record
-$stmt = $pdo->prepare("SELECT file_lampiran, nomor_agenda_lengkap FROM surat_masuk WHERE id = ?");
+$stmt = $pdo->prepare("SELECT * FROM surat_masuk WHERE id = ?");
 $stmt->execute([$id]);
 $surat = $stmt->fetch(PDO::FETCH_ASSOC);
 $nomor_agenda_untuk_log = $surat['nomor_agenda_lengkap'] ?? "ID: {$id}";
 
-if ($surat && $surat['file_lampiran']) {
+if ($surat && !empty($surat['file_lampiran'])) {
     // Path lengkap ke file
     $filePath = 'uploads/' . $surat['file_lampiran'];
     // Hapus file jika ada
@@ -37,7 +37,7 @@ $stmt_delete = $pdo->prepare("DELETE FROM surat_masuk WHERE id = ?");
 $stmt_delete->execute([$id]);
 
 // Catat aktivitas
-log_activity($pdo, "Menghapus Surat Masuk dengan nomor agenda '{$nomor_agenda_untuk_log}'");
+log_activity($pdo, "Menghapus Surat Masuk '{$nomor_agenda_untuk_log}'", ['sebelum' => $surat]);
 
 $_SESSION['success_message'] = "Surat masuk berhasil dihapus.";
 header('Location: /surat-masuk');

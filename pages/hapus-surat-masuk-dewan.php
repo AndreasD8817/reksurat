@@ -1,10 +1,7 @@
 <?php
 // pages/hapus-surat-masuk-dewan.php
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-require_once '../config/database.php';
+require_once 'helpers.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     $_SESSION['error_message'] = "Anda tidak memiliki izin untuk melakukan aksi ini.";
@@ -18,11 +15,12 @@ if (!$id) {
     exit;
 }
 
-$stmt = $pdo->prepare("SELECT file_lampiran FROM surat_masuk_dewan WHERE id = ?");
+$stmt = $pdo->prepare("SELECT * FROM surat_masuk_dewan WHERE id = ?");
 $stmt->execute([$id]);
 $surat = $stmt->fetch(PDO::FETCH_ASSOC);
+$nomor_agenda_untuk_log = $surat['nomor_agenda_lengkap'] ?? "ID: {$id}";
 
-if ($surat && $surat['file_lampiran']) {
+if ($surat && !empty($surat['file_lampiran'])) {
     // Arahkan ke folder 'uploads-dewan'
     $filePath = 'uploads-dewan/' . $surat['file_lampiran'];
     if (file_exists($filePath)) {
@@ -32,6 +30,9 @@ if ($surat && $surat['file_lampiran']) {
 
 $stmt_delete = $pdo->prepare("DELETE FROM surat_masuk_dewan WHERE id = ?");
 $stmt_delete->execute([$id]);
+
+// Catat aktivitas
+log_activity($pdo, "Menghapus Surat Masuk Dewan '{$nomor_agenda_untuk_log}'", ['sebelum' => $surat]);
 
 $_SESSION['success_message'] = "Surat masuk dewan berhasil dihapus.";
 header('Location: /surat-masuk-dewan');

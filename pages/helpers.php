@@ -8,11 +8,11 @@
  * @param string $kegiatan Deskripsi kegiatan yang dilakukan.
  * @return void
  */
-function log_activity(PDO $pdo, string $kegiatan): void {
+function log_activity(PDO $pdo, string $kegiatan, ?array $detail = null): void {
     if (isset($_SESSION['user_id'])) {
         $user_id = $_SESSION['user_id'];
-        $stmt = $pdo->prepare("INSERT INTO log_user (user_id, kegiatan) VALUES (?, ?)");
-        $stmt->execute([$user_id, $kegiatan]);
+        $stmt = $pdo->prepare("INSERT INTO log_user (user_id, kegiatan, detail) VALUES (?, ?, ?)");
+        $stmt->execute([$user_id, $kegiatan, $detail ? json_encode($detail) : null]);
     }
 }
 

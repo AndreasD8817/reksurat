@@ -151,10 +151,12 @@ export function setupPageFunctionality(config) {
     };
 
     searchForm.fetchData = fetchData;
-    searchInput.addEventListener("input", () => {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => fetchData(1), 300);
-    });
+    if (searchInput) {
+      searchInput.addEventListener("input", () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => fetchData(1), 300);
+      });
+    }
 
     // Tambahkan event listener untuk filter tahun
     const filterTahunEl = document.getElementById(config.filterTahunId);

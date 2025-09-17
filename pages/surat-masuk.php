@@ -3,34 +3,6 @@
 
 require_once 'helpers.php';
 
-// Fungsi handleFileUpload tidak berubah
-function handleFileUpload($fileInputName, $subDirectory) {
-    if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
-        $file = $_FILES[$fileInputName];
-        $fileName = time() . '_' . basename($file['name']);
-        $mainUploadDir = realpath(dirname(__FILE__) . '/../uploads');
-        $targetDir = $mainUploadDir . DIRECTORY_SEPARATOR . $subDirectory;
-        if (!file_exists($targetDir)) {
-            mkdir($targetDir, 0777, true);
-        }
-        $targetPath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
-        $allowedTypes = ['application/pdf', 'image/jpeg'];
-        $maxSize = 5 * 1024 * 1024;
-        if (!in_array($file['type'], $allowedTypes)) {
-            $_SESSION['error_message'] = 'Tipe file tidak valid. Hanya PDF dan JPG.';
-            return null;
-        }
-        if ($file['size'] > $maxSize) {
-            $_SESSION['error_message'] = 'Ukuran file terlalu besar. Maksimal 5 MB.';
-            return null;
-        }
-        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-            return $subDirectory . '/' . $fileName; 
-        }
-    }
-    return null;
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat_masuk'])) {
     $agenda_urut = $_POST['agenda_urut'];
     // Ambil tahun dari dropdown
@@ -44,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat_masuk'])
     if ($is_exists) {
         $_SESSION['error_message'] = "Nomor Urut Agenda '{$agenda_urut}' untuk tahun {$tahun} sudah terdaftar.";
     } else {
-        $fileLampiran = handleFileUpload('file_lampiran', 'surat_masuk'); 
+        $fileLampiran = handle_file_upload('file_lampiran', 'uploads', 'surat_masuk'); 
         
         if (!isset($_SESSION['error_message'])) {
             $agenda_klas = $_POST['agenda_klasifikasi'];
@@ -58,16 +30,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat_masuk'])
             
             // Gunakan tahun dari dropdown untuk nomor agenda
             $nomor_agenda_lengkap = sprintf("%s/%s/436.5/%s", $agenda_klas, $agenda_urut, $tahun);
+
+            $data_baru = [
+                'agenda_klasifikasi' => $agenda_klas, 'agenda_urut' => $agenda_urut, 'nomor_agenda_lengkap' => $nomor_agenda_lengkap,
+                'nomor_surat_lengkap' => $nomor_surat_lengkap, 'tanggal_surat' => $tgl_surat, 'tanggal_diterima' => $tgl_diterima,
+                'asal_surat' => $asal_surat, 'sifat_surat' => $sifat_surat, 'perihal' => $perihal,
+                'keterangan' => $keterangan, 'file_lampiran' => $fileLampiran
+            ];
     
             $stmt = $pdo->prepare(
                 "INSERT INTO surat_masuk (agenda_klasifikasi, agenda_urut, nomor_agenda_lengkap, nomor_surat_lengkap, tanggal_surat, tanggal_diterima, asal_surat, sifat_surat, perihal, keterangan, file_lampiran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
-            $stmt->execute([$agenda_klas, $agenda_urut, $nomor_agenda_lengkap, $nomor_surat_lengkap, $tgl_surat, $tgl_diterima, $asal_surat, $sifat_surat, $perihal, $keterangan, $fileLampiran]);
+            $stmt->execute(array_values($data_baru));
             
             $_SESSION['success_message'] = "Surat masuk berhasil disimpan.";
 
             // Catat aktivitas
-            log_activity($pdo, "Menambah Surat Masuk dengan nomor agenda '{$nomor_agenda_lengkap}'");
+            log_activity($pdo, "Menambah Surat Masuk '{$nomor_agenda_lengkap}'", ['sesudah' => $data_baru]);
         }
     }
     

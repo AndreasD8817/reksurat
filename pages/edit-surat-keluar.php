@@ -95,12 +95,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat'])) {
         }
     }
 
+    // Siapkan data baru untuk log
+    $data_baru = [
+        'kode_klasifikasi' => $kode_klas, 'nomor_urut' => $nomor_urut, 'nomor_surat_lengkap' => $nomor_lengkap,
+        'tanggal_surat' => $tgl_surat, 'tujuan' => $tujuan, 'sifat_surat' => $sifat_surat,
+        'perihal' => $perihal, 'hub_surat_no' => $hub_surat, 'konseptor' => $konseptor,
+        'keterangan' => $keterangan, 'file_lampiran' => $namaFileBaru
+    ];
+
+    // Ambil data lama sebelum diupdate untuk perbandingan log
+    $data_lama = array_intersect_key($surat, $data_baru);
+    $perubahan = array_diff_assoc($data_baru, $data_lama);
+
     // 3. Update data di database
     $stmt = $pdo->prepare("UPDATE surat_keluar SET kode_klasifikasi = ?, nomor_urut = ?, nomor_surat_lengkap = ?, tanggal_surat = ?, tujuan = ?, sifat_surat = ?, perihal = ?, hub_surat_no = ?, konseptor = ?, keterangan = ?, file_lampiran = ? WHERE id = ?");
     $stmt->execute([$kode_klas, $nomor_urut, $nomor_lengkap, $tgl_surat, $tujuan, $sifat_surat, $perihal, $hub_surat, $konseptor, $keterangan, $namaFileBaru, $id]);
     
     // Catat aktivitas
-    log_activity($pdo, "Mengedit Surat Keluar dengan nomor '{$nomor_lengkap}' (ID: {$id})");
+    log_activity($pdo, "Mengedit Surat Keluar '{$nomor_lengkap}'", ['sebelum' => $data_lama, 'sesudah' => $data_baru, 'perubahan' => $perubahan]);
 
     $_SESSION['success_message'] = "Data surat keluar berhasil diperbarui.";
     header("Location: /surat-keluar");

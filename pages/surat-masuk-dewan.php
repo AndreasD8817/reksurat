@@ -60,15 +60,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat_masuk_de
             // Gunakan tahun dari dropdown
             $nomor_agenda_lengkap = sprintf("%s/%s/436.5/%s", $agenda_klas, $agenda_urut, $tahun);
 
+            $data_baru = [
+                'agenda_klasifikasi' => $agenda_klas, 'agenda_urut' => $agenda_urut, 'nomor_agenda_lengkap' => $nomor_agenda_lengkap,
+                'nomor_surat_lengkap' => $nomor_surat_lengkap, 'tanggal_surat' => $tgl_surat, 'tanggal_diterima' => $tgl_diterima,
+                'asal_surat' => $asal_surat, 'sifat_surat' => $sifat_surat, 'perihal' => $perihal,
+                'diteruskan_kepada' => $diteruskan_kepada, 'keterangan' => $keterangan, 'file_lampiran' => $fileLampiran
+            ];
+
             $stmt = $pdo->prepare(
                 "INSERT INTO surat_masuk_dewan (agenda_klasifikasi, agenda_urut, nomor_agenda_lengkap, nomor_surat_lengkap, tanggal_surat, tanggal_diterima, asal_surat, sifat_surat, perihal, diteruskan_kepada, keterangan, file_lampiran) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
-            $stmt->execute([$agenda_klas, $agenda_urut, $nomor_agenda_lengkap, $nomor_surat_lengkap, $tgl_surat, $tgl_diterima, $asal_surat, $sifat_surat, $perihal, $diteruskan_kepada, $keterangan, $fileLampiran]);
+            $stmt->execute(array_values($data_baru));
 
             $_SESSION['success_message'] = "Surat masuk dewan berhasil disimpan.";
 
             // Catat aktivitas
-            log_activity($pdo, "Menambah Surat Masuk Dewan dengan nomor agenda '{$nomor_agenda_lengkap}'");
+            log_activity($pdo, "Menambah Surat Masuk Dewan '{$nomor_agenda_lengkap}'", ['sesudah' => $data_baru]);
         }
     }
 

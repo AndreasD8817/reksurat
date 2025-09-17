@@ -7,7 +7,8 @@ import {
   updateTableSuratMasuk,
   updateTableSuratMasukDewan,
   updateTableDisposisi,
-  confirmDelete, // Pastikan ini diekspor dari ui.js
+  confirmDelete,
+  showLogDetailModal, // Impor fungsi untuk menampilkan modal log
 } from "./modules/ui.js";
 
 // Jadikan fungsi confirmDelete global agar bisa diakses dari HTML
@@ -212,4 +213,12 @@ document.addEventListener("DOMContentLoaded", () => {
       filterTahunId: "filterTahunDisposisi", // Tambahkan ini
     });
   }
+
+  // Event delegation untuk tombol detail log
+  // Ini akan menangani klik pada tombol "Lihat" di seluruh aplikasi
+  document.body.addEventListener("click", function (e) {
+    if (e.target.classList.contains("detail-log-btn")) {
+      showLogDetailModal(e.target.dataset.detail);
+    }
+  });
 });

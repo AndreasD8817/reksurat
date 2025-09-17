@@ -228,7 +228,7 @@ export function updateTableLog(logs) {
   const tableBody = document.getElementById("tableBodyLog");
   if (!tableBody) return;
   if (!logs || logs.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500"><p>Data log tidak ditemukan.</p></td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500"><p>Data log tidak ditemukan.</p></td></tr>`;
   } else {
     let rowNumber =
       (document.getElementById("searchFormLog").currentPage - 1) * 15 + 1;
@@ -239,15 +239,75 @@ export function updateTableLog(logs) {
 }
 
 function getLogRowHTML(log, no) {
+  const detailButton = log.detail
+    ? `<button class="detail-log-btn text-primary hover:underline text-sm" data-detail='${escapeHTML(
+        log.detail
+      )}'>Lihat</button>`
+    : "";
+
   return `<tr class="hover:bg-blue-50">
       <td class="px-6 py-4 font-medium text-gray-500">${no}</td>
       <td class="px-6 py-4 font-semibold text-gray-800">${escapeHTML(
         log.user_nama
       )}</td>
       <td class="px-6 py-4 text-gray-600">${escapeHTML(log.kegiatan)}</td>
+      <td class="px-6 py-4 text-center">${detailButton}</td>
       <td class="px-6 py-4 text-gray-600">${escapeHTML(log.tanggal)}</td>
       <td class="px-6 py-4 text-gray-600">${escapeHTML(log.jam)}</td>
     </tr>`;
+}
+
+export function showLogDetailModal(detailJson) {
+  try {
+    const modal = document.getElementById("detail-modal");
+    const modalContent = document.getElementById("detail-modal-content");
+    if (!modal || !modalContent) {
+      console.error("Elemen modal detail tidak ditemukan!");
+      return;
+    }
+
+    const data = JSON.parse(detailJson);
+    const { sebelum, sesudah, perubahan } = data;
+
+    let contentHTML =
+      '<div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">';
+    // Header untuk tabel detail
+    contentHTML += `<div class="md:col-span-1 font-bold text-gray-500 border-b pb-2">Kolom</div>`;
+    contentHTML += `<div class="md:col-span-1 font-bold text-gray-500 border-b pb-2">Sebelum</div>`;
+    contentHTML += `<div class="md:col-span-1 font-bold text-gray-500 border-b pb-2">Sesudah</div>`;
+
+    if (Object.keys(perubahan).length === 0) {
+      contentHTML += `<div class="col-span-3 text-center py-4 text-gray-500">Tidak ada perubahan data yang terdeteksi. Mungkin hanya file yang diubah.</div>`;
+    } else {
+      for (const key in perubahan) {
+        const valSebelum = escapeHTML(sebelum[key] || "-");
+        const valSesudah = escapeHTML(sesudah[key] || "-");
+        contentHTML += `
+          <div class="md:col-span-1 font-semibold text-gray-800 py-2 border-b">${escapeHTML(
+            key
+          )}</div>
+          <div class="md:col-span-1 text-gray-600 py-2 border-b break-words">${valSebelum}</div>
+          <div class="md:col-span-1 text-green-600 font-medium py-2 border-b break-words">${valSesudah}</div>
+        `;
+      }
+    }
+
+    contentHTML += "</div>";
+
+    document.querySelector("#detail-modal h3").innerHTML =
+      '<i class="fas fa-exchange-alt text-primary mr-3"></i> Detail Perubahan Data';
+    document.getElementById("modal-body-content").innerHTML = contentHTML;
+    document.getElementById("modal-footer-content").innerHTML = ""; // Kosongkan footer
+
+    // Tampilkan modal secara langsung tanpa animasi yang berkonflik
+    modal.classList.remove("hidden", "opacity-0");
+    modalContent.classList.remove("scale-95");
+    // Pastikan class-class ini ada untuk reset
+    modal.classList.add("opacity-100");
+    modalContent.classList.add("scale-100");
+  } catch (e) {
+    console.error("Gagal parsing detail log:", e);
+  }
 }
 
 // --- FUNGSI RENDER DETAIL MODAL (Tidak ada perubahan) ---

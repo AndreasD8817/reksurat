@@ -1,7 +1,7 @@
 <?php
 // pages/hapus-surat-keluar.php
-// session_start();
-// require_once '../config/database.php';
+
+require_once 'helpers.php';
 
 // Keamanan: Pastikan hanya admin yang bisa mengakses
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
@@ -17,11 +17,12 @@ if (!$id) {
 }
 
 // Ambil nama file lampiran sebelum menghapus record
-$stmt = $pdo->prepare("SELECT file_lampiran FROM surat_keluar WHERE id = ?");
+$stmt = $pdo->prepare("SELECT * FROM surat_keluar WHERE id = ?");
 $stmt->execute([$id]);
 $surat = $stmt->fetch(PDO::FETCH_ASSOC);
+$nomor_surat_untuk_log = $surat['nomor_surat_lengkap'] ?? "ID: {$id}";
 
-if ($surat && $surat['file_lampiran']) {
+if ($surat && !empty($surat['file_lampiran'])) {
     // Path lengkap ke file. Menggunakan __DIR__ relatif terhadap index.php sekarang.
     $filePath = realpath(__DIR__ . '/../uploads/' . $surat['file_lampiran']);
     // Hapus file jika ada
@@ -33,6 +34,9 @@ if ($surat && $surat['file_lampiran']) {
 // Hapus record dari database
 $stmt_delete = $pdo->prepare("DELETE FROM surat_keluar WHERE id = ?");
 $stmt_delete->execute([$id]);
+
+// Catat aktivitas
+log_activity($pdo, "Menghapus Surat Keluar '{$nomor_surat_untuk_log}'", ['sebelum' => $surat]);
 
 $_SESSION['success_message'] = "Surat keluar berhasil dihapus.";
 header('Location: /surat-keluar');
