@@ -91,12 +91,19 @@ function renderTableRows(tableBody, list, rowRenderer) {
 
 const isAdmin = document.body.dataset.userRole === "admin";
 function getActionButtons(type, id) {
-  if (!isAdmin) return "";
+  // Tombol Edit selalu ada untuk role yang berwenang (ditentukan di PHP)
+  let editButton = `<a href="/edit-surat-${type}?id=${id}" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>`;
+
+  // Tombol Hapus hanya untuk admin
+  let deleteButton = isAdmin
+    ? `<button onclick="window.confirmDelete('surat-${type}', ${id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash-alt"></i></button>`
+    : "";
+
   return `
     <td class="px-6 py-4">
         <div class="flex space-x-3">
-            <a href="/edit-surat-${type}?id=${id}" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
-            <button onclick="window.confirmDelete('surat-${type}', ${id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash-alt"></i></button>
+            ${editButton}
+            ${deleteButton}
         </div>
     </td>`;
 }

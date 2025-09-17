@@ -103,25 +103,33 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
             <div class="px-5 mt-4 mb-2">
                 <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Sekretariat</p>
             </div>
-            <a href="/surat-keluar" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'surat-keluar' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
-                <i class="fas fa-paper-plane mr-3 w-5 text-center"></i> Surat Keluar Setwan
-            </a>
-            <a href="/surat-masuk" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'surat-masuk' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
-                <i class="fas fa-envelope mr-3 w-5 text-center"></i> Surat Masuk Setwan
-            </a>
-            <a href="/disposisi-sekwan" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'disposisi-sekwan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
-                <i class="fas fa-share-square mr-3 w-5 text-center"></i> Disposisi Setwan
-            </a>
+            <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat keluar'])): ?>
+                <a href="/surat-keluar" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'surat-keluar' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                    <i class="fas fa-paper-plane mr-3 w-5 text-center"></i> Surat Keluar Setwan
+                </a>
+            <?php endif; ?>
+            <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
+                <a href="/surat-masuk" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'surat-masuk' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                    <i class="fas fa-envelope mr-3 w-5 text-center"></i> Surat Masuk Setwan
+                </a>
+                <a href="/disposisi-sekwan" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'disposisi-sekwan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                    <i class="fas fa-share-square mr-3 w-5 text-center"></i> Disposisi Setwan
+                </a>
+            <?php endif; ?>
 
             <div class="px-5 mt-6 mb-2">
                 <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Dewan</p>
             </div>
-            <a href="/surat-keluar-dewan" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'surat-keluar-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
-                <i class="fas fa-paper-plane mr-3 w-5 text-center"></i> Surat Keluar Dewan
-            </a>
-            <a href="/surat-masuk-dewan" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'surat-masuk-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
-                <i class="fas fa-envelope mr-3 w-5 text-center"></i> Surat Masuk Dewan
-            </a>
+            <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat keluar'])): ?>
+                <a href="/surat-keluar-dewan" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'surat-keluar-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                    <i class="fas fa-paper-plane mr-3 w-5 text-center"></i> Surat Keluar Dewan
+                </a>
+            <?php endif; ?>
+            <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
+                <a href="/surat-masuk-dewan" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'surat-masuk-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                    <i class="fas fa-envelope mr-3 w-5 text-center"></i> Surat Masuk Dewan
+                </a>
+            <?php endif; ?>
             
             <div class="px-5 mt-8 mb-2">
                 <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Sistem</p>

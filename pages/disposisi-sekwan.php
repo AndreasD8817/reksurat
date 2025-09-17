@@ -3,6 +3,12 @@
 
 require_once 'helpers.php';
 
+if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])) {
+    $_SESSION['error_message'] = "Anda tidak memiliki izin untuk mengakses halaman Disposisi.";
+    header('Location: /dashboard');
+    exit;
+}
+
 // Logika untuk menyimpan data disposisi baru
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_disposisi'])) {
     $surat_masuk_id = $_POST['surat_masuk_id'];
@@ -176,7 +182,7 @@ require_once 'templates/header.php';
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Perihal</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pegawai Tertuju</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Disposisi</th>
-                    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                    <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     <?php endif; ?>
                 </tr>
@@ -197,16 +203,17 @@ require_once 'templates/header.php';
                         <td class="px-6 py-4 whitespace-nowrap"><?php echo htmlspecialchars($disposisi['nama_pegawai']); ?></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($disposisi['tgl_disposisi_formatted']); ?></td>
                         
-                        <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                        <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <!-- MODIFIKASI: Menambahkan tombol Edit dan mengubah tombol Batalkan menjadi ikon -->
                                 <div class="flex space-x-3">
                                     <a href="/edit-disposisi-sekwan?id=<?php echo $disposisi['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit Disposisi">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button onclick="confirmDelete('disposisi-sekwan', <?php echo $disposisi['id']; ?>)" class="text-red-500 hover:text-red-700" title="Batalkan Disposisi">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                    <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                                        <button onclick="confirmDelete('disposisi-sekwan', <?php echo $disposisi['id']; ?>)" class="text-red-500 hover:text-red-700" title="Batalkan Disposisi">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         <?php endif; ?>

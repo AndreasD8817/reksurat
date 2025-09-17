@@ -1,6 +1,12 @@
 <?php
 // pages/surat-keluar.php
 
+if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['admin', 'staff surat keluar'])) {
+    $_SESSION['error_message'] = "Anda tidak memiliki izin untuk mengakses halaman Surat Keluar.";
+    header('Location: /dashboard');
+    exit;
+}
+
 // Logika untuk menyimpan surat baru
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat'])) {
     $nomor_urut = $_POST['nomor_urut'];
@@ -219,7 +225,7 @@ require_once 'templates/header.php';
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Tanggal</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Perihal</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Tujuan</th>
-                    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                    <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat keluar'])): ?>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
                     <?php endif; ?>
                 </tr>
@@ -235,11 +241,13 @@ require_once 'templates/header.php';
                         <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($surat['tgl_formatted']); ?></td>
                         <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($surat['perihal']); ?></td>
                         <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($surat['tujuan']); ?></td>
-                        <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                        <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat keluar'])): ?>
                             <td class="px-6 py-4">
                                 <div class="flex space-x-2">
                                     <a href="/edit-surat-keluar?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
-                                    <button onclick="confirmDelete('surat-keluar', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                    <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                                        <button onclick="confirmDelete('surat-keluar', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         <?php endif; ?>

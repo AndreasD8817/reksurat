@@ -101,8 +101,9 @@ require_once 'templates/header.php';
             <div>
                 <label for="role" class="block text-sm font-medium text-gray-700 mb-2">Role</label>
                 <select id="role" name="role" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white" required>
-                    <option value="staff" <?php echo ($user['role'] == 'staff') ? 'selected' : ''; ?>>Staff</option>
                     <option value="admin" <?php echo ($user['role'] == 'admin') ? 'selected' : ''; ?>>Admin</option>
+                    <option value="staff surat masuk" <?php echo ($user['role'] == 'staff surat masuk') ? 'selected' : ''; ?>>Staff Surat Masuk</option>
+                    <option value="staff surat keluar" <?php echo ($user['role'] == 'staff surat keluar') ? 'selected' : ''; ?>>Staff Surat Keluar</option>
                 </select>
             </div>
         </div>
