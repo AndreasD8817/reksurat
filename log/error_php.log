@@ -1,5 +1,2 @@
 
-[17-Sep-2025 06:27:08 UTC] PHP Warning:  Undefined variable $all_years in C:\laragon\www\reksurat\pages\surat-masuk-dewan.php on line 194
-[17-Sep-2025 06:27:08 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-masuk-dewan.php on line 194
-[17-Sep-2025 06:27:41 UTC] PHP Warning:  Undefined variable $all_years in C:\laragon\www\reksurat\pages\surat-masuk-dewan.php on line 194
-[17-Sep-2025 06:27:41 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-masuk-dewan.php on line 194
+

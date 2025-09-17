@@ -1,74 +1,81 @@
 <?php
 // pages/dashboard.php
 
-function get_total_surat(PDO $pdo, string $table): int {
+// --- 1. PENGATURAN TAHUN ---
+$selected_year = $_GET['tahun'] ?? date('Y');
+
+// --- 2. FUNGSI HELPER & PENGAMBILAN DATA ---
+
+/**
+ * Mengambil total surat dari tabel tertentu untuk tahun yang dipilih.
+ * @param PDO $pdo Koneksi PDO.
+ * @param string $table Nama tabel.
+ * @param string $date_column Nama kolom tanggal untuk filter tahun.
+ * @param int $year Tahun yang dipilih.
+ * @return int Jumlah total.
+ */
+function get_total_surat_by_year(PDO $pdo, string $table, string $date_column, int $year): int {
     try {
-        $stmt = $pdo->query("SELECT COUNT(id) FROM $table");
+        $stmt = $pdo->prepare("SELECT COUNT(id) FROM $table WHERE YEAR($date_column) = ?");
+        $stmt->execute([$year]);
         return (int)$stmt->fetchColumn();
     } catch (PDOException $e) {
         error_log("Error getting total surat from $table: " . $e->getMessage());
         return 0;
     }
 }
-// Ambil data statistik untuk ditampilkan di kartu
-$total_surat_masuk = get_total_surat($pdo, 'surat_masuk');
-$total_surat_keluar = get_total_surat($pdo, 'surat_keluar');
-$total_surat_masuk_dewan = get_total_surat($pdo, 'surat_masuk_dewan');
-$total_surat_keluar_dewan = get_total_surat($pdo, 'surat_keluar_dewan');
-$total_disposisi = get_total_surat($pdo, 'disposisi_sekwan');
 
-// BARU: Query untuk menghitung surat masuk setwan yang belum didisposisi
+// Ambil data statistik untuk kartu berdasarkan tahun yang dipilih
+$total_surat_masuk = get_total_surat_by_year($pdo, 'surat_masuk', 'tanggal_diterima', $selected_year);
+$total_surat_keluar = get_total_surat_by_year($pdo, 'surat_keluar', 'tanggal_surat', $selected_year);
+$total_surat_masuk_dewan = get_total_surat_by_year($pdo, 'surat_masuk_dewan', 'tanggal_diterima', $selected_year);
+$total_surat_keluar_dewan = get_total_surat_by_year($pdo, 'surat_keluar_dewan', 'tanggal_surat', $selected_year);
+$total_disposisi = get_total_surat_by_year($pdo, 'disposisi_sekwan', 'tanggal_disposisi', $selected_year);
+
+// Query untuk menghitung surat masuk setwan yang belum didisposisi untuk tahun yang dipilih
 $stmt = $pdo->prepare(
     "SELECT COUNT(sm.id)
      FROM surat_masuk sm
      LEFT JOIN disposisi_sekwan ds ON sm.id = ds.surat_masuk_id 
-     WHERE ds.id IS NULL"
+     WHERE ds.id IS NULL AND YEAR(sm.tanggal_diterima) = ?"
 );
-$stmt->execute();
+$stmt->execute([$selected_year]);
 $surat_belum_disposisi = $stmt->fetchColumn();
 
-// Ambil data untuk line chart dari database
-$bulan_terakhir = 6; // Jumlah bulan terakhir yang ingin ditampilkan
+// Ambil data untuk line chart (12 bulan dalam tahun yang dipilih)
 $line_chart_labels = [];
 $line_chart_masuk = [];
 $line_chart_keluar = [];
 
-$current_month = date('n'); // Ambil bulan saat ini (angka)
-$current_year = date('Y');  // Ambil tahun saat ini
-
-for ($i = $bulan_terakhir - 1; $i >= 0; $i--) {
-    $month = $current_month - $i;
-    $year = $current_year;
-
-    // Jika bulan kurang dari 1, sesuaikan tahun dan bulan
-    if ($month < 1) {
-        $month += 12;
-        $year--;
-    }
-
-    $line_chart_labels[] = date('M', mktime(0, 0, 0, $month, 1, $year)); // Format nama bulan
+for ($month = 1; $month <= 12; $month++) {
+    $line_chart_labels[] = date('M', mktime(0, 0, 0, $month, 1));
 
     // Query untuk surat masuk
     $stmt = $pdo->prepare("SELECT COUNT(id) FROM surat_masuk WHERE MONTH(tanggal_diterima) = ? AND YEAR(tanggal_diterima) = ?");
-    $stmt->execute([$month, $year]);
+    $stmt->execute([$month, $selected_year]);
     $line_chart_masuk[] = (int)$stmt->fetchColumn();
 
     // Query untuk surat keluar
     $stmt = $pdo->prepare("SELECT COUNT(id) FROM surat_keluar WHERE MONTH(tanggal_surat) = ? AND YEAR(tanggal_surat) = ?");
-    $stmt->execute([$month, $year]);
+    $stmt->execute([$month, $selected_year]);
     $line_chart_keluar[] = (int)$stmt->fetchColumn();
 }
-
-// Balik array agar urutan bulan sesuai
-$line_chart_labels = array_reverse($line_chart_labels);
-$line_chart_masuk = array_reverse($line_chart_masuk);
-$line_chart_keluar = array_reverse($line_chart_keluar);
 
 // Encode ke JSON
 $line_chart_labels = json_encode($line_chart_labels);
 $line_chart_masuk = json_encode($line_chart_masuk);
 $line_chart_keluar = json_encode($line_chart_keluar);
 
+// --- 3. LOGIKA UNTUK DROPDOWN TAHUN ---
+$stmt_years = $pdo->query(
+    "(SELECT DISTINCT YEAR(tanggal_surat) as y FROM surat_keluar) UNION " .
+    "(SELECT DISTINCT YEAR(tanggal_diterima) as y FROM surat_masuk) UNION " .
+    "(SELECT DISTINCT YEAR(tanggal_surat) as y FROM surat_keluar_dewan) UNION " .
+    "(SELECT DISTINCT YEAR(tanggal_diterima) as y FROM surat_masuk_dewan)"
+);
+$db_years = $stmt_years->fetchAll(PDO::FETCH_COLUMN);
+$all_years = array_unique(array_merge($db_years, [date('Y'), date('Y') + 1]));
+rsort($all_years); // Urutkan dari terbaru ke terlama
 
 $pageTitle = 'Dashboard';
 require_once 'templates/header.php';
@@ -133,45 +140,61 @@ require_once 'templates/header.php';
 </head>
 <body class="bg-gray-50">
     <div class="container mx-auto px-4 py-8">
-        <header class="text-center mb-12">
-            <h1 class="text-4xl font-bold mb-4 text-gray-800">DASHBOARD PENOMORAN SURAT</h1>
-            <h2 class="text-2xl font-semibold text-gray-600">SEKRETARIAT DPRD KOTA SURABAYA</h2>
-            <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mt-4 rounded-full"></div>
-        </header>
+        <div class="flex flex-col md:flex-row justify-between items-center mb-10">
+            <header class="text-center md:text-left">
+                <h1 class="text-4xl font-bold text-gray-800">Dashboard Penomoran Surat</h1>
+                <h2 class="text-2xl font-semibold text-gray-600">Sekretariat DPRD Kota Surabaya</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mt-4 rounded-full mx-auto md:mx-0"></div>
+            </header>
+            
+            <!-- Filter Tahun -->
+            <div class="mt-6 md:mt-0">
+                <form method="GET" action="/dashboard" class="flex items-center gap-3 bg-white p-2 rounded-xl shadow-sm border">
+                    <label for="tahun" class="text-sm font-medium text-gray-600">Tampilkan Data Tahun:</label>
+                    <select name="tahun" id="tahun" class="w-32 px-3 py-2 rounded-lg border-gray-300 bg-gray-50 focus:ring-2 focus:ring-indigo-300" onchange="this.form.submit()">
+                        <?php foreach ($all_years as $year): ?>
+                            <option value="<?php echo $year; ?>" <?php echo ($year == $selected_year) ? 'selected' : ''; ?>>
+                                <?php echo $year; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </form>
+            </div>
+        </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
             <div class="card p-6 text-center">
                 <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Masuk Setwan</h3> 
-                <div class="stats-number"><?php echo $total_surat_masuk; ?></div>
+                <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_surat_masuk; ?></div>
             </div>
             <div class="card p-6 text-center">
                 <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Keluar Setwan</h3> 
-                <div class="stats-number"><?php echo $total_surat_keluar; ?></div>
+                <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_surat_keluar; ?></div>
             </div>
             <div class="card p-6 text-center">
                 <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Masuk Dewan</h3> 
-                <div class="stats-number"><?php echo $total_surat_masuk_dewan; ?></div>
+                <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_surat_masuk_dewan; ?></div>
             </div>
             <div class="card p-6 text-center">
                 <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Keluar Dewan</h3> 
-                <div class="stats-number"><?php echo $total_surat_keluar_dewan; ?></div>
+                <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_surat_keluar_dewan; ?></div>
             </div>
             <div class="card p-6 text-center">
                 <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Setwan Terdisposisi</h3>
-                <div class="stats-number"><?php echo $total_disposisi; ?></div>
+                <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_disposisi; ?></div>
             </div>
         </div>
         
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
             <div class="card p-6 lg:col-span-2">
-                <h3 class="text-xl font-semibold mb-4 text-center text-gray-700">Trend Surat 6 Bulan Terakhir</h3>
+                <h3 class="text-xl font-semibold mb-4 text-center text-gray-700">Grafik Surat Setwan Tahun <?php echo $selected_year; ?></h3>
                 <div class="chart-container">
                     <canvas id="lineChart"></canvas>
                 </div>
             </div>
             
             <a href="/disposisi-sekwan" class="card p-6 flex flex-col justify-center items-center <?php echo ($surat_belum_disposisi > 0) ? 'blinking-red' : 'blinking-green'; ?>">
-                <h3 class="text-xl font-semibold mb-4 text-center text-gray-700">Perlu Tindak Lanjut</h3>
+                <h3 class="text-xl font-semibold mb-4 text-center text-gray-700">Perlu Disposisi (<?php echo $selected_year; ?>)</h3>
                 <div class="text-6xl font-bold text-gray-800 my-4">
                     <?php echo $surat_belum_disposisi; ?>
                 </div>
@@ -190,13 +213,13 @@ require_once 'templates/header.php';
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div class="card p-6">
-                <h3 class="text-xl font-semibold mb-4 text-center text-gray-700">Volume Surat Total</h3>
+                <h3 class="text-xl font-semibold mb-4 text-center text-gray-700">Volume Surat Tahun <?php echo $selected_year; ?></h3>
                 <div class="chart-container">
                     <canvas id="barChart"></canvas>
                 </div>
             </div>
             <div class="card p-6">
-                <h3 class="text-xl font-semibold mb-4 text-center text-gray-700">Distribusi Surat</h3>
+                <h3 class="text-xl font-semibold mb-4 text-center text-gray-700">Distribusi Surat Tahun <?php echo $selected_year; ?></h3>
                 <div class="chart-container">
                     <canvas id="pieChart"></canvas>
                 </div>
@@ -206,6 +229,7 @@ require_once 'templates/header.php';
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const selectedYear = '<?php echo $selected_year; ?>';
             // Data dari PHP
             const totalSuratMasuk = <?php echo $total_surat_masuk; ?>;
             const totalSuratKeluar = <?php echo $total_surat_keluar; ?>;
@@ -231,7 +255,11 @@ require_once 'templates/header.php';
                         borderRadius: 5 
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } } // Sembunyikan legend karena sudah jelas dari label
+                }
             });
             
             // Pie Chart
@@ -245,7 +273,11 @@ require_once 'templates/header.php';
                         backgroundColor: ['#4f46e5', '#6366f1', '#f59e0b', '#10b981'] 
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } }
+                }
             });
             
             // Line Chart
@@ -256,7 +288,7 @@ require_once 'templates/header.php';
                     labels: lineChartLabels,
                     datasets: [
                         {
-                            label: 'Surat Masuk',
+                            label: 'Surat Masuk Setwan',
                             data: lineChartMasuk,
                             borderColor: '#ef4444', 
                             backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -264,7 +296,7 @@ require_once 'templates/header.php';
                             fill: true
                         },
                         {
-                            label: 'Surat Keluar',
+                            label: 'Surat Keluar Setwan',
                             data: lineChartKeluar, 
                             borderColor: '#3b82f6',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -273,7 +305,7 @@ require_once 'templates/header.php';
                         }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
             });
         });
     </script>
