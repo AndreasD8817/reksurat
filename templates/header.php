@@ -91,9 +91,12 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
     <div class="overlay" id="overlay"></div>
 
     <aside class="sidebar bg-white w-64 shadow-lg z-20 h-screen fixed transition-transform duration-300 ease-in-out" id="sidebar">
-        <div class="px-5 h-20 flex flex-col justify-center border-b border-gray-200 bg-gradient-to-r from-primary to-secondary">
-            <h1 class="text-xl font-bold text-white">Reksurat</h1>
-            <p class="text-sm text-indigo-100">Dashboard Penomoran</p>
+        <div class="px-4 h-20 flex items-center gap-3 border-b border-gray-200 bg-gradient-to-r from-primary to-secondary">
+            <img src="/assets/img/ArekSurat icon.png" alt="Logo ArekSurat" class="h-12 w-12">
+            <div>
+                <h1 class="text-xl font-bold text-white">ArekSurat</h1>
+                <p class="text-sm text-indigo-100">Dashboard Penomoran</p>
+            </div>
         </div>
         <nav class="mt-6">
             

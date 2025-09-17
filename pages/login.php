@@ -56,8 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="relative w-full max-w-md">
         <div class="bg-white rounded-2xl shadow-2xl p-8 backdrop-blur-sm bg-opacity-95">
             <div class="text-center mb-8">
-                <i class="fas fa-envelope-open-text text-indigo-600 text-5xl mx-auto mb-4"></i>
-                <h1 class="text-3xl font-bold text-gray-800">Reksurat</h1>
+                <img src="assets/img/ArekSurat icon.png" alt="Logo" class="mx-auto mb-4" style="width: 250px; height: auto;">
                 <p class="text-gray-500 mt-2">Masuk untuk mengakses dashboard</p>
             </div>
             
@@ -68,7 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <form class="space-y-6" method="POST" action="/login">
-                <!-- Tambahkan CSRF Token -->
                 <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                 <div>
                     <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
