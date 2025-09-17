@@ -97,29 +97,29 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
         </div>
         <nav class="mt-6">
             
-            <a href="/dashboard" class="block py-3 px-5 mx-2 rounded-lg transition-all duration-200 <?php echo ($_GET['page'] ?? '') === 'dashboard' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+            <a href="/dashboard" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'dashboard' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                 <i class="fas fa-tachometer-alt mr-3 w-5 text-center"></i> Dashboard
             </a>
             <div class="px-5 mt-4 mb-2">
                 <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Sekretariat</p>
             </div>
-            <a href="/surat-keluar" class="block py-3 px-5 mx-2 rounded-lg transition-all duration-200 <?php echo ($_GET['page'] ?? '') === 'surat-keluar' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+            <a href="/surat-keluar" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'surat-keluar' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                 <i class="fas fa-paper-plane mr-3 w-5 text-center"></i> Surat Keluar Setwan
             </a>
-            <a href="/surat-masuk" class="block py-3 px-5 mx-2 rounded-lg transition-all duration-200 <?php echo ($_GET['page'] ?? '') === 'surat-masuk' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+            <a href="/surat-masuk" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'surat-masuk' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                 <i class="fas fa-envelope mr-3 w-5 text-center"></i> Surat Masuk Setwan
             </a>
-            <a href="/disposisi-sekwan" class="block py-3 px-5 mx-2 rounded-lg transition-all duration-200 <?php echo ($_GET['page'] ?? '') === 'disposisi-sekwan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+            <a href="/disposisi-sekwan" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'disposisi-sekwan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                 <i class="fas fa-share-square mr-3 w-5 text-center"></i> Disposisi Setwan
             </a>
 
             <div class="px-5 mt-6 mb-2">
                 <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Dewan</p>
             </div>
-            <a href="/surat-keluar-dewan" class="block py-3 px-5 mx-2 rounded-lg transition-all duration-200 <?php echo ($_GET['page'] ?? '') === 'surat-keluar-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+            <a href="/surat-keluar-dewan" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'surat-keluar-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                 <i class="fas fa-paper-plane mr-3 w-5 text-center"></i> Surat Keluar Dewan
             </a>
-            <a href="/surat-masuk-dewan" class="block py-3 px-5 mx-2 rounded-lg transition-all duration-200 <?php echo ($_GET['page'] ?? '') === 'surat-masuk-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+            <a href="/surat-masuk-dewan" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'surat-masuk-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                 <i class="fas fa-envelope mr-3 w-5 text-center"></i> Surat Masuk Dewan
             </a>
             
@@ -127,11 +127,11 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
                 <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Sistem</p>
             </div>
              <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-                <a href="/users" class="block py-3 px-5 mx-2 rounded-lg transition-all duration-200 <?php echo ($_GET['page'] ?? '') === 'users' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                <a href="/users" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'users' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                     <i class="fas fa-users-cog mr-3 w-5 text-center"></i> Manajemen User
                 </a>
             <?php endif; ?>
-            <a href="/logout" class="block py-3 px-5 mx-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-primary transition-all duration-200">
+            <a href="/logout" class="block py-3 px-5 mx-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-primary ">
                 <i class="fas fa-sign-out-alt mr-3 w-5 text-center"></i> Keluar
             </a>
         </nav>
