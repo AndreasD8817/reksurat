@@ -75,7 +75,7 @@ require_once 'templates/header.php';
     </h3>
     
     <form method="POST" action="/edit-user?id=<?php echo $user['id']; ?>" class="space-y-6">
-        <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <label for="nama" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
@@ -117,4 +117,3 @@ require_once 'templates/header.php';
 </div>
 
 <?php require_once 'templates/footer.php'; ?>
-

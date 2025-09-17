@@ -74,8 +74,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_disposisi'])) 
         $fileBaru = handleDisposisiFileUpload('file_lampiran');
         if ($fileBaru) {
             // Jika unggah berhasil, hapus file lama (jika ada)
-            if ($disposisi['file_lampiran'] && file_exists('uploads/disposisi_sekwan/' . $disposisi['file_lampiran'])) {
-                unlink('uploads/disposisi_sekwan/' . $disposisi['file_lampiran']);
+            $pathFileLama = '../uploads/disposisi_sekwan/' . $disposisi['file_lampiran'];
+            if ($disposisi['file_lampiran'] && file_exists($pathFileLama)) {
+                unlink($pathFileLama);
             }
             $namaFileBaru = $fileBaru; // Gunakan nama file baru
         }
@@ -150,4 +151,13 @@ require_once 'templates/header.php';
     </form>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('file-upload-disposisi');
+    const fileNameDisplay = document.getElementById('file-name-disposisi');
+    fileInput.addEventListener('change', function() {
+        fileNameDisplay.textContent = this.files[0] ? this.files[0].name : 'Belum ada file dipilih';
+    });
+});
+</script>
 <?php require_once 'templates/footer.php'; ?>

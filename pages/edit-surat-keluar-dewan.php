@@ -79,8 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat'])) {
     if (isset($_FILES['file_lampiran']) && $_FILES['file_lampiran']['error'] === UPLOAD_ERR_OK) {
         $fileBaru = handleFileUpload('file_lampiran', 'surat_keluar_dewan');
         if ($fileBaru) {
-            $pathFileLama = realpath(__DIR__ . '/../uploads-dewan/' . $surat['file_lampiran']);
-            if ($surat['file_lampiran'] && $pathFileLama && file_exists($pathFileLama)) {
+            $pathFileLama = '../uploads-dewan/' . $surat['file_lampiran'];
+            if ($surat['file_lampiran'] && file_exists($pathFileLama)) {
                 unlink($pathFileLama);
             }
             $namaFileBaru = $fileBaru;
@@ -212,4 +212,13 @@ require_once 'templates/header.php';
     </form>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('file-upload-keluar-dewan');
+    const fileNameDisplay = document.getElementById('file-name-keluar-dewan');
+    fileInput.addEventListener('change', function() {
+        fileNameDisplay.textContent = this.files[0] ? this.files[0].name : 'Belum ada file dipilih';
+    });
+});
+</script>
 <?php require_once 'templates/footer.php'; ?>

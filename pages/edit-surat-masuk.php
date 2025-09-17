@@ -25,6 +25,34 @@ if (!$surat) {
     exit;
 }
 
+// Fungsi untuk menangani unggahan file (dipindahkan dari surat-masuk.php agar bisa dipakai di sini)
+function handleFileUpload($fileInputName, $subDirectory) {
+    if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
+        $file = $_FILES[$fileInputName];
+        $fileName = time() . '_' . basename($file['name']);
+        $mainUploadDir = realpath(dirname(__FILE__) . '/../uploads');
+        $targetDir = $mainUploadDir . DIRECTORY_SEPARATOR . $subDirectory;
+        if (!file_exists($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
+        $targetPath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
+        $allowedTypes = ['application/pdf', 'image/jpeg'];
+        $maxSize = 5 * 1024 * 1024;
+        if (!in_array($file['type'], $allowedTypes)) {
+            $_SESSION['error_message'] = 'Tipe file tidak valid. Hanya PDF dan JPG.';
+            return null;
+        }
+        if ($file['size'] > $maxSize) {
+            $_SESSION['error_message'] = 'Ukuran file terlalu besar. Maksimal 5 MB.';
+            return null;
+        }
+        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+            return $subDirectory . '/' . $fileName;
+        }
+    }
+    return null;
+}
+
 
 // --- LOGIKA UPDATE DATA (TERMASUK FILE) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk'])) {
@@ -45,12 +73,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk'])
     // 2. Cek apakah ada file baru yang diunggah
     $namaFileBaru = $surat['file_lampiran']; // Defaultnya adalah nama file lama
     if (isset($_FILES['file_lampiran']) && $_FILES['file_lampiran']['error'] === UPLOAD_ERR_OK) {
-        // Asumsi fungsi handleFileUpload ada dari file surat-masuk.php atau di-include terpisah
-        // Jika belum, pindahkan fungsinya ke sini juga
         $fileBaru = handleFileUpload('file_lampiran', 'surat_masuk');
         if ($fileBaru) {
-            $pathFileLama = realpath(__DIR__ . '/../uploads/' . $surat['file_lampiran']);
-            if ($surat['file_lampiran'] && $pathFileLama && file_exists($pathFileLama)) {
+            $pathFileLama = '../uploads/' . $surat['file_lampiran'];
+            if ($surat['file_lampiran'] && file_exists($pathFileLama)) {
                 unlink($pathFileLama);
             }
             $namaFileBaru = $fileBaru;
@@ -80,6 +106,7 @@ require_once 'templates/header.php';
     </h3>
     
     <form method="POST" action="/edit-surat-masuk?id=<?php echo $surat['id']; ?>" class="space-y-6" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Klasifikasi / No. Urut Agenda / Tahun</label>
@@ -178,4 +205,13 @@ require_once 'templates/header.php';
     </form>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('file-upload-masuk');
+    const fileNameDisplay = document.getElementById('file-name-masuk');
+    fileInput.addEventListener('change', function() {
+        fileNameDisplay.textContent = this.files[0] ? this.files[0].name : 'Belum ada file dipilih';
+    });
+});
+</script>
 <?php require_once 'templates/footer.php'; ?>
