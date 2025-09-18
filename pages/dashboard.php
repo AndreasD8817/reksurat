@@ -163,26 +163,26 @@ require_once 'templates/header.php';
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
-            <div class="card p-6 text-center">
+            <a href="/cetak-laporan-tahunan?tipe=surat-masuk&tahun=<?php echo $selected_year; ?>" target="_blank" class="card p-6 text-center block">
                 <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Masuk Setwan</h3> 
                 <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_surat_masuk; ?></div>
-            </div>
-            <div class="card p-6 text-center">
+            </a>
+            <a href="/cetak-laporan-tahunan?tipe=surat-keluar&tahun=<?php echo $selected_year; ?>" target="_blank" class="card p-6 text-center block">
                 <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Keluar Setwan</h3> 
                 <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_surat_keluar; ?></div>
-            </div>
-            <div class="card p-6 text-center">
+            </a>
+            <a href="/cetak-laporan-tahunan?tipe=surat-masuk-dewan&tahun=<?php echo $selected_year; ?>" target="_blank" class="card p-6 text-center block">
                 <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Masuk Dewan</h3> 
                 <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_surat_masuk_dewan; ?></div>
-            </div>
-            <div class="card p-6 text-center">
+            </a>
+            <a href="/cetak-laporan-tahunan?tipe=surat-keluar-dewan&tahun=<?php echo $selected_year; ?>" target="_blank" class="card p-6 text-center block">
                 <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Keluar Dewan</h3> 
                 <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_surat_keluar_dewan; ?></div>
-            </div>
-            <div class="card p-6 text-center">
+            </a>
+            <a href="/cetak-laporan-tahunan?tipe=disposisi-sekwan&tahun=<?php echo $selected_year; ?>" target="_blank" class="card p-6 text-center block">
                 <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Setwan Terdisposisi</h3>
                 <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_disposisi; ?></div>
-            </div>
+            </a>
         </div>
         
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">

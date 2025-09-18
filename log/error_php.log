@@ -1,5 +1,5 @@
-[17-Sep-2025 11:22:37 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function handle_file_upload() in C:\laragon\www\reksurat\pages\surat-keluar.php:24
+[18-Sep-2025 00:21:28 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method PDF::SetWidths() in C:\laragon\www\reksurat\pages\cetak-laporan-tahunan.php:166
 Stack trace:
 #0 C:\laragon\www\reksurat\index.php(63): require_once()
 #1 {main}
-  thrown in C:\laragon\www\reksurat\pages\surat-keluar.php on line 24
+  thrown in C:\laragon\www\reksurat\pages\cetak-laporan-tahunan.php on line 166
