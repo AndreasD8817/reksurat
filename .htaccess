@@ -3,6 +3,12 @@
 # Aktifkan Modul Rewrite
 RewriteEngine On
 
+# --- PAKSAKAN PENGGUNAAN HTTPS ---
+# Cek jika koneksi bukan HTTPS
+RewriteCond %{HTTPS} !=on
+# Alihkan ke URL yang sama dengan skema https
+RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R=301,L]
+
 # Hindari file & direktori yang benar-benar ada
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

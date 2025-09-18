@@ -11,10 +11,25 @@ ini_set('error_log', __DIR__ . DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR
 // 4. Atur agar semua jenis error (kecuali notice) tercatat
 error_reporting(E_ALL & ~E_NOTICE);
 
+// --- PENGATURAN MODE MAINTENANCE ---
+// Ubah menjadi 'true' untuk mengaktifkan halaman maintenance.
+$maintenance_mode = true;
+
+// --- MEMUAT DEPENDENSI & VARIABEL LINGKUNGAN ---
+require_once __DIR__ . '/vendor/autoload.php';
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
 
 // Mulai session untuk manajemen login
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
+}
+
+// Cek jika mode maintenance aktif
+if ($maintenance_mode) {
+    require_once 'pages/maintenance.php';
+    exit;
 }
 
 // Panggil file koneksi database

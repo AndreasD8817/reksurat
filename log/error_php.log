@@ -1,5 +1,8 @@
-[18-Sep-2025 00:21:28 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method PDF::SetWidths() in C:\laragon\www\reksurat\pages\cetak-laporan-tahunan.php:166
-Stack trace:
-#0 C:\laragon\www\reksurat\index.php(63): require_once()
-#1 {main}
-  thrown in C:\laragon\www\reksurat\pages\cetak-laporan-tahunan.php on line 166
+[18-Sep-2025 09:55:13 UTC] Koneksi database gagal: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)
+[18-Sep-2025 09:55:13 UTC] Koneksi database gagal: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)
+[18-Sep-2025 10:00:17 UTC] Koneksi database gagal: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)
+[18-Sep-2025 10:00:17 UTC] Koneksi database gagal: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)
+[18-Sep-2025 10:00:24 UTC] Koneksi database gagal: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)
+[18-Sep-2025 10:00:24 UTC] Koneksi database gagal: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)
+[18-Sep-2025 10:00:30 UTC] Koneksi database gagal: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)
+[18-Sep-2025 10:00:30 UTC] Koneksi database gagal: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)
