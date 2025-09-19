@@ -89,13 +89,14 @@ function renderTableRows(tableBody, list, rowRenderer) {
   }
 }
 
-const isAdmin = document.body.dataset.userRole === "admin";
+const userRole = document.body.dataset.userRole;
+const canDelete = userRole === "admin" || userRole === "superadmin";
 function getActionButtons(type, id) {
   // Tombol Edit selalu ada untuk role yang berwenang (ditentukan di PHP)
   let editButton = `<a href="/edit-surat-${type}?id=${id}" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>`;
 
   // Tombol Hapus hanya untuk admin
-  let deleteButton = isAdmin
+  let deleteButton = canDelete
     ? `<button onclick="window.confirmDelete('surat-${type}', ${id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash-alt"></i></button>`
     : "";
 
@@ -158,17 +159,17 @@ export function updateTableSuratKeluarDewan(suratList) {
   );
 }
 function getSuratKeluarDewanRowHTML(surat) {
-  const userRole = document.body.dataset.userRole;
   const canShowActions =
-    userRole === "admin" || userRole === "staff surat keluar";
+    userRole === "superadmin" ||
+    userRole === "admin" ||
+    userRole === "staff surat keluar";
   let actionButtonsHTML = "";
 
   if (canShowActions) {
     const editButton = `<a href="/edit-surat-keluar-dewan?id=${surat.id}" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>`;
-    const deleteButton =
-      userRole === "admin"
-        ? `<button onclick="window.confirmDelete('surat-keluar-dewan', ${surat.id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>`
-        : "";
+    const deleteButton = canDelete
+      ? `<button onclick="window.confirmDelete('surat-keluar-dewan', ${surat.id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>`
+      : "";
 
     actionButtonsHTML = `
         <!-- Tombol Aksi KHUSUS MOBILE -->
@@ -235,13 +236,13 @@ export function updateTableSuratMasuk(suratList) {
 }
 function getSuratMasukRowHTML(surat) {
   // Dapatkan tombol aksi terlebih dahulu
-  const isAdmin = document.body.dataset.userRole === "admin";
+  const canDelete = userRole === "admin" || userRole === "superadmin";
   let actionButtons;
 
   if (surat.disposisi_id) {
     // Surat sudah terdisposisi, tombol dinonaktifkan
     const disabledEdit = `<span class="text-gray-300 cursor-not-allowed" title="Tidak dapat diedit/dihapus karena sudah terdisposisi"><i class="fas fa-edit"></i></span>`;
-    const disabledDelete = isAdmin
+    const disabledDelete = canDelete
       ? `<span class="text-gray-300 cursor-not-allowed" title="Tidak dapat diedit/dihapus karena sudah terdisposisi"><i class="fas fa-trash"></i></span>`
       : "";
     actionButtons = `
@@ -293,9 +294,9 @@ export function updateTableSuratMasukDewan(suratList) {
   );
 }
 function getSuratMasukDewanRowHTML(surat) {
-  const isAdmin = document.body.dataset.userRole === "admin";
+  const canDelete = userRole === "admin" || userRole === "superadmin";
   const editButton = `<a href="/edit-surat-masuk-dewan?id=${surat.id}" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>`;
-  const deleteButton = isAdmin
+  const deleteButton = canDelete
     ? `<button onclick="window.confirmDelete('surat-masuk-dewan', ${surat.id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>`
     : "";
 
@@ -351,8 +352,9 @@ export function updateTableDisposisi(disposisiList) {
 }
 function getDisposisiRowHTML(disposisi) {
   const isAdminOrStaff =
-    document.body.dataset.userRole === "admin" ||
-    document.body.dataset.userRole === "staff surat masuk";
+    userRole === "superadmin" ||
+    userRole === "admin" ||
+    userRole === "staff surat masuk";
 
   const noAgendaHtml = disposisi.file_lampiran
     ? `<a href="#" class="text-primary hover:underline pdf-modal-trigger" data-pdf-src="/uploads/${escapeHTML(
@@ -367,7 +369,7 @@ function getDisposisiRowHTML(disposisi) {
   let actionButtons = "";
   if (isAdminOrStaff) {
     let editButton = `<a href="/edit-disposisi-sekwan?id=${disposisi.id}" class="text-blue-500 hover:text-blue-700" title="Edit Disposisi"><i class="fas fa-edit"></i></a>`;
-    let deleteButton = isAdmin
+    let deleteButton = canDelete
       ? `<button onclick="window.confirmDelete('disposisi-sekwan', ${disposisi.id})" class="text-red-500 hover:text-red-700" title="Batalkan Disposisi"><i class="fas fa-trash-alt"></i></button>`
       : "";
     actionButtons = `

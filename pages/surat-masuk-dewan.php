@@ -4,7 +4,7 @@
 require_once 'helpers.php';
 
 // Memastikan pengguna memiliki izin untuk mengakses halaman ini
-if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])) {
+if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])) {
     $_SESSION['error_message'] = "Anda tidak memiliki izin untuk mengakses halaman Surat Masuk Dewan.";
     header('Location: /dashboard');
     exit;
@@ -228,7 +228,7 @@ require_once 'templates/header.php';
                     <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Asal Surat</th>
                     <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Perihal</th>
                     <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Tgl Diterima</th>
-                    <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
+                    <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])): ?>
                         <!-- [PERBAIKAN] Sembunyikan kolom 'Aksi' di mobile -->
                         <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Aksi</th>
                     <?php endif; ?>
@@ -243,10 +243,10 @@ require_once 'templates/header.php';
                         <td class="px-4 pr-12 md:px-6 py-3 md:py-4 font-semibold">
                             
                             <!-- [PERBAIKAN] Tombol Aksi KHUSUS MOBILE -->
-                            <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
+                            <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])): ?>
                             <div class="md:hidden absolute top-4 right-4 flex space-x-3">
                                 <a href="/edit-surat-masuk-dewan?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
-                                <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                                <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin'])): ?>
                                     <button onclick="window.confirmDelete('surat-masuk-dewan', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
                                 <?php endif; ?>
                             </div>
@@ -270,11 +270,11 @@ require_once 'templates/header.php';
                         <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($surat['tgl_terima_formatted']); ?></td>
                         
                         <!-- [PERBAIKAN] Kolom Aksi KHUSUS DESKTOP -->
-                        <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
+                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])): ?>
                             <td class="px-4 md:px-6 py-3 md:py-4 hidden md:table-cell">
                                 <div class="flex space-x-2">
                                     <a href="/edit-surat-masuk-dewan?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
-                                    <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                                    <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin'])): ?>
                                         <button onclick="window.confirmDelete('surat-masuk-dewan', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
                                     <?php endif; ?>
                                 </div>

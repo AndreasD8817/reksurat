@@ -1,8 +1,8 @@
 <?php
 // pages/users.php
 
-// Keamanan: Pastikan hanya admin yang bisa mengakses halaman ini
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+// Keamanan: Pastikan hanya superadmin yang bisa mengakses halaman ini
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'superadmin') {
     $_SESSION['error_message'] = "Anda tidak memiliki izin untuk mengakses halaman Manajemen User.";
     header('Location: /dashboard');
     exit;
@@ -90,6 +90,7 @@ require_once 'templates/header.php';
                 <label for="role" class="block text-sm font-medium text-gray-700 mb-2">Role</label>
                 <select id="role" name="role" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white" required>
                     <option value="" disabled selected>-- Pilih Role --</option>
+                    <option value="superadmin">Superadmin</option>
                     <option value="admin">Admin</option>
                     <option value="staff surat masuk">Staff Surat Masuk</option>
                     <option value="staff surat keluar">Staff Surat Keluar</option>
@@ -136,6 +137,9 @@ require_once 'templates/header.php';
                             <?php
                                 $role = htmlspecialchars($user['role']);
                                 $badge_class = 'bg-blue-100 text-blue-800';
+                                if ($role === 'superadmin') {
+                                    $badge_class = 'bg-red-100 text-red-800';
+                                }
                                 if ($role === 'admin') {
                                     $badge_class = 'bg-green-100 text-green-800';
                                 }

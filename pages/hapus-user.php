@@ -1,8 +1,8 @@
 <?php
 // pages/hapus-user.php
 
-// Keamanan: Pastikan hanya admin yang bisa melakukan aksi ini
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+// Keamanan: Pastikan hanya superadmin yang bisa melakukan aksi ini
+if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
     $_SESSION['error_message'] = "Anda tidak memiliki izin untuk melakukan aksi ini.";
     header('Location: /users');
     exit;

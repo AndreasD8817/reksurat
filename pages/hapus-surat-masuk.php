@@ -3,8 +3,8 @@
 
 require_once 'helpers.php';
 
-// Keamanan: Pastikan hanya admin yang bisa mengakses
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+// Keamanan: Pastikan hanya superadmin dan admin yang bisa mengakses
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'], ['superadmin', 'admin'])) {
     $_SESSION['error_message'] = "Anda tidak memiliki izin untuk melakukan aksi ini.";
     header('Location: /surat-masuk');
     exit;

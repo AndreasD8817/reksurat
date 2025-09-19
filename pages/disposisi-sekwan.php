@@ -3,7 +3,7 @@
 
 require_once 'helpers.php';
 
-if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])) {
+if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])) {
     $_SESSION['error_message'] = "Anda tidak memiliki izin untuk mengakses halaman Disposisi.";
     header('Location: /dashboard');
     exit;
@@ -184,7 +184,7 @@ require_once 'templates/header.php';
                     <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Perihal</th>
                     <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Pegawai Tertuju</th>
                     <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Tanggal Disposisi</th>
-                    <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
+                    <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])): ?>
                         <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
                     <?php endif; ?>
                 </tr>
@@ -210,13 +210,13 @@ require_once 'templates/header.php';
                         <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($disposisi['nama_pegawai']); ?></td>
                         <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell text-sm"><?php echo htmlspecialchars($disposisi['tgl_disposisi_formatted']); ?></td>
                         
-                        <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
+                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])): ?>
                             <td class="px-4 md:px-6 py-3 md:py-4 text-sm font-medium">
                                 <div class="flex space-x-2">
                                     <a href="/edit-disposisi-sekwan?id=<?php echo $disposisi['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit Disposisi">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                                    <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin'])): ?>
                                         <button onclick="confirmDelete('disposisi-sekwan', <?php echo $disposisi['id']; ?>)" class="text-red-500 hover:text-red-700" title="Batalkan Disposisi">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>

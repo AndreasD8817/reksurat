@@ -4,7 +4,7 @@
 require_once 'helpers.php';
 
 // Memastikan pengguna memiliki izin untuk mengakses halaman
-if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['admin', 'staff surat keluar'])) {
+if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat keluar'])) {
     $_SESSION['error_message'] = "Anda tidak memiliki izin untuk mengakses halaman Surat Keluar Dewan.";
     header('Location: /dashboard');
     exit;
@@ -228,7 +228,7 @@ require_once 'templates/header.php';
                         <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Tanggal</th>
                         <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Perihal</th>
                         <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Tujuan</th>
-                        <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat keluar'])): ?>
+                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat keluar'])): ?>
                             <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
                         <?php endif; ?>
                     </tr>
@@ -244,10 +244,10 @@ require_once 'templates/header.php';
                                     <div><strong>Tanggal:</strong> <?php echo htmlspecialchars($surat['tgl_formatted']); ?></div>
                                     <div><strong>Perihal:</strong> <?php echo htmlspecialchars($surat['perihal']); ?></div>
                                     <div><strong>Tujuan:</strong> <?php echo htmlspecialchars($surat['tujuan']); ?></div>
-                                    <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat keluar'])): ?>
+                                    <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat keluar'])): ?>
                                         <div class="flex space-x-3 mt-2">
                                             <a href="/edit-surat-keluar-dewan?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit mr-1"></i>Edit</a>
-                                            <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                                            <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin'])): ?>
                                                 <button onclick="confirmDelete('surat-keluar-dewan', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash mr-1"></i>Hapus</button>
                                             <?php endif; ?>
                                         </div>
@@ -257,11 +257,11 @@ require_once 'templates/header.php';
                             <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($surat['tgl_formatted']); ?></td>
                             <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($surat['perihal']); ?></td>
                             <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($surat['tujuan']); ?></td>
-                            <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat keluar'])): ?>
+                            <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat keluar'])): ?>
                                 <td class="px-4 md:px-6 py-3 md:py-4 hidden md:table-cell">
                                     <div class="flex space-x-2">
                                         <a href="/edit-surat-keluar-dewan?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
-                                        <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin'])): ?>
                                             <button onclick="confirmDelete('surat-keluar-dewan', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
                                         <?php endif; ?>
                                     </div>

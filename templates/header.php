@@ -1,9 +1,20 @@
 <?php
 // templates/header.php
 
-// Ambil nama user dari session
+// Ambil data user dari session
 $nama_user = $_SESSION['user_nama'] ?? 'User';
 $inisial_user = strtoupper(substr($nama_user, 0, 1));
+$user_role = $_SESSION['user_role'] ?? null;
+
+// --- Logika Hak Akses Menu ---
+// Hak akses untuk menu Surat Keluar (Setwan & Dewan)
+$can_access_surat_keluar = in_array($user_role, ['superadmin', 'admin', 'staff surat keluar']);
+// Hak akses untuk menu Surat Masuk (Setwan & Dewan)
+$can_access_surat_masuk = in_array($user_role, ['superadmin', 'admin', 'staff surat masuk']);
+// Hak akses untuk menu Disposisi (Berdasarkan file disposisi-sekwan.php, staff surat masuk juga bisa akses)
+$can_access_disposisi = in_array($user_role, ['superadmin', 'admin', 'staff surat masuk']);
+// Hak akses untuk menu Sistem (hanya superadmin)
+$can_access_sistem = ($user_role === 'superadmin');
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -117,15 +128,17 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
             <div class="px-5 mt-4 mb-2">
                 <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Sekretariat</p>
             </div>
-            <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat keluar'])): ?>
+            <?php if ($can_access_surat_keluar): ?>
                 <a href="/surat-keluar" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['page'] ?? '') === 'surat-keluar' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                     <i class="fas fa-paper-plane mr-3 w-5 text-center"></i> Surat Keluar Setwan
                 </a>
             <?php endif; ?>
-            <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
+            <?php if ($can_access_surat_masuk): ?>
                 <a href="/surat-masuk" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['page'] ?? '') === 'surat-masuk' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                     <i class="fas fa-envelope mr-3 w-5 text-center"></i> Surat Masuk Setwan
                 </a>
+            <?php endif; ?>
+            <?php if ($can_access_disposisi): ?>
                 <a href="/disposisi-sekwan" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['page'] ?? '') === 'disposisi-sekwan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                     <i class="fas fa-share-square mr-3 w-5 text-center"></i> Disposisi Setwan
                 </a>
@@ -134,21 +147,21 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
             <div class="px-5 mt-6 mb-2">
                 <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Dewan</p>
             </div>
-            <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat keluar'])): ?>
+            <?php if ($can_access_surat_keluar): ?>
                 <a href="/surat-keluar-dewan" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['page'] ?? '') === 'surat-keluar-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                     <i class="fas fa-paper-plane mr-3 w-5 text-center"></i> Surat Keluar Dewan
                 </a>
             <?php endif; ?>
-            <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
+            <?php if ($can_access_surat_masuk): ?>
                 <a href="/surat-masuk-dewan" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['page'] ?? '') === 'surat-masuk-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                     <i class="fas fa-envelope mr-3 w-5 text-center"></i> Surat Masuk Dewan
                 </a>
             <?php endif; ?>
             
-            <div class="px-5 mt-8 mb-2">
-                <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Sistem</p>
-            </div>
-             <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+            <?php if ($can_access_sistem): ?>
+                <div class="px-5 mt-8 mb-2">
+                    <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Sistem</p>
+                </div>
                 <a href="/users" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['page'] ?? '') === 'users' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                     <i class="fas fa-users-cog mr-3 w-5 text-center"></i> Manajemen User
                 </a>

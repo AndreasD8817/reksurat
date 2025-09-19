@@ -1,7 +1,7 @@
 <?php
 // pages/ajax-search-log-user.php
 
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'superadmin') {
     http_response_code(403);
     echo json_encode(['error' => 'Akses ditolak']);
     exit;

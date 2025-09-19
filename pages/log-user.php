@@ -1,8 +1,8 @@
 <?php
 // pages/log-user.php
 
-// Keamanan: Pastikan hanya admin yang bisa mengakses
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+// Keamanan: Pastikan hanya superadmin yang bisa mengakses
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'superadmin') {
     $_SESSION['error_message'] = "Anda tidak memiliki izin untuk mengakses halaman ini.";
     header('Location: /dashboard');
     exit;

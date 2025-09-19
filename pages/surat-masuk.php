@@ -3,7 +3,7 @@
 
 require_once 'helpers.php';
 
-if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])) {
+if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])) {
     $_SESSION['error_message'] = "Anda tidak memiliki izin untuk mengakses halaman Surat Masuk.";
     header('Location: /dashboard');
     exit;
@@ -239,7 +239,7 @@ require_once 'templates/header.php';
                     <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Asal Surat</th>
                     <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Perihal</th>
                     <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Tgl Diterima</th>
-                    <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
+                    <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])): ?>
                         <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
                     <?php endif; ?>
                 </tr>
@@ -260,7 +260,7 @@ require_once 'templates/header.php';
                         <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($surat['asal_surat']); ?></td>
                         <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($surat['perihal']); ?></td>
                         <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($surat['tgl_terima_formatted']); ?></td>
-                        <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
+                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])): ?>
                             <td class="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                                 <?php if ($surat['disposisi_id']): ?>
                                     <div class="flex items-center space-x-2">
@@ -269,7 +269,7 @@ require_once 'templates/header.php';
                                         </span>
                                         <!-- Tombol dinonaktifkan -->
                                         <span class="text-gray-300 cursor-not-allowed" title="Tidak dapat diedit/dihapus karena sudah terdisposisi"><i class="fas fa-edit"></i></span>
-                                        <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin'])): ?>
                                             <span class="text-gray-300 cursor-not-allowed" title="Tidak dapat diedit/dihapus karena sudah terdisposisi"><i class="fas fa-trash"></i></span>
                                         <?php endif; ?>
                                     </div>
@@ -277,7 +277,7 @@ require_once 'templates/header.php';
                                     <!-- Tombol aktif -->
                                     <div class="flex space-x-2">
                                         <a href="/edit-surat-masuk?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
-                                        <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin'])): ?>
                                             <button onclick="window.confirmDelete('surat-masuk', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
                                         <?php endif; ?>
                                     <?php endif; ?>

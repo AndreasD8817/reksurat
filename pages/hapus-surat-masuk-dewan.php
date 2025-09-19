@@ -3,7 +3,7 @@
 
 require_once 'helpers.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'], ['superadmin', 'admin'])) {
     $_SESSION['error_message'] = "Anda tidak memiliki izin untuk melakukan aksi ini.";
     header('Location: /surat-masuk-dewan');
     exit;

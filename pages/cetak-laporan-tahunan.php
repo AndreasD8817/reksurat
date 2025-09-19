@@ -3,8 +3,9 @@
 
 require_once __DIR__ . '/../libs/fpdf/fpdf.php';
 
-if (!isset($_SESSION['user_id'])) {
-    die("Akses ditolak. Silakan login terlebih dahulu.");
+// Hanya superadmin dan admin yang boleh mencetak laporan
+if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['superadmin', 'admin'])) {
+    die("Akses ditolak. Anda tidak memiliki izin untuk mencetak laporan.");
 }
 
 $tipe = $_GET['tipe'] ?? null;
