@@ -62,7 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat_masuk'])
 
 // Logika memuat data awal tidak berubah
 $limit = 10;
-$stmt_data = $pdo->prepare("SELECT *, DATE_FORMAT(tanggal_diterima, '%d-%m-%Y') as tgl_terima_formatted FROM surat_masuk ORDER BY id DESC LIMIT ?");
+$stmt_data = $pdo->prepare(
+    "SELECT sm.*, DATE_FORMAT(sm.tanggal_diterima, '%d-%m-%Y') as tgl_terima_formatted, ds.id as disposisi_id 
+     FROM surat_masuk sm
+     LEFT JOIN disposisi_sekwan ds ON sm.id = ds.surat_masuk_id
+     ORDER BY sm.id DESC LIMIT ?"
+);
 $stmt_data->bindValue(1, $limit, PDO::PARAM_INT);
 $stmt_data->execute();
 $surat_masuk_list = $stmt_data->fetchAll(PDO::FETCH_ASSOC);
@@ -256,11 +261,25 @@ require_once 'templates/header.php';
                         <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($surat['perihal']); ?></td>
                         <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($surat['tgl_terima_formatted']); ?></td>
                         <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
-                            <td class="px-4 md:px-6 py-3 md:py-4">
-                                <div class="flex space-x-2">
-                                    <a href="/edit-surat-masuk?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
-                                    <?php if ($_SESSION['user_role'] === 'admin'): ?>
-                                        <button onclick="confirmDelete('surat-masuk', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                            <td class="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                                <?php if ($surat['disposisi_id']): ?>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700" title="Surat ini sudah didisposisi pada ID Disposisi: <?php echo $surat['disposisi_id']; ?>">
+                                            <i class="fas fa-check-circle mr-1"></i> Terdisposisi
+                                        </span>
+                                        <!-- Tombol dinonaktifkan -->
+                                        <span class="text-gray-300 cursor-not-allowed" title="Tidak dapat diedit/dihapus karena sudah terdisposisi"><i class="fas fa-edit"></i></span>
+                                        <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                                            <span class="text-gray-300 cursor-not-allowed" title="Tidak dapat diedit/dihapus karena sudah terdisposisi"><i class="fas fa-trash"></i></span>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php else: ?>
+                                    <!-- Tombol aktif -->
+                                    <div class="flex space-x-2">
+                                        <a href="/edit-surat-masuk?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
+                                        <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                                            <button onclick="window.confirmDelete('surat-masuk', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                        <?php endif; ?>
                                     <?php endif; ?>
                                 </div>
                             </td>

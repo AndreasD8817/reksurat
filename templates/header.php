@@ -103,7 +103,7 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
 
     <aside class="sidebar bg-white w-64 shadow-lg z-50 h-screen fixed md:fixed transition-transform duration-300 ease-in-out" id="sidebar">
         <div class="px-4 h-20 flex items-center gap-3 border-b border-gray-200 bg-gradient-to-r from-primary to-secondary">
-            <img src="/assets/img/ArekSurat icon.png" alt="Logo ArekSurat" class="h-12 w-12">
+            <img src="/assets/img/ArekSurat icon.png" alt="Logo Aplikasi ArekSurat" class="h-12 w-12">
             <div>
                 <h1 class="text-xl font-bold text-white">ArekSurat</h1>
                 <p class="text-sm text-indigo-100">Dashboard Penomoran</p>
@@ -111,22 +111,22 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
         </div>
         <nav class="mt-6">
             
-            <a href="/dashboard" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'dashboard' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+            <a href="/dashboard" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['page'] ?? '') === 'dashboard' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                 <i class="fas fa-tachometer-alt mr-3 w-5 text-center"></i> Dashboard
             </a>
             <div class="px-5 mt-4 mb-2">
                 <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Sekretariat</p>
             </div>
             <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat keluar'])): ?>
-                <a href="/surat-keluar" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'surat-keluar' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                <a href="/surat-keluar" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['page'] ?? '') === 'surat-keluar' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                     <i class="fas fa-paper-plane mr-3 w-5 text-center"></i> Surat Keluar Setwan
                 </a>
             <?php endif; ?>
             <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
-                <a href="/surat-masuk" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'surat-masuk' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                <a href="/surat-masuk" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['page'] ?? '') === 'surat-masuk' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                     <i class="fas fa-envelope mr-3 w-5 text-center"></i> Surat Masuk Setwan
                 </a>
-                <a href="/disposisi-sekwan" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'disposisi-sekwan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                <a href="/disposisi-sekwan" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['page'] ?? '') === 'disposisi-sekwan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                     <i class="fas fa-share-square mr-3 w-5 text-center"></i> Disposisi Setwan
                 </a>
             <?php endif; ?>
@@ -135,12 +135,12 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
                 <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Dewan</p>
             </div>
             <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat keluar'])): ?>
-                <a href="/surat-keluar-dewan" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'surat-keluar-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                <a href="/surat-keluar-dewan" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['page'] ?? '') === 'surat-keluar-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                     <i class="fas fa-paper-plane mr-3 w-5 text-center"></i> Surat Keluar Dewan
                 </a>
             <?php endif; ?>
             <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
-                <a href="/surat-masuk-dewan" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'surat-masuk-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                <a href="/surat-masuk-dewan" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['page'] ?? '') === 'surat-masuk-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                     <i class="fas fa-envelope mr-3 w-5 text-center"></i> Surat Masuk Dewan
                 </a>
             <?php endif; ?>
@@ -149,10 +149,10 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
                 <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Sistem</p>
             </div>
              <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-                <a href="/users" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'users' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                <a href="/users" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['page'] ?? '') === 'users' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                     <i class="fas fa-users-cog mr-3 w-5 text-center"></i> Manajemen User
                 </a>
-                <a href="/log-user" class="block py-3 px-5 mx-2 rounded-lg  <?php echo ($_GET['page'] ?? '') === 'log-user' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                <a href="/log-user" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['page'] ?? '') === 'log-user' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                     <i class="fas fa-history mr-3 w-5 text-center"></i> Log User
                 </a>
             <?php endif; ?>
@@ -169,10 +169,10 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
                     <button class="md:hidden text-gray-600 bg-gray-100 p-2 rounded-lg mr-4 shadow-sm hover:bg-gray-200 transition-colors" id="menu-toggle">
                         <i class="fas fa-bars text-lg"></i>
                     </button>
-                    <h2 class="text-xl font-semibold text-gray-700 "><?php echo $pageTitle ?? 'Dashboard'; ?></h2>
+                    <h2 class="text-xl font-semibold text-gray-700"><?php echo $pageTitle ?? 'Dashboard'; ?></h2>
                 </div>
-                <div class="flex items-center">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white font-bold shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                <div class="flex items-center cursor-pointer">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white font-bold shadow-md hover:shadow-lg transition-shadow">
                         <?php echo htmlspecialchars($inisial_user); ?>
                     </div>
                     <span class="text-gray-700 font-medium text-sm ml-3 hidden md:block">

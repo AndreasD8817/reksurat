@@ -45,15 +45,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
     if ($stmt_check->fetch()) {
         $_SESSION['error_message'] = "Username atau email sudah digunakan oleh pengguna lain.";
     } else {
-        // Jika password diisi, update password. Jika tidak, biarkan password lama.
+        // Bangun query secara dinamis
+        $sql = "UPDATE users SET nama = ?, username = ?, email = ?, role = ?";
+        $params = [$nama, $username, $email, $role];
+
         if (!empty($password)) {
+            $sql .= ", password = ?";
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("UPDATE users SET nama = ?, username = ?, email = ?, password = ?, role = ? WHERE id = ?");
-            $stmt->execute([$nama, $username, $email, $hashed_password, $role, $id]);
-        } else {
-            $stmt = $pdo->prepare("UPDATE users SET nama = ?, username = ?, email = ?, role = ? WHERE id = ?");
-            $stmt->execute([$nama, $username, $email, $role, $id]);
+            $params[] = $hashed_password;
         }
+
+        $sql .= " WHERE id = ?";
+        $params[] = $id;
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+
         $_SESSION['success_message'] = "Data user berhasil diperbarui.";
         header('Location: /users');
         exit;

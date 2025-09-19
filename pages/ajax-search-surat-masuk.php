@@ -25,7 +25,7 @@ $params = [];
 $conditions = [];
 
 if (!empty($search)) {
-    $conditions[] = "(nomor_agenda_lengkap LIKE ? OR nomor_surat_lengkap LIKE ? OR asal_surat LIKE ? OR perihal LIKE ?)";
+    $conditions[] = "(sm.nomor_agenda_lengkap LIKE ? OR sm.nomor_surat_lengkap LIKE ? OR sm.asal_surat LIKE ? OR sm.perihal LIKE ?)";
     $search_param = "%$search%";
     array_push($params, $search_param, $search_param, $search_param, $search_param);
 }
@@ -39,18 +39,22 @@ if (!empty($conditions)) {
     $sql_where = "WHERE " . implode(' AND ', $conditions);
 }
 
+$query_base = "FROM surat_masuk sm LEFT JOIN disposisi_sekwan ds ON sm.id = ds.surat_masuk_id " . $sql_where;
+
 // Hitung total data untuk pagination
-$stmt_count = $pdo->prepare("SELECT COUNT(id) FROM surat_masuk " . $sql_where);
+$stmt_count = $pdo->prepare("SELECT COUNT(sm.id) " . $query_base);
 $stmt_count->execute($params);
 $total_records = $stmt_count->fetchColumn();
 $total_pages = ceil($total_records / $limit);
 
 // Ambil data surat
 $stmt_data = $pdo->prepare(
-    "SELECT *, 
-            DATE_FORMAT(tanggal_surat, '%d-%m-%Y') as tgl_surat_formatted, 
-            DATE_FORMAT(tanggal_diterima, '%d-%m-%Y') as tgl_terima_formatted 
-     FROM surat_masuk " . $sql_where . " ORDER BY id DESC LIMIT ? OFFSET ?"
+    "SELECT sm.*, 
+            DATE_FORMAT(sm.tanggal_surat, '%d-%m-%Y') as tgl_surat_formatted, 
+            DATE_FORMAT(sm.tanggal_diterima, '%d-%m-%Y') as tgl_terima_formatted,
+            ds.id as disposisi_id
+     " . $query_base . " 
+     ORDER BY sm.id DESC LIMIT ? OFFSET ?"
 );
 
 // Bind parameters

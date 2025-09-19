@@ -43,22 +43,29 @@ $stmt->execute([$selected_year]);
 $surat_belum_disposisi = $stmt->fetchColumn();
 
 // Ambil data untuk line chart (12 bulan dalam tahun yang dipilih)
-$line_chart_labels = [];
-$line_chart_masuk = [];
-$line_chart_keluar = [];
+$line_chart_labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+$line_chart_masuk = array_fill(0, 12, 0);
+$line_chart_keluar = array_fill(0, 12, 0);
 
+// --- OPTIMASI: Mengambil data bulanan dengan satu query per tabel ---
+// Query untuk surat masuk
+$stmt_masuk = $pdo->prepare("SELECT MONTH(tanggal_diterima) as bulan, COUNT(id) as total FROM surat_masuk WHERE YEAR(tanggal_diterima) = ? GROUP BY bulan");
+$stmt_masuk->execute([$selected_year]);
+$data_masuk_per_bulan = $stmt_masuk->fetchAll(PDO::FETCH_KEY_PAIR);
+
+// Query untuk surat keluar
+$stmt_keluar = $pdo->prepare("SELECT MONTH(tanggal_surat) as bulan, COUNT(id) as total FROM surat_keluar WHERE YEAR(tanggal_surat) = ? GROUP BY bulan");
+$stmt_keluar->execute([$selected_year]);
+$data_keluar_per_bulan = $stmt_keluar->fetchAll(PDO::FETCH_KEY_PAIR);
+
+// Memasukkan data hasil query ke dalam array chart
 for ($month = 1; $month <= 12; $month++) {
-    $line_chart_labels[] = date('M', mktime(0, 0, 0, $month, 1));
-
-    // Query untuk surat masuk
-    $stmt = $pdo->prepare("SELECT COUNT(id) FROM surat_masuk WHERE MONTH(tanggal_diterima) = ? AND YEAR(tanggal_diterima) = ?");
-    $stmt->execute([$month, $selected_year]);
-    $line_chart_masuk[] = (int)$stmt->fetchColumn();
-
-    // Query untuk surat keluar
-    $stmt = $pdo->prepare("SELECT COUNT(id) FROM surat_keluar WHERE MONTH(tanggal_surat) = ? AND YEAR(tanggal_surat) = ?");
-    $stmt->execute([$month, $selected_year]);
-    $line_chart_keluar[] = (int)$stmt->fetchColumn();
+    if (isset($data_masuk_per_bulan[$month])) {
+        $line_chart_masuk[$month - 1] = (int)$data_masuk_per_bulan[$month];
+    }
+    if (isset($data_keluar_per_bulan[$month])) {
+        $line_chart_keluar[$month - 1] = (int)$data_keluar_per_bulan[$month];
+    }
 }
 
 // Encode ke JSON

@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tambah_user'])) {
     // Verifikasi CSRF token
     if (!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])) {
-        $_SESSION['error_message'] = "Sesi tidak valid. Silakan coba lagi.";
+        $_SESSION['error_message'] = "Terjadi kesalahan validasi. Silakan coba lagi.";
         header('Location: /users');
         exit;
     }
@@ -89,8 +89,10 @@ require_once 'templates/header.php';
             <div>
                 <label for="role" class="block text-sm font-medium text-gray-700 mb-2">Role</label>
                 <select id="role" name="role" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white" required>
-                    <option value="staff">Staff</option>
+                    <option value="" disabled selected>-- Pilih Role --</option>
                     <option value="admin">Admin</option>
+                    <option value="staff surat masuk">Staff Surat Masuk</option>
+                    <option value="staff surat keluar">Staff Surat Keluar</option>
                 </select>
             </div>
         </div>
@@ -167,4 +169,3 @@ require_once 'templates/header.php';
 <?php
 require_once 'templates/footer.php';
 ?>
-

@@ -235,8 +235,30 @@ export function updateTableSuratMasuk(suratList) {
 }
 function getSuratMasukRowHTML(surat) {
   // Dapatkan tombol aksi terlebih dahulu
-  const actionButtons = getActionButtons("masuk", surat.id);
+  const isAdmin = document.body.dataset.userRole === "admin";
+  let actionButtons;
 
+  if (surat.disposisi_id) {
+    // Surat sudah terdisposisi, tombol dinonaktifkan
+    const disabledEdit = `<span class="text-gray-300 cursor-not-allowed" title="Tidak dapat diedit/dihapus karena sudah terdisposisi"><i class="fas fa-edit"></i></span>`;
+    const disabledDelete = isAdmin
+      ? `<span class="text-gray-300 cursor-not-allowed" title="Tidak dapat diedit/dihapus karena sudah terdisposisi"><i class="fas fa-trash"></i></span>`
+      : "";
+    actionButtons = `
+      <td class="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
+        <div class="flex items-center space-x-2">
+          <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700" title="Surat ini sudah didisposisi pada ID Disposisi: ${surat.disposisi_id}"><i class="fas fa-check-circle mr-1"></i> Terdisposisi</span>
+          ${disabledEdit}
+          ${disabledDelete}
+        </div>
+      </td>`;
+  } else {
+    // Surat belum terdisposisi, tombol aktif
+    actionButtons = getActionButtons("masuk", surat.id).replace(
+      '<td class="px-6 py-4">',
+      '<td class="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">'
+    );
+  }
   return `<tr class="hover:bg-blue-50 transition-colors duration-200">
         <td class="px-4 md:px-6 py-3 md:py-4 font-semibold">
             <a href="#" class="text-primary hover:underline detail-link" data-id="${
@@ -259,10 +281,7 @@ function getSuratMasukRowHTML(surat) {
         <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
           surat.tgl_terima_formatted
         )}</td>
-        ${actionButtons.replace(
-          '<td class="px-6 py-4">',
-          '<td class="px-4 md:px-6 py-3 md:py-4">'
-        )}
+        ${actionButtons}
     </tr>`;
 }
 
