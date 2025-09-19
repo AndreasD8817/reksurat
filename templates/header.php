@@ -46,6 +46,11 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
         .sidebar {
             transition: all 0.3s ease;
         }
+        /* Penambahan transisi untuk konten utama */
+        .main-content {
+            transition: margin-left 0.3s ease;
+        }
+        
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -69,7 +74,12 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
             .overlay.open {
                 display: block;
             }
+            /* Mencegah body scroll saat sidebar mobile terbuka */
+            body.sidebar-open {
+                overflow: hidden;
+            }
         }
+
         .nav-active {
             background-color: #4f46e5;
             color: white;
@@ -80,7 +90,7 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
         
         /* Fix untuk layout yang benar */
         body {
-            overflow: hidden;
+            /* Dihapus: overflow: hidden; */
         }
         .main-container {
             height: calc(100vh - 80px); /* 80px adalah tinggi header */
@@ -91,7 +101,7 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
 <body class="bg-gray-50 min-h-screen flex" data-user-role="<?php echo $_SESSION['user_role'] ?? 'staff'; ?>">
     <div class="overlay" id="overlay"></div>
 
-    <aside class="sidebar bg-white w-64 shadow-lg z-20 h-screen fixed transition-transform duration-300 ease-in-out" id="sidebar">
+    <aside class="sidebar bg-white w-64 shadow-lg z-50 h-screen fixed md:fixed transition-transform duration-300 ease-in-out" id="sidebar">
         <div class="px-4 h-20 flex items-center gap-3 border-b border-gray-200 bg-gradient-to-r from-primary to-secondary">
             <img src="/assets/img/ArekSurat icon.png" alt="Logo ArekSurat" class="h-12 w-12">
             <div>
@@ -152,7 +162,7 @@ $inisial_user = strtoupper(substr($nama_user, 0, 1));
         </nav>
     </aside>
 
-    <div class="flex-1 flex flex-col md:ml-64">
+    <div class="flex-1 flex flex-col md:ml-64 main-content">
         <header class="sticky top-0 z-10 h-20 bg-indigo-100/80 backdrop-blur-lg border-b border-indigo-200/80">
             <div class="px-6 h-full flex items-center justify-between">
                 <div class="flex items-center">

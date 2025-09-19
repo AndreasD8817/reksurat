@@ -90,189 +90,194 @@ $pageTitle = 'Surat Keluar';
 require_once 'templates/header.php';
 ?>
 
-<div id="form-keluar-container" class="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl p-6 animate-fade-in border border-blue-100">
-    <div class="flex justify-between items-center mb-6 border-b border-blue-200 pb-3">
-        <h3 class="text-2xl font-bold text-gray-800 flex items-center">
-            <span class="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Form Penomoran Surat Keluar</span>
-            <i class="fas fa-paper-plane ml-3 text-primary"></i>
-        </h3>
-        <button id="toggle-form-btn" class="text-primary hover:text-secondary text-xl p-2">
-            <i class="fas fa-chevron-up"></i>
-        </button>
-    </div>
-    
-    <form id="form-keluar-body" method="POST" action="/surat-keluar" enctype="multipart/form-data" class="space-y-6 transition-all duration-500">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-5">
-                <div>
-                    <!-- MODIFIKASI: Mengubah label dan struktur input nomor -->
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Klasifikasi / Nomor Urut / Tahun</label>
-                    <div class="flex items-center space-x-2">
-                        <input type="text" name="kode_klasifikasi" class="flex-1 px-4 py-3 rounded-xl border border-gray-300" placeholder="Klasifikasi" required />
-                        <span class="text-gray-500 pt-2">/</span>
-                        <input type="number" id="nomor_urut_keluar" name="nomor_urut" value="<?php echo $next_nomor_urut; ?>" class="w-24 px-4 py-3 rounded-xl border border-gray-300 text-center" placeholder="No. Urut" required />
-                        <span class="text-gray-500 pt-2">/</span>
-                        <!-- Dropdown Tahun -->
-                        <select id="tahun_penomoran_keluar" name="tahun_penomoran" class="w-28 px-4 py-3 rounded-xl border border-gray-300 bg-white" required>
-                            <?php foreach ($all_years as $year): ?>
-                                <option value="<?php echo $year; ?>" <?php echo ($year == $current_year) ? 'selected' : ''; ?>>
-                                    <?php echo $year; ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <button type="button" id="checkNomorKeluarBtn" class="px-4 py-3 bg-indigo-100 text-indigo-600 rounded-xl hover:bg-indigo-200" title="Cek ketersediaan No. Urut">
-                            <i class="fas fa-check"></i>
-                        </button>
-                    </div>
-                </div>
-                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Surat</label>
-                    <input type="date" name="tanggal_surat" class="w-full px-4 py-3 rounded-xl border border-gray-300" value="<?php echo date('Y-m-d'); ?>" required />
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Tujuan</label>
-                    <input type="text" name="tujuan" class="w-full px-4 py-3 rounded-xl border border-gray-300" required />
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Konseptor</label>
-                    <input type="text" name="konseptor" class="w-full px-4 py-3 rounded-xl border border-gray-300" />
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Sifat Surat</label>
-                    <div class="flex items-center space-x-6 pt-2">
-                        <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="radio" name="sifat_surat" value="Biasa" class="form-radio h-4 w-4 text-primary" checked>
-                            <span class="text-gray-700">Biasa</span>
-                        </label>
-                        <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="radio" name="sifat_surat" value="Penting" class="form-radio h-4 w-4 text-primary">
-                            <span class="text-gray-700">Penting</span>
-                        </label>
-                        <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="radio" name="sifat_surat" value="Amat Segera" class="form-radio h-4 w-4 text-primary">
-                            <span class="text-gray-700">Amat Segera</span>
-                        </label>
-                    </div>
-                </div>
-
-            </div>
-            <div class="space-y-5">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Perihal</label>
-                    <textarea name="perihal" class="w-full px-4 py-3 rounded-xl border border-gray-300 h-32" required></textarea>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Hubungan Dgn Surat No</label>
-                    <input type="text" name="hub_surat_no" class="w-full px-4 py-3 rounded-xl border border-gray-300" />
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Keterangan</label>
-                    <textarea name="keterangan" class="w-full px-4 py-3 rounded-xl border border-gray-300 h-32"></textarea>
-                </div>
-                
-            </div>
-
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-2">File Lampiran <span class="text-gray-400 font-normal">(PDF/JPG, maks 5MB)</span></label>
-                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-primary cursor-pointer relative group">
-                    <input id="file-upload-keluar" name="file_lampiran" type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                    <div class="space-y-1 text-center">
-                         <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 group-hover:text-primary"></i>
-                        <div class="flex text-sm text-gray-600">
-                            <span class="relative bg-white rounded-md font-medium text-primary hover:text-secondary">
-                                Unggah file
-                            </span>
-                            <p class="pl-1">atau tarik dan lepas</p>
-                        </div>
-                        <p class="text-xs text-gray-500" id="file-name-keluar">Belum ada file dipilih</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="mt-8 flex justify-end space-x-4">
-            <button type="reset" class="px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50">Reset</button>
-            <button type="submit" name="simpan_surat" class="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl shadow-md hover:shadow-lg">
-                <i class="fas fa-save mr-2"></i> Simpan
+<!-- Menambahkan class pb-20 untuk memberi ruang di bagian bawah pada mobile -->
+<div class="pb-10 md:pb-6">
+    <div id="form-keluar-container" class="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl p-4 md:p-6 animate-fade-in border border-blue-100 mx-2 md:mx-0 mt-4 md:mt-0">
+        <div class="flex justify-between items-center mb-4 md:mb-6 border-b border-blue-200 pb-2 md:pb-3">
+            <h3 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center">
+                <span class="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Form Penomoran Surat Keluar</span>
+                <i class="fas fa-paper-plane ml-2 md:ml-3 text-primary"></i>
+            </h3>
+            <button id="toggle-form-btn" class="text-primary hover:text-secondary text-lg md:text-xl p-1 md:p-2">
+                <i class="fas fa-chevron-up"></i>
             </button>
         </div>
-    </form>
-</div>
+        
+        <form id="form-keluar-body" method="POST" action="/surat-keluar" enctype="multipart/form-data" class="space-y-4 md:space-y-6 transition-all duration-500">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div class="space-y-4 md:space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Klasifikasi / Nomor Urut / Tahun</label>
+                        <div class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-2">
+                            <input type="text" name="kode_klasifikasi" class="flex-1 px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300" placeholder="Klasifikasi" required />
+                            <span class="hidden md:block text-gray-500 pt-2">/</span>
+                            <input type="number" id="nomor_urut_keluar" name="nomor_urut" value="<?php echo $next_nomor_urut; ?>" class="w-full md:w-24 px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300 text-center" placeholder="No. Urut" required />
+                            <span class="hidden md:block text-gray-500 pt-2">/</span>
+                            <select id="tahun_penomoran_keluar" name="tahun_penomoran" class="w-full md:w-28 px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300 bg-white" required>
+                                <?php foreach ($all_years as $year): ?>
+                                    <option value="<?php echo $year; ?>" <?php echo ($year == $current_year) ? 'selected' : ''; ?>>
+                                        <?php echo $year; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <button type="button" id="checkNomorKeluarBtn" class="px-3 md:px-4 py-2 md:py-3 bg-indigo-100 text-indigo-600 rounded-xl hover:bg-indigo-200 mt-2 md:mt-0" title="Cek ketersediaan No. Urut">
+                                <i class="fas fa-check"></i> <span class="md:hidden">Cek Nomor</span>
+                            </button>
+                        </div>
+                    </div>
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Surat</label>
+                        <input type="date" name="tanggal_surat" class="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300" value="<?php echo date('Y-m-d'); ?>" required />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tujuan</label>
+                        <input type="text" name="tujuan" class="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300" required />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Konseptor</label>
+                        <input type="text" name="konseptor" class="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sifat Surat</label>
+                        <div class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-6 pt-2">
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="sifat_surat" value="Biasa" class="form-radio h-4 w-4 text-primary" checked>
+                                <span class="text-gray-700">Biasa</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="sifat_surat" value="Penting" class="form-radio h-4 w-4 text-primary">
+                                <span class="text-gray-700">Penting</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="sifat_surat" value="Amat Segera" class="form-radio h-4 w-4 text-primary">
+                                <span class="text-gray-700">Amat Segera</span>
+                            </label>
+                        </div>
+                    </div>
 
-<!-- Bagian tabel daftar surat (tidak ada perubahan) -->
-<div id="list-keluar-container" class="mt-8 bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl p-6 animate-fade-in border border-blue-100">
-    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <h3 class="text-xl font-bold text-gray-800 flex items-center">
-            <i class="fas fa-list-alt text-primary mr-2"></i> 
-            <span class="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Daftar Surat Keluar</span>
-        </h3>
-        <form id="searchFormKeluar" class="w-full md:w-auto flex items-center gap-4">
-            <!-- Filter Tahun -->
-            <select id="filterTahunKeluar" name="filter_tahun" class="w-44 px-4 py-3 rounded-xl border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500 transition duration-200">
-                <option value="">Semua Tahun</option>
-                <?php foreach ($all_years as $year): ?>
-                    <option value="<?php echo $year; ?>">
-                        <?php echo $year; ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-            <!-- Kolom Pencarian -->
-            <div class="relative w-full md:w-80">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                    <i class="fas fa-search"></i>
                 </div>
-                <input type="text" id="searchInputKeluar" name="search" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl" placeholder="Cari perihal, tujuan...">
+                <div class="space-y-4 md:space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Perihal</label>
+                        <textarea name="perihal" class="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300 h-32" required></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Hubungan Dgn Surat No</label>
+                        <input type="text" name="hub_surat_no" class="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Keterangan</label>
+                        <textarea name="keterangan" class="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300 h-32"></textarea>
+                    </div>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">File Lampiran <span class="text-gray-400 font-normal">(PDF/JPG, maks 5MB)</span></label>
+                    <div class="mt-1 flex justify-center px-4 md:px-6 pt-4 md:pt-5 pb-4 md:pb-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-primary cursor-pointer relative group">
+                        <input id="file-upload-keluar" name="file_lampiran" type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        <div class="space-y-1 text-center">
+                             <i class="fas fa-cloud-upload-alt text-3xl md:text-4xl text-gray-400 group-hover:text-primary"></i>
+                            <div class="flex flex-col md:flex-row text-sm text-gray-600">
+                                <span class="relative bg-white rounded-md font-medium text-primary hover:text-secondary">
+                                    Unggah file
+                                </span>
+                                <p class="md:pl-1">atau tarik dan lepas</p>
+                            </div>
+                            <p class="text-xs text-gray-500" id="file-name-keluar">Belum ada file dipilih</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 flex flex-col-reverse md:flex-row justify-end space-y-reverse space-y-4 md:space-y-0 md:space-x-4">
+                <button type="reset" class="px-4 md:px-6 py-2 md:py-3 border border-gray-300 rounded-xl hover:bg-gray-50 mt-4 md:mt-0">Reset</button>
+                <button type="submit" name="simpan_surat" class="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl shadow-md hover:shadow-lg">
+                    <i class="fas fa-save mr-2"></i> Simpan
+                </button>
             </div>
         </form>
     </div>
-    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gradient-to-r from-primary to-secondary">
-                <tr>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">No. Surat</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Tanggal</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Perihal</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Tujuan</th>
-                    <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat keluar'])): ?>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
-                    <?php endif; ?>
-                </tr>
-            </thead>
-            <tbody id="tableBodyKeluar" class="bg-white divide-y divide-gray-200">
-                <?php foreach ($surat_keluar_list as $surat): ?>
-                     <tr class="hover:bg-blue-50 transition-colors duration-200">
-                        <td class="px-6 py-4 font-medium">
-                            <a href="#" class="text-primary hover:underline detail-link-keluar" data-id="<?php echo $surat['id']; ?>">
-                                <?php echo htmlspecialchars($surat['nomor_surat_lengkap']); ?>
-                            </a>
-                        </td>
-                        <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($surat['tgl_formatted']); ?></td>
-                        <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($surat['perihal']); ?></td>
-                        <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($surat['tujuan']); ?></td>
+
+    <!-- Bagian tabel daftar surat dengan modifikasi responsif -->
+    <div id="list-keluar-container" class="mt-6 md:mt-8 bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl p-4 md:p-6 animate-fade-in border border-blue-100 mx-2 md:mx-0">
+        <div class="flex flex-col gap-4 mb-4 md:mb-6">
+            <h3 class="text-xl font-bold text-gray-800 flex items-center">
+                <i class="fas fa-list-alt text-primary mr-2"></i> 
+                <span class="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Daftar Surat Keluar</span>
+            </h3>
+            <form id="searchFormKeluar" class="w-full flex flex-col md:flex-row items-stretch md:items-center gap-3">
+                <!-- Filter Tahun -->
+                <select id="filterTahunKeluar" name="filter_tahun" class="w-full md:w-44 px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500 transition duration-200">
+                    <option value="">Semua Tahun</option>
+                    <?php foreach ($all_years as $year): ?>
+                        <option value="<?php echo $year; ?>">
+                            <?php echo $year; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <!-- Kolom Pencarian -->
+                <div class="relative w-full">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <input type="text" id="searchInputKeluar" name="search" class="w-full pl-10 pr-4 py-2 md:py-3 border border-gray-300 rounded-xl" placeholder="Cari perihal, tujuan...">
+                </div>
+            </form>
+        </div>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gradient-to-r from-primary to-secondary">
+                    <tr>
+                        <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">No. Surat</th>
+                        <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Tanggal</th>
+                        <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Perihal</th>
+                        <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Tujuan</th>
                         <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat keluar'])): ?>
-                            <td class="px-6 py-4">
-                                <div class="flex space-x-2">
-                                    <a href="/edit-surat-keluar?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
-                                    <?php if ($_SESSION['user_role'] === 'admin'): ?>
-                                        <button onclick="confirmDelete('surat-keluar', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
-                                    <?php endif; ?>
-                                </div>
-                            </td>
+                            <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
                         <?php endif; ?>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-    <div id="paginationContainerKeluar" class="mt-6">
-         <?php
-         if ($total_pages > 1) {
-             echo '<div class="flex items-center justify-between">';
-             echo '<div class="text-sm text-gray-600">Halaman 1 dari ' . $total_pages . '</div>';
-             echo '<div><button onclick="fetchData(2)" class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-primary hover:bg-gray-50">Selanjutnya <i class="fas fa-arrow-right ml-1"></i></button></div>';
-             echo '</div>';
-         }
-         ?>
+                </thead>
+                <tbody id="tableBodyKeluar" class="bg-white divide-y divide-gray-200">
+                    <?php foreach ($surat_keluar_list as $surat): ?>
+                         <tr class="hover:bg-blue-50 transition-colors duration-200">
+                            <td class="px-4 md:px-6 py-3 md:py-4 font-medium">
+                                <a href="#" class="text-primary hover:underline detail-link-keluar" data-id="<?php echo $surat['id']; ?>">
+                                    <?php echo htmlspecialchars($surat['nomor_surat_lengkap']); ?>
+                                </a>
+                                <div class="md:hidden text-sm text-gray-600 mt-1">
+                                    <div><?php echo htmlspecialchars($surat['tgl_formatted']); ?></div>
+                                    <div class="truncate"><?php echo htmlspecialchars($surat['perihal']); ?></div>
+                                    <div><?php echo htmlspecialchars($surat['tujuan']); ?></div>
+                                </div>
+                            </td>
+                            <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($surat['tgl_formatted']); ?></td>
+                            <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($surat['perihal']); ?></td>
+                            <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($surat['tujuan']); ?></td>
+                            <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat keluar'])): ?>
+                                <td class="px-4 md:px-6 py-3 md:py-4">
+                                    <div class="flex space-x-2">
+                                        <a href="/edit-surat-keluar?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
+                                        <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                                            <button onclick="confirmDelete('surat-keluar', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                            <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <div id="paginationContainerKeluar" class="mt-4 md:mt-6">
+             <?php
+             if ($total_pages > 1) {
+                 echo '<div class="flex flex-col md:flex-row items-center justify-between gap-3 md:gap-0">';
+                 echo '<div class="text-sm text-gray-600">Halaman 1 dari ' . $total_pages . '</div>';
+                 echo '<div><button onclick="fetchData(2)" class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-primary hover:bg-gray-50 w-full md:w-auto">Selanjutnya <i class="fas fa-arrow-right ml-1"></i></button></div>';
+                 echo '</div>';
+             }
+             ?>
+        </div>
     </div>
 </div>
 

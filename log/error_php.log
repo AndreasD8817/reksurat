@@ -6,3 +6,51 @@
 [18-Sep-2025 10:00:24 UTC] Koneksi database gagal: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)
 [18-Sep-2025 10:00:30 UTC] Koneksi database gagal: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)
 [18-Sep-2025 10:00:30 UTC] Koneksi database gagal: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES)
+[19-Sep-2025 01:28:24 UTC] PHP Warning:  Undefined variable $next_nomor_urut in C:\laragon\www\reksurat\pages\surat-keluar.php on line 39
+[19-Sep-2025 01:28:24 UTC] PHP Warning:  Undefined variable $all_years in C:\laragon\www\reksurat\pages\surat-keluar.php on line 42
+[19-Sep-2025 01:28:24 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 42
+[19-Sep-2025 01:28:24 UTC] PHP Warning:  Undefined variable $all_years in C:\laragon\www\reksurat\pages\surat-keluar.php on line 137
+[19-Sep-2025 01:28:24 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 137
+[19-Sep-2025 01:28:24 UTC] PHP Warning:  Undefined variable $surat_keluar_list in C:\laragon\www\reksurat\pages\surat-keluar.php on line 166
+[19-Sep-2025 01:28:24 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 166
+[19-Sep-2025 01:28:24 UTC] PHP Warning:  Undefined variable $total_pages in C:\laragon\www\reksurat\pages\surat-keluar.php on line 198
+[19-Sep-2025 01:29:10 UTC] PHP Warning:  Undefined variable $next_nomor_urut in C:\laragon\www\reksurat\pages\surat-keluar.php on line 39
+[19-Sep-2025 01:29:10 UTC] PHP Warning:  Undefined variable $all_years in C:\laragon\www\reksurat\pages\surat-keluar.php on line 42
+[19-Sep-2025 01:29:10 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 42
+[19-Sep-2025 01:29:10 UTC] PHP Warning:  Undefined variable $all_years in C:\laragon\www\reksurat\pages\surat-keluar.php on line 137
+[19-Sep-2025 01:29:10 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 137
+[19-Sep-2025 01:29:10 UTC] PHP Warning:  Undefined variable $surat_keluar_list in C:\laragon\www\reksurat\pages\surat-keluar.php on line 166
+[19-Sep-2025 01:29:10 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 166
+[19-Sep-2025 01:29:10 UTC] PHP Warning:  Undefined variable $total_pages in C:\laragon\www\reksurat\pages\surat-keluar.php on line 198
+[19-Sep-2025 01:29:42 UTC] PHP Warning:  Undefined variable $next_nomor_urut in C:\laragon\www\reksurat\pages\surat-keluar.php on line 39
+[19-Sep-2025 01:29:42 UTC] PHP Warning:  Undefined variable $all_years in C:\laragon\www\reksurat\pages\surat-keluar.php on line 42
+[19-Sep-2025 01:29:42 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 42
+[19-Sep-2025 01:29:42 UTC] PHP Warning:  Undefined variable $all_years in C:\laragon\www\reksurat\pages\surat-keluar.php on line 137
+[19-Sep-2025 01:29:42 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 137
+[19-Sep-2025 01:29:42 UTC] PHP Warning:  Undefined variable $surat_keluar_list in C:\laragon\www\reksurat\pages\surat-keluar.php on line 166
+[19-Sep-2025 01:29:42 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 166
+[19-Sep-2025 01:29:42 UTC] PHP Warning:  Undefined variable $total_pages in C:\laragon\www\reksurat\pages\surat-keluar.php on line 198
+[19-Sep-2025 01:29:50 UTC] PHP Warning:  Undefined variable $next_nomor_urut in C:\laragon\www\reksurat\pages\surat-keluar.php on line 39
+[19-Sep-2025 01:29:50 UTC] PHP Warning:  Undefined variable $all_years in C:\laragon\www\reksurat\pages\surat-keluar.php on line 42
+[19-Sep-2025 01:29:50 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 42
+[19-Sep-2025 01:29:50 UTC] PHP Warning:  Undefined variable $all_years in C:\laragon\www\reksurat\pages\surat-keluar.php on line 137
+[19-Sep-2025 01:29:50 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 137
+[19-Sep-2025 01:29:50 UTC] PHP Warning:  Undefined variable $surat_keluar_list in C:\laragon\www\reksurat\pages\surat-keluar.php on line 166
+[19-Sep-2025 01:29:50 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 166
+[19-Sep-2025 01:29:50 UTC] PHP Warning:  Undefined variable $total_pages in C:\laragon\www\reksurat\pages\surat-keluar.php on line 198
+[19-Sep-2025 01:32:19 UTC] PHP Warning:  Undefined variable $next_nomor_urut in C:\laragon\www\reksurat\pages\surat-keluar.php on line 39
+[19-Sep-2025 01:32:19 UTC] PHP Warning:  Undefined variable $all_years in C:\laragon\www\reksurat\pages\surat-keluar.php on line 42
+[19-Sep-2025 01:32:19 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 42
+[19-Sep-2025 01:32:19 UTC] PHP Warning:  Undefined variable $all_years in C:\laragon\www\reksurat\pages\surat-keluar.php on line 137
+[19-Sep-2025 01:32:19 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 137
+[19-Sep-2025 01:32:19 UTC] PHP Warning:  Undefined variable $surat_keluar_list in C:\laragon\www\reksurat\pages\surat-keluar.php on line 166
+[19-Sep-2025 01:32:19 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 166
+[19-Sep-2025 01:32:19 UTC] PHP Warning:  Undefined variable $total_pages in C:\laragon\www\reksurat\pages\surat-keluar.php on line 206
+[19-Sep-2025 01:32:27 UTC] PHP Warning:  Undefined variable $next_nomor_urut in C:\laragon\www\reksurat\pages\surat-keluar.php on line 39
+[19-Sep-2025 01:32:27 UTC] PHP Warning:  Undefined variable $all_years in C:\laragon\www\reksurat\pages\surat-keluar.php on line 42
+[19-Sep-2025 01:32:27 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 42
+[19-Sep-2025 01:32:27 UTC] PHP Warning:  Undefined variable $all_years in C:\laragon\www\reksurat\pages\surat-keluar.php on line 137
+[19-Sep-2025 01:32:27 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 137
+[19-Sep-2025 01:32:27 UTC] PHP Warning:  Undefined variable $surat_keluar_list in C:\laragon\www\reksurat\pages\surat-keluar.php on line 166
+[19-Sep-2025 01:32:27 UTC] PHP Warning:  foreach() argument must be of type array|object, null given in C:\laragon\www\reksurat\pages\surat-keluar.php on line 166
+[19-Sep-2025 01:32:27 UTC] PHP Warning:  Undefined variable $total_pages in C:\laragon\www\reksurat\pages\surat-keluar.php on line 206

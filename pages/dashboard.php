@@ -140,14 +140,13 @@ require_once 'templates/header.php';
 </head>
 <body class="bg-gray-50">
     <div class="container mx-auto px-4 py-8">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-10">
-            <header class="text-center md:text-left">
-                <h1 class="text-4xl font-bold text-gray-800">Dashboard Penomoran Surat</h1>
-                <h2 class="text-2xl font-semibold text-gray-600">Sekretariat DPRD Kota Surabaya</h2>
+        <div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left mb-10">
+            <header>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Dashboard Penomoran Surat</h1>
+                <h2 class="text-xl md:text-2xl font-semibold text-gray-600">Sekretariat DPRD Kota Surabaya</h2>
                 <div class="w-24 h-1 bg-gradient-to-r from-primary to-secondary mt-4 rounded-full mx-auto md:mx-0"></div>
             </header>
             
-            <!-- Filter Tahun -->
             <div class="mt-6 md:mt-0">
                 <form method="GET" action="/dashboard" class="flex items-center gap-3 bg-white p-2 rounded-xl shadow-sm border">
                     <label for="tahun" class="text-sm font-medium text-gray-600">Tampilkan Data Tahun:</label>
@@ -162,7 +161,7 @@ require_once 'templates/header.php';
             </div>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
             <a href="/cetak-laporan-tahunan?tipe=surat-masuk&tahun=<?php echo $selected_year; ?>" target="_blank" class="card p-6 text-center block">
                 <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Masuk Setwan</h3> 
                 <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_surat_masuk; ?></div>
@@ -179,7 +178,7 @@ require_once 'templates/header.php';
                 <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Keluar Dewan</h3> 
                 <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_surat_keluar_dewan; ?></div>
             </a>
-            <a href="/cetak-laporan-tahunan?tipe=disposisi-sekwan&tahun=<?php echo $selected_year; ?>" target="_blank" class="card p-6 text-center block">
+            <a href="/cetak-laporan-tahunan?tipe=disposisi-sekwan&tahun=<?php echo $selected_year; ?>" target="_blank" class="card p-6 text-center block sm:col-span-2 lg:col-span-1">
                 <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Setwan Terdisposisi</h3>
                 <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_disposisi; ?></div>
             </a>

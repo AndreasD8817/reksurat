@@ -118,14 +118,35 @@ export function updateTableSuratKeluar(suratList) {
   );
 }
 function getSuratKeluarRowHTML(surat) {
-  return `<tr class="hover:bg-gray-50">
-        <td class="px-6 py-4 font-medium"><a href="#" class="text-primary hover:underline detail-link-keluar" data-id="${
-          surat.id
-        }">${escapeHTML(surat.nomor_surat_lengkap)}</a></td>
-        <td class="px-6 py-4">${escapeHTML(surat.tgl_formatted)}</td>
-        <td class="px-6 py-4">${escapeHTML(surat.perihal)}</td>
-        <td class="px-6 py-4">${escapeHTML(surat.tujuan)}</td>
-        ${getActionButtons("keluar", surat.id)}
+  // Dapatkan tombol aksi terlebih dahulu
+  const actionButtons = getActionButtons("keluar", surat.id);
+
+  return `<tr class="hover:bg-blue-50 transition-colors duration-200">
+        <td class="px-4 md:px-6 py-3 md:py-4 font-medium">
+            <a href="#" class="text-primary hover:underline detail-link-keluar" data-id="${
+              surat.id
+            }">
+                ${escapeHTML(surat.nomor_surat_lengkap)}
+            </a>
+            <div class="md:hidden text-sm text-gray-600 mt-1">
+                <div>${escapeHTML(surat.tgl_formatted)}</div>
+                <div class="truncate">${escapeHTML(surat.perihal)}</div>
+                <div>${escapeHTML(surat.tujuan)}</div>
+            </div>
+        </td>
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
+          surat.tgl_formatted
+        )}</td>
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
+          surat.perihal
+        )}</td>
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
+          surat.tujuan
+        )}</td>
+        ${actionButtons.replace(
+          '<td class="px-6 py-4">',
+          '<td class="px-4 md:px-6 py-3 md:py-4">'
+        )}
     </tr>`;
 }
 
@@ -137,14 +158,71 @@ export function updateTableSuratKeluarDewan(suratList) {
   );
 }
 function getSuratKeluarDewanRowHTML(surat) {
-  return `<tr class="hover:bg-gray-50">
-        <td class="px-6 py-4 font-medium"><a href="#" class="text-primary hover:underline detail-link-keluar-dewan" data-id="${
-          surat.id
-        }">${escapeHTML(surat.nomor_surat_lengkap)}</a></td>
-        <td class="px-6 py-4">${escapeHTML(surat.tgl_formatted)}</td>
-        <td class="px-6 py-4">${escapeHTML(surat.perihal)}</td>
-        <td class="px-6 py-4">${escapeHTML(surat.tujuan)}</td>
-        ${getActionButtons("keluar-dewan", surat.id)}
+  const userRole = document.body.dataset.userRole;
+  const canShowActions =
+    userRole === "admin" || userRole === "staff surat keluar";
+  let actionButtonsHTML = "";
+
+  if (canShowActions) {
+    const editButton = `<a href="/edit-surat-keluar-dewan?id=${surat.id}" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>`;
+    const deleteButton =
+      userRole === "admin"
+        ? `<button onclick="window.confirmDelete('surat-keluar-dewan', ${surat.id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>`
+        : "";
+
+    actionButtonsHTML = `
+        <!-- Tombol Aksi KHUSUS MOBILE -->
+        <div class="md:hidden absolute top-4 right-4 flex space-x-3">
+            ${editButton} 
+            ${deleteButton} 
+        </div>
+        <!-- Kolom Aksi KHUSUS DESKTOP -->
+        <td class="px-4 md:px-6 py-3 md:py-4 hidden md:table-cell">
+            <div class="flex space-x-2">
+                ${editButton} 
+                ${deleteButton}
+            </div>
+        </td>`;
+  }
+
+  return `<tr class="hover:bg-blue-50 transition-colors duration-200 relative">
+        <td class="px-4 pr-12 md:px-6 md:pr-6 py-3 md:py-4 font-medium">
+            ${
+              // [PERBAIKAN] Mengambil hanya bagian mobile dari actionButtonsHTML
+              canShowActions
+                ? actionButtonsHTML.match(/<div class="md:hidden.*?<\/div>/s)[0]
+                : ""
+            }
+            <!-- Konten Utama (Nomor Surat & Detail) -->
+            <a href="#" class="text-primary hover:underline detail-link-keluar-dewan" data-id="${
+              surat.id
+            }">
+                ${escapeHTML(surat.nomor_surat_lengkap)}
+            </a>
+            <!-- Detail surat yang hanya tampil di mobile -->
+            <div class="md:hidden text-sm text-gray-600 mt-1">
+                <div>${escapeHTML(surat.tgl_formatted)}</div> 
+                <div class="truncate">${escapeHTML(surat.perihal)}</div>
+                <div>${escapeHTML(surat.tujuan)}</div> 
+            </div>
+        </td>
+
+        <!-- Kolom-kolom ini hanya akan muncul di DESKTOP -->
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
+          surat.tgl_formatted
+        )}</td>
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
+          surat.perihal
+        )}</td>
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
+          surat.tujuan
+        )}</td>
+        ${
+          // [PERBAIKAN] Mengambil hanya bagian desktop (kolom <td>) dari actionButtonsHTML
+          canShowActions
+            ? actionButtonsHTML.match(/<td class="px-4.*?<\/td>/s)[0]
+            : ""
+        }
     </tr>`;
 }
 
@@ -156,14 +234,35 @@ export function updateTableSuratMasuk(suratList) {
   );
 }
 function getSuratMasukRowHTML(surat) {
-  return `<tr class="hover:bg-gray-50">
-        <td class="px-6 py-4 font-semibold"><a href="#" class="text-primary hover:underline detail-link" data-id="${
-          surat.id
-        }">${escapeHTML(surat.nomor_agenda_lengkap)}</a></td>
-        <td class="px-6 py-4">${escapeHTML(surat.asal_surat)}</td>
-        <td class="px-6 py-4">${escapeHTML(surat.perihal)}</td>
-        <td class="px-6 py-4">${escapeHTML(surat.tgl_terima_formatted)}</td>
-        ${getActionButtons("masuk", surat.id)}
+  // Dapatkan tombol aksi terlebih dahulu
+  const actionButtons = getActionButtons("masuk", surat.id);
+
+  return `<tr class="hover:bg-blue-50 transition-colors duration-200">
+        <td class="px-4 md:px-6 py-3 md:py-4 font-semibold">
+            <a href="#" class="text-primary hover:underline detail-link" data-id="${
+              surat.id
+            }">
+                ${escapeHTML(surat.nomor_agenda_lengkap)}
+            </a>
+            <div class="md:hidden text-sm text-gray-600 mt-1 space-y-1">
+                <div>Dari: ${escapeHTML(surat.asal_surat)}</div>
+                <div class="truncate">${escapeHTML(surat.perihal)}</div>
+                <div>Diterima: ${escapeHTML(surat.tgl_terima_formatted)}</div>
+            </div>
+        </td>
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
+          surat.asal_surat
+        )}</td>
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
+          surat.perihal
+        )}</td>
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
+          surat.tgl_terima_formatted
+        )}</td>
+        ${actionButtons.replace(
+          '<td class="px-6 py-4">',
+          '<td class="px-4 md:px-6 py-3 md:py-4">'
+        )}
     </tr>`;
 }
 
@@ -175,14 +274,54 @@ export function updateTableSuratMasukDewan(suratList) {
   );
 }
 function getSuratMasukDewanRowHTML(surat) {
-  return `<tr class="hover:bg-gray-50">
-        <td class="px-6 py-4 font-semibold"><a href="#" class="text-primary hover:underline detail-link-masuk-dewan" data-id="${
-          surat.id
-        }">${escapeHTML(surat.nomor_agenda_lengkap)}</a></td>
-        <td class="px-6 py-4">${escapeHTML(surat.asal_surat)}</td>
-        <td class="px-6 py-4">${escapeHTML(surat.perihal)}</td>
-        <td class="px-6 py-4">${escapeHTML(surat.tgl_terima_formatted)}</td>
-        ${getActionButtons("masuk-dewan", surat.id)}
+  const isAdmin = document.body.dataset.userRole === "admin";
+  const editButton = `<a href="/edit-surat-masuk-dewan?id=${surat.id}" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>`;
+  const deleteButton = isAdmin
+    ? `<button onclick="window.confirmDelete('surat-masuk-dewan', ${surat.id})" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>`
+    : "";
+
+  // [PERBAIKAN] Menyamakan struktur dengan file PHP
+  return `<tr class="hover:bg-blue-50 transition-colors duration-200 relative">
+        <td class="px-4 pr-12 md:px-6 py-3 md:py-4 font-semibold">
+            
+            <!-- Tombol Aksi KHUSUS MOBILE -->
+            <div class="md:hidden absolute top-4 right-4 flex space-x-3">
+                ${editButton}
+                ${deleteButton}
+            </div>
+
+            <!-- Konten Utama (Nomor Agenda & Detail) -->
+            <a href="#" class="text-primary hover:underline detail-link-masuk-dewan" data-id="${
+              surat.id
+            }">
+                ${escapeHTML(surat.nomor_agenda_lengkap)}
+            </a>
+            <!-- Detail surat yang hanya tampil di mobile -->
+            <div class="md:hidden text-sm text-gray-600 mt-1 space-y-1">
+                <div>Dari: ${escapeHTML(surat.asal_surat)}</div>
+                <div class="truncate">${escapeHTML(surat.perihal)}</div>
+                <div>Diterima: ${escapeHTML(surat.tgl_terima_formatted)}</div>
+            </div>
+        </td>
+
+        <!-- Kolom-kolom ini hanya akan muncul di DESKTOP -->
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
+          surat.asal_surat
+        )}</td>
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
+          surat.perihal
+        )}</td>
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
+          surat.tgl_terima_formatted
+        )}</td>
+
+        <!-- Kolom Aksi KHUSUS DESKTOP -->
+        <td class="px-4 md:px-6 py-3 md:py-4 hidden md:table-cell">
+            <div class="flex space-x-2">
+                ${editButton}
+                ${deleteButton}
+            </div>
+        </td>
     </tr>`;
 }
 
@@ -192,39 +331,53 @@ export function updateTableDisposisi(disposisiList) {
   renderTableRows(tableBody, disposisiList, getDisposisiRowHTML);
 }
 function getDisposisiRowHTML(disposisi) {
+  const isAdminOrStaff =
+    document.body.dataset.userRole === "admin" ||
+    document.body.dataset.userRole === "staff surat masuk";
+
   const noAgendaHtml = disposisi.file_lampiran
     ? `<a href="#" class="text-primary hover:underline pdf-modal-trigger" data-pdf-src="/uploads/${escapeHTML(
         disposisi.file_lampiran
       )}" data-agenda-no="${escapeHTML(disposisi.nomor_agenda_lengkap)}">
           ${escapeHTML(disposisi.nomor_agenda_lengkap)}
        </a>`
-    : `<span class="text-gray-500">${escapeHTML(
+    : `<span class="text-gray-800">${escapeHTML(
         disposisi.nomor_agenda_lengkap
       )}</span>`;
+
   let actionButtons = "";
-  if (isAdmin) {
+  if (isAdminOrStaff) {
+    let editButton = `<a href="/edit-disposisi-sekwan?id=${disposisi.id}" class="text-blue-500 hover:text-blue-700" title="Edit Disposisi"><i class="fas fa-edit"></i></a>`;
+    let deleteButton = isAdmin
+      ? `<button onclick="window.confirmDelete('disposisi-sekwan', ${disposisi.id})" class="text-red-500 hover:text-red-700" title="Batalkan Disposisi"><i class="fas fa-trash-alt"></i></button>`
+      : "";
     actionButtons = `
-      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-          <div class="flex space-x-3">
-              <a href="/edit-disposisi-sekwan?id=${disposisi.id}" class="text-blue-500 hover:text-blue-700" title="Edit Disposisi">
-                  <i class="fas fa-edit"></i>
-              </a>
-              <button onclick="window.confirmDelete('disposisi-sekwan', ${disposisi.id})" class="text-red-500 hover:text-red-700" title="Batalkan Disposisi">
-                  <i class="fas fa-trash-alt"></i>
-              </button>
+      <td class="px-4 md:px-6 py-3 md:py-4 text-sm font-medium">
+          <div class="flex space-x-2">
+              ${editButton}
+              ${deleteButton}
           </div>
       </td>`;
   }
 
-  return `<tr class="hover:bg-gray-50">
-        <td class="px-6 py-4 whitespace-nowrap font-medium">
+  return `<tr class="hover:bg-blue-50 transition-colors duration-200">
+        <td class="px-4 md:px-6 py-3 md:py-4 font-medium">
             ${noAgendaHtml}
+            <div class="md:hidden text-sm text-gray-600 mt-1">
+                <div class="truncate">Perihal: ${escapeHTML(
+                  disposisi.perihal
+                )}</div>
+                <div>Tujuan: ${escapeHTML(disposisi.nama_pegawai)}</div>
+                <div>Tgl: ${escapeHTML(disposisi.tgl_disposisi_formatted)}</div>
+            </div>
         </td>
-        <td class="px-6 py-4">${escapeHTML(disposisi.perihal)}</td>
-        <td class="px-6 py-4 whitespace-nowrap">${escapeHTML(
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
+          disposisi.perihal
+        )}</td>
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
           disposisi.nama_pegawai
         )}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${escapeHTML(
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell text-sm">${escapeHTML(
           disposisi.tgl_disposisi_formatted
         )}</td>
         ${actionButtons}

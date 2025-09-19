@@ -6,7 +6,7 @@
     </div> <!-- Penutup div flex utama -->
 
     <!-- Modal untuk Detail Surat -->
-    <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden transition-opacity duration-300 opacity-0">
+    <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden transition-opacity duration-300 opacity-0 h-screen">
         <div id="detail-modal-content" class="bg-white rounded-2xl shadow-xl w-full max-w-2xl transform transition-transform duration-300 scale-95">
             
             <div class="flex justify-between items-center p-5 border-b border-gray-200">

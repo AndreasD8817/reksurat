@@ -86,78 +86,80 @@ $pageTitle = 'Disposisi Surat Masuk';
 require_once 'templates/header.php';
 ?>
 
-<!-- Form Disposisi (tidak ada perubahan) -->
-<div id="form-disposisi-container" class="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl p-6 animate-fade-in border border-blue-100">
-    <div class="flex justify-between items-center mb-6 border-b border-blue-200 pb-3">
-        <h3 class="text-2xl font-bold text-gray-800 flex items-center">
-            <span class="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Form Disposisi Surat (Sekwan)</span>
-            <i class="fas fa-share-square ml-3 text-primary"></i>
-        </h3>
-        <button id="toggle-form-disposisi-btn" class="text-primary hover:text-secondary text-xl p-2">
-            <i class="fas fa-chevron-up"></i>
-        </button>
-    </div>
-    
-    <form id="form-disposisi-body" method="POST" action="/disposisi-sekwan" class="space-y-6 transition-all duration-500" enctype="multipart/form-data">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label for="surat_masuk_id" class="block text-sm font-medium text-gray-700 mb-2">Nomor Agenda Surat</label>
-                <select id="surat_masuk_id" name="surat_masuk_id" class="w-full px-4 py-3 rounded-xl border border-gray-300" required>
-                    <option value="" disabled selected>-- Pilih Nomor Agenda --</option>
-                    <?php foreach ($surat_untuk_disposisi as $surat): ?>
-                        <option value="<?php echo $surat['id']; ?>">
-                            <?php echo htmlspecialchars($surat['nomor_agenda_lengkap']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
+<div class="pb-10 md:pb-6">
+    <div id="form-disposisi-container" class="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl p-4 md:p-6 animate-fade-in border border-blue-100 mx-2 md:mx-0 mt-4 md:mt-0">
+        <div class="flex justify-between items-center mb-4 md:mb-6 border-b border-blue-200 pb-2 md:pb-3">
+            <h3 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center">
+                <span class="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Form Disposisi Surat (Sekwan)</span>
+                <i class="fas fa-share-square ml-2 md:ml-3 text-primary"></i>
+            </h3>
+            <button id="toggle-form-disposisi-btn" class="text-primary hover:text-secondary text-lg md:text-xl p-1 md:p-2">
+                <i class="fas fa-chevron-up"></i>
+            </button>
+        </div>
+        
+        <form id="form-disposisi-body" method="POST" action="/disposisi-sekwan" class="space-y-4 md:space-y-6 transition-all duration-500" enctype="multipart/form-data">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div>
+                    <label for="surat_masuk_id" class="block text-sm font-medium text-gray-700 mb-2">Nomor Agenda Surat</label>
+                    <select id="surat_masuk_id" name="surat_masuk_id" class="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300" required>
+                        <option value="" disabled selected>-- Pilih Nomor Agenda --</option>
+                        <?php foreach ($surat_untuk_disposisi as $surat): ?>
+                            <option value="<?php echo $surat['id']; ?>">
+                                <?php echo htmlspecialchars($surat['nomor_agenda_lengkap']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-            <div>
-                <label for="nama_pegawai" class="block text-sm font-medium text-gray-700 mb-2">Nama Pegawai</label>
-                <input type="text" id="nama_pegawai" name="nama_pegawai" class="w-full px-4 py-3 rounded-xl border border-gray-300" placeholder="Masukkan nama pegawai yang dituju" required>
-            </div>
+                <div>
+                    <label for="nama_pegawai" class="block text-sm font-medium text-gray-700 mb-2">Nama Pegawai</label>
+                    <input type="text" id="nama_pegawai" name="nama_pegawai" class="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300" placeholder="Masukkan nama pegawai yang dituju" required>
+                </div>
 
-            <div class="md:col-span-2">
-                <label for="catatan_disposisi" class="block text-sm font-medium text-gray-700 mb-2">Isi/Catatan Disposisi</label>
-                <textarea id="catatan_disposisi" name="catatan_disposisi" rows="4" class="w-full px-4 py-3 rounded-xl border border-gray-300" placeholder="Contoh: Mohon segera ditindaklanjuti..."></textarea>
-            </div>
-            
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-2">File Lampiran <span class="text-gray-400 font-normal">(Opsional: PDF/JPG/PNG, maks 5MB)</span></label>
-                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-primary cursor-pointer relative group">
-                    <input id="file-upload-disposisi" name="file_lampiran" type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                    <div class="space-y-1 text-center">
-                         <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 group-hover:text-primary"></i>
-                        <div class="flex text-sm text-gray-600">
-                            <span class="relative bg-white rounded-md font-medium text-primary hover:text-secondary">
-                                Unggah file
-                            </span>
-                            <p class="pl-1">atau tarik dan lepas</p>
+                <div class="md:col-span-2">
+                    <label for="catatan_disposisi" class="block text-sm font-medium text-gray-700 mb-2">Isi/Catatan Disposisi</label>
+                    <textarea id="catatan_disposisi" name="catatan_disposisi" rows="4" class="w-full px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300" placeholder="Contoh: Mohon segera ditindaklanjuti..."></textarea>
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">File Lampiran <span class="text-gray-400 font-normal">(Opsional: PDF/JPG/PNG, maks 5MB)</span></label>
+                    <div class="mt-1 flex justify-center px-4 md:px-6 pt-4 md:pt-5 pb-4 md:pb-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-primary cursor-pointer relative group">
+                        <input id="file-upload-disposisi" name="file_lampiran" type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        <div class="space-y-1 text-center">
+                             <i class="fas fa-cloud-upload-alt text-3xl md:text-4xl text-gray-400 group-hover:text-primary"></i>
+                            <div class="flex flex-col md:flex-row text-sm text-gray-600">
+                                <span class="relative bg-white rounded-md font-medium text-primary hover:text-secondary">
+                                    Unggah file
+                                </span>
+                                <p class="md:pl-1">atau tarik dan lepas</p>
+                            </div>
+                            <p class="text-xs text-gray-500" id="file-name-disposisi">Belum ada file dipilih</p>
                         </div>
-                        <p class="text-xs text-gray-500" id="file-name-disposisi">Belum ada file dipilih</p>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="mt-8 flex justify-end">
-            <button type="submit" name="simpan_disposisi" class="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl shadow-md hover:shadow-lg">
-                <i class="fas fa-save mr-2"></i> Simpan Disposisi
-            </button>
-        </div>
-    </form>
+            <div class="mt-6 flex flex-col-reverse md:flex-row justify-end space-y-reverse space-y-4 md:space-y-0 md:space-x-4">
+                <button type="reset" class="px-4 md:px-6 py-2 md:py-3 border border-gray-300 rounded-xl hover:bg-gray-50 mt-4 md:mt-0">Reset</button>
+                <button type="submit" name="simpan_disposisi" class="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl shadow-md hover:shadow-lg">
+                    <i class="fas fa-save mr-2"></i> Simpan Disposisi
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- Daftar Disposisi -->
-<div id="list-disposisi-container" class="mt-8 bg-white rounded-2xl shadow-xl p-6">
-    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-         <h3 class="text-xl font-bold text-gray-800 flex items-center">
+<div id="list-disposisi-container" class="mt-6 md:mt-8 bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl p-4 md:p-6 animate-fade-in border border-blue-100 mx-2 md:mx-0">
+    <div class="flex flex-col gap-4 mb-4 md:mb-6">
+        <h3 class="text-xl font-bold text-gray-800 flex items-center">
             <i class="fas fa-list-alt text-primary mr-2"></i> 
             <span class="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Daftar Disposisi</span>
         </h3>
-        <form id="searchFormDisposisi" class="w-full md:w-auto flex items-center gap-4">
+        <form id="searchFormDisposisi" class="w-full flex flex-col md:flex-row items-stretch md:items-center gap-3">
              <!-- Filter Tahun -->
-            <select id="filterTahunDisposisi" name="filter_tahun" class="w-44 px-4 py-3 rounded-xl border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500 transition duration-200">
+            <select id="filterTahunDisposisi" name="filter_tahun" class="w-full md:w-44 px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500 transition duration-200">
                 <option value="">Semua Tahun</option>
                 <?php foreach ($all_years as $year): ?>
                     <option value="<?php echo $year; ?>">
@@ -166,46 +168,51 @@ require_once 'templates/header.php';
                 <?php endforeach; ?>
             </select>
             <!-- Kolom Pencarian -->
-            <div class="relative w-full md:w-80">
-                <input type="text" id="searchInputDisposisi" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl" placeholder="Cari perihal, no agenda...">
+            <div class="relative w-full">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                     <i class="fas fa-search"></i>
                 </div>
+                <input type="text" id="searchInputDisposisi" name="search" class="w-full pl-10 pr-4 py-2 md:py-3 border border-gray-300 rounded-xl" placeholder="Cari perihal, no agenda...">
             </div>
         </form>
     </div>
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
         <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+            <thead class="bg-gradient-to-r from-primary to-secondary">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Agenda</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Perihal</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pegawai Tertuju</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Disposisi</th>
+                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">No. Agenda</th>
+                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Perihal</th>
+                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Pegawai Tertuju</th>
+                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Tanggal Disposisi</th>
                     <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
                     <?php endif; ?>
                 </tr>
             </thead>
             <tbody id="tableBodyDisposisi" class="bg-white divide-y divide-gray-200">
                 <?php foreach ($disposisi_list as $disposisi): ?>
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap font-medium">
+                    <tr class="hover:bg-blue-50 transition-colors duration-200">
+                        <td class="px-4 md:px-6 py-3 md:py-4 font-medium">
                             <?php if (!empty($disposisi['file_lampiran'])): ?>
                                 <a href="#" class="text-primary hover:underline pdf-modal-trigger" data-pdf-src="/uploads/<?php echo htmlspecialchars($disposisi['file_lampiran']); ?>" data-agenda-no="<?php echo htmlspecialchars($disposisi['nomor_agenda_lengkap']); ?>">
                                     <?php echo htmlspecialchars($disposisi['nomor_agenda_lengkap']); ?>
                                 </a>
                             <?php else: ?>
-                                <span class="text-gray-500"><?php echo htmlspecialchars($disposisi['nomor_agenda_lengkap']); ?></span>
+                                <span class="text-gray-800"><?php echo htmlspecialchars($disposisi['nomor_agenda_lengkap']); ?></span>
                             <?php endif; ?>
+                            <div class="md:hidden text-sm text-gray-600 mt-1">
+                                <div class="truncate">Perihal: <?php echo htmlspecialchars($disposisi['perihal']); ?></div>
+                                <div>Tujuan: <?php echo htmlspecialchars($disposisi['nama_pegawai']); ?></div>
+                                <div>Tgl: <?php echo htmlspecialchars($disposisi['tgl_disposisi_formatted']); ?></div>
+                            </div>
                         </td>
-                        <td class="px-6 py-4"><?php echo htmlspecialchars($disposisi['perihal']); ?></td>
-                        <td class="px-6 py-4 whitespace-nowrap"><?php echo htmlspecialchars($disposisi['nama_pegawai']); ?></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($disposisi['tgl_disposisi_formatted']); ?></td>
+                        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($disposisi['perihal']); ?></td>
+                        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($disposisi['nama_pegawai']); ?></td>
+                        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell text-sm"><?php echo htmlspecialchars($disposisi['tgl_disposisi_formatted']); ?></td>
                         
                         <?php if (in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])): ?>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div class="flex space-x-3">
+                            <td class="px-4 md:px-6 py-3 md:py-4 text-sm font-medium">
+                                <div class="flex space-x-2">
                                     <a href="/edit-disposisi-sekwan?id=<?php echo $disposisi['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit Disposisi">
                                         <i class="fas fa-edit"></i>
                                     </a>
@@ -222,7 +229,7 @@ require_once 'templates/header.php';
             </tbody>
         </table>
     </div>
-    <div id="paginationContainerDisposisi" class="mt-4">
+    <div id="paginationContainerDisposisi" class="mt-4 md:mt-6">
         <!-- Pagination akan dimuat oleh JavaScript -->
     </div>
 </div>

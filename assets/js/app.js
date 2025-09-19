@@ -8,7 +8,7 @@ import {
   updateTableSuratMasukDewan,
   updateTableDisposisi,
   confirmDelete,
-  showLogDetailModal, // Impor fungsi untuk menampilkan modal log
+  showLogDetailModal,
 } from "./modules/ui.js";
 
 // Jadikan fungsi confirmDelete global agar bisa diakses dari HTML
@@ -20,7 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const toggleButtons = document.querySelectorAll(".toggle-password");
     toggleButtons.forEach((button) => {
       button.addEventListener("click", function () {
-        // Cari input password di dalam parent element yang sama
         const passwordInput = this.parentElement.querySelector("input");
         const icon = this.querySelector("i");
 
@@ -38,20 +37,26 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   initPasswordToggle();
 
+  // --- MODIFIKASI DIMULAI DISINI ---
   // Inisialisasi Sidebar Mobile
   const menuToggle = document.getElementById("menu-toggle");
   const sidebar = document.getElementById("sidebar");
   const overlay = document.getElementById("overlay");
+  const body = document.body; // Ambil elemen body
+
   if (menuToggle && sidebar && overlay) {
     menuToggle.addEventListener("click", () => {
       sidebar.classList.toggle("open");
       overlay.classList.toggle("open");
+      body.classList.toggle("sidebar-open"); // Tambah/Hapus class untuk lock scroll
     });
     overlay.addEventListener("click", () => {
       sidebar.classList.remove("open");
       overlay.classList.remove("open");
+      body.classList.remove("sidebar-open"); // Selalu hapus class saat overlay diklik
     });
   }
+  // --- MODIFIKASI SELESAI DISINI ---
 
   // Inisialisasi semua modal
   initModal();
@@ -111,8 +116,8 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: "nomor_urut_keluar",
       urutLabel: "No. Urut",
       checkUrl: "/ajax-check-nomor-keluar",
-      yearSelectId: "tahun_penomoran_keluar", // ID dropdown tahun
-      suratType: "keluar", // Tipe surat untuk AJAX
+      yearSelectId: "tahun_penomoran_keluar",
+      suratType: "keluar",
       dateInputName: "tanggal_surat",
       searchFormId: "searchFormKeluar",
       searchInputId: "searchInputKeluar",
@@ -120,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
       paginationContainerId: "paginationContainerKeluar",
       searchUrl: "/ajax-search-surat-keluar",
       updateTable: updateTableSuratKeluar,
-      filterTahunId: "filterTahunKeluar", // Tambahkan ini
+      filterTahunId: "filterTahunKeluar",
     });
   }
 
@@ -136,8 +141,8 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: "agenda_urut",
       urutLabel: "No. Urut Agenda",
       checkUrl: "/ajax-check-nomor",
-      yearSelectId: "tahun_penomoran_masuk", // ID dropdown tahun
-      suratType: "masuk", // Tipe surat untuk AJAX
+      yearSelectId: "tahun_penomoran_masuk",
+      suratType: "masuk",
       dateInputName: "tanggal_diterima",
       searchFormId: "searchFormMasuk",
       searchInputId: "searchInputMasuk",
@@ -145,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
       paginationContainerId: "paginationContainerMasuk",
       searchUrl: "/ajax-search-surat-masuk",
       updateTable: updateTableSuratMasuk,
-      filterTahunId: "filterTahunMasuk", // Tambahkan ini
+      filterTahunId: "filterTahunMasuk",
     });
   }
 
@@ -161,8 +166,8 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: "nomor_urut_keluar_dewan",
       urutLabel: "No. Urut",
       checkUrl: "/ajax-check-nomor-keluar-dewan",
-      yearSelectId: "tahun_penomoran_keluar_dewan", // ID dropdown tahun
-      suratType: "keluar-dewan", // Tipe surat untuk AJAX
+      yearSelectId: "tahun_penomoran_keluar_dewan",
+      suratType: "keluar-dewan",
       dateInputName: "tanggal_surat",
       searchFormId: "searchFormKeluarDewan",
       searchInputId: "searchInputKeluarDewan",
@@ -170,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
       paginationContainerId: "paginationContainerKeluarDewan",
       searchUrl: "/ajax-search-surat-keluar-dewan",
       updateTable: updateTableSuratKeluarDewan,
-      filterTahunId: "filterTahunKeluarDewan", // Tambahkan ini
+      filterTahunId: "filterTahunKeluarDewan",
     });
   }
 
@@ -186,8 +191,8 @@ document.addEventListener("DOMContentLoaded", () => {
       urutInputId: "agenda_urut_dewan",
       urutLabel: "No. Urut Agenda",
       checkUrl: "/ajax-check-nomor-agenda-dewan",
-      yearSelectId: "tahun_penomoran_masuk_dewan", // ID dropdown tahun
-      suratType: "masuk-dewan", // Tipe surat untuk AJAX
+      yearSelectId: "tahun_penomoran_masuk_dewan",
+      suratType: "masuk-dewan",
       dateInputName: "tanggal_diterima",
       searchFormId: "searchFormMasukDewan",
       searchInputId: "searchInputMasukDewan",
@@ -195,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
       paginationContainerId: "paginationContainerMasukDewan",
       searchUrl: "/ajax-search-surat-masuk-dewan",
       updateTable: updateTableSuratMasukDewan,
-      filterTahunId: "filterTahunMasukDewan", // Tambahkan ini
+      filterTahunId: "filterTahunMasukDewan",
     });
   }
 
@@ -218,12 +223,11 @@ document.addEventListener("DOMContentLoaded", () => {
       paginationContainerId: "paginationContainerDisposisi",
       searchUrl: "/ajax-search-disposisi-sekwan",
       updateTable: updateTableDisposisi,
-      filterTahunId: "filterTahunDisposisi", // Tambahkan ini
+      filterTahunId: "filterTahunDisposisi",
     });
   }
 
   // Event delegation untuk tombol detail log
-  // Ini akan menangani klik pada tombol "Lihat" di seluruh aplikasi
   document.body.addEventListener("click", function (e) {
     if (e.target.classList.contains("detail-log-btn")) {
       showLogDetailModal(e.target.dataset.detail);

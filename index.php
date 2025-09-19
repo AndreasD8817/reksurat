@@ -13,7 +13,7 @@ error_reporting(E_ALL & ~E_NOTICE);
 
 // --- PENGATURAN MODE MAINTENANCE ---
 // Ubah menjadi 'true' untuk mengaktifkan halaman maintenance.
-$maintenance_mode = true;
+$maintenance_mode = false;
 
 // --- MEMUAT DEPENDENSI & VARIABEL LINGKUNGAN ---
 require_once __DIR__ . '/vendor/autoload.php';
