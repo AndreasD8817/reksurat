@@ -54,64 +54,8 @@ if (!isset($csrf_token)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - Reksurat</title>
     <link rel="icon" href="/assets/img/ArekSurat favicon.png" type="image/png">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/assets/css/output.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <style>
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        .floating {
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
-        }
-        
-        .input-focus-effect:focus {
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-        }
-        
-        .btn-hover-effect {
-            transition: all 0.3s ease;
-            transform: translateY(0);
-        }
-        
-        .btn-hover-effect:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
-        }
-        
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            animation: float 8s infinite ease-in-out;
-        }
-        
-        .card-entrance {
-            animation: cardEntrance 0.8s ease-out forwards;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        
-        @keyframes cardEntrance {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 overflow-hidden">
     <div class="fixed inset-0 gradient-bg z-0"></div>

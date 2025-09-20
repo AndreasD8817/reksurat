@@ -23,91 +23,10 @@ $can_access_sistem = ($user_role === 'superadmin');
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><?php echo $pageTitle ?? 'Dashboard'; ?> - Reksurat</title>
     <link rel="icon" href="/assets/img/ArekSurat favicon.png" type="image/png">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+     <link href="/assets/css/output.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#4f46e5',
-                        secondary: '#6366f1',
-                        dark: '#1f2937'
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.5s ease-out',
-                        'slide-in': 'slideIn 0.3s ease-out',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        slideIn: {
-                            '0%': { transform: 'translateX(-100%)' },
-                            '100%': { transform: 'translateX(0)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style type="text/css">
-        .sidebar {
-            transition: all 0.3s ease;
-        }
-        /* Penambahan transisi untuk konten utama */
-        .main-content {
-            transition: margin-left 0.3s ease;
-        }
-        
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                position: fixed;
-                z-index: 50;
-                height: 100vh;
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: rgba(0, 0, 0, 0.5);
-                z-index: 40;
-            }
-            .overlay.open {
-                display: block;
-            }
-            /* Mencegah body scroll saat sidebar mobile terbuka */
-            body.sidebar-open {
-                overflow: hidden;
-            }
-        }
-
-        .nav-active {
-            background-color: #4f46e5;
-            color: white;
-        }
-        .nav-active:hover {
-            background-color: #4338ca;
-        }
-        
-        /* Fix untuk layout yang benar */
-        body {
-            /* Dihapus: overflow: hidden; */
-        }
-        .main-container {
-            height: calc(100vh - 80px); /* 80px adalah tinggi header */
-            overflow-y: auto;
-        }
-    </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex" data-user-role="<?php echo $_SESSION['user_role'] ?? 'staff'; ?>">
     <div class="overlay" id="overlay"></div>

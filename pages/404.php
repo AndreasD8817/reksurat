@@ -5,18 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 Halaman Tidak Ditemukan</title>
     <!-- Menggunakan Tailwind CSS agar konsisten dengan proyek -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/assets/css/output.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <style>
-        /* Style untuk animasi sederhana */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-            animation: fadeIn 0.8s ease-out forwards;
-        }
-    </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
     <div class="text-center p-8">

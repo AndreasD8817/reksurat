@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .sidebar {
+    transition: all 0.3s ease;
+  }
+  .main-content {
+    transition: margin-left 0.3s ease;
+  }
+  .nav-active {
+    @apply bg-primary text-white shadow-md;
+  }
+  .nav-active:hover {
+    @apply bg-indigo-700;
+  }
+  .main-container {
+    height: calc(100vh - 80px); /* 80px adalah tinggi header */
+    @apply overflow-y-auto;
+  }
+  .card {
+    @apply bg-white/90 rounded-2xl border border-gray-200 transition-all duration-300 shadow-md;
+  }
+  .card:hover {
+    @apply -translate-y-1 shadow-lg;
+  }
+  .stats-number {
+    @apply text-4xl font-bold bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text;
+  }
+  .blinking-red {
+    animation: blink-red-glow 1.5s linear infinite;
+  }
+  .blinking-green {
+    animation: blink-green-glow 2s linear infinite;
+  }
+}
+
+@keyframes blink-red-glow {
+  50% {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+    border-color: rgba(239, 68, 68, 0.7);
+  }
+}
+
+@keyframes blink-green-glow {
+  50% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+    border-color: rgba(16, 185, 129, 0.7);
+  }
+}

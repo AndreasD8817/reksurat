@@ -1,0 +1,23 @@
+{
+  "name": "reksurat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AndreasD8817/reksurat.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AndreasD8817/reksurat/issues"
+  },
+  "homepage": "https://github.com/AndreasD8817/reksurat#readme",
+  "devDependencies": {
+    "tailwindcss": "^4.1.13"
+  }
+}

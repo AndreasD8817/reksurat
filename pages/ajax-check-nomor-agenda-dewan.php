@@ -1,7 +1,7 @@
 <?php
 // pages/ajax-check-nomor-agenda-dewan.php
 
-error_reporting(0);
+// Pastikan session dimulai dan database dimuat, karena file ini bisa diakses langsung
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
