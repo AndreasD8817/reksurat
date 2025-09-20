@@ -53,13 +53,70 @@ if (!isset($csrf_token)) {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - Reksurat</title>
-    <link rel="icon" href="/assets/img/ArekSurat favicon.png" type="image/png">
-    <link href="/assets/css/output.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        .input-focus-effect:focus {
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+        
+        .btn-hover-effect {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        
+        .btn-hover-effect:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            animation: float 8s infinite ease-in-out;
+        }
+        
+        .card-entrance {
+            animation: cardEntrance 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        @keyframes cardEntrance {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 overflow-hidden">
+    <!-- Animated Background -->
     <div class="fixed inset-0 gradient-bg z-0"></div>
     
+    <!-- Floating Particles -->
     <div id="particles-container" class="fixed inset-0 z-1"></div>
     
     <div class="relative w-full max-w-md z-10 card-entrance">
@@ -99,6 +156,7 @@ if (!isset($csrf_token)) {
                         </div>
                     </div>
                 </div>
+
                 <div>
                     <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-300 btn-hover-effect">
                         Masuk
@@ -109,28 +167,37 @@ if (!isset($csrf_token)) {
     </div>
 
     <script>
+        // Create floating particles
         document.addEventListener('DOMContentLoaded', function() {
-            // Kode untuk partikel (tidak diubah)
             const container = document.getElementById('particles-container');
             const particleCount = 15;
+            
             for (let i = 0; i < particleCount; i++) {
                 createParticle(container);
             }
+            
             function createParticle(container) {
                 const particle = document.createElement('div');
                 particle.classList.add('particle');
+                
+                // Random size between 5 and 20px
                 const size = Math.random() * 15 + 5;
                 particle.style.width = `${size}px`;
                 particle.style.height = `${size}px`;
+                
+                // Random position
                 const posX = Math.random() * 100;
                 const posY = Math.random() * 100;
                 particle.style.left = `${posX}%`;
                 particle.style.top = `${posY}%`;
+                
+                // Random animation delay
                 particle.style.animationDelay = `${Math.random() * 5}s`;
+                
                 container.appendChild(particle);
             }
             
-            // Kode untuk animasi input (tidak diubah)
+            // Add input animation on focus
             const inputs = document.querySelectorAll('input');
             inputs.forEach(input => {
                 input.addEventListener('focus', () => {
@@ -146,15 +213,17 @@ if (!isset($csrf_token)) {
             const togglePassword = document.querySelector('#togglePassword');
             const passwordInput = document.querySelector('#password');
 
-            togglePassword.addEventListener('click', function() {
-                // Ganti tipe input dari 'password' ke 'text' atau sebaliknya
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                
-                // Ganti ikon mata dari 'fa-eye' ke 'fa-eye-slash' atau sebaliknya
-                this.querySelector('i').classList.toggle('fa-eye');
-                this.querySelector('i').classList.toggle('fa-eye-slash');
-            });
+            if (togglePassword && passwordInput) {
+                togglePassword.addEventListener('click', function() {
+                    // Ganti tipe input dari 'password' ke 'text' atau sebaliknya
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    
+                    // Ganti ikon mata dari 'fa-eye' ke 'fa-eye-slash' atau sebaliknya
+                    this.querySelector('i').classList.toggle('fa-eye');
+                    this.querySelector('i').classList.toggle('fa-eye-slash');
+                });
+            }
             // --- AKHIR DARI KODE BARU ---
         });
     </script>

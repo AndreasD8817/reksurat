@@ -75,7 +75,7 @@ require_once 'templates/header.php';
     }
 </style>
 
-<div class="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl p-6 animate-fade-in border border-blue-100">
+<div class="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl animate-fade-in border border-blue-100">
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <h3 class="text-2xl font-bold text-gray-800 flex items-center">
             <span class="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Log Aktivitas Pengguna</span>
@@ -118,7 +118,7 @@ require_once 'templates/header.php';
                         <tr class="md:hover:bg-blue-50 transition-colors duration-200">
                             <td data-label="No" class="px-6 py-4 font-medium text-gray-700"><?php echo $no++; ?></td>
                             <td data-label="User" class="px-6 py-4 font-semibold text-gray-800"><?php echo htmlspecialchars($log['user_nama']); ?></td>
-                            <td data-label="Kegiatan" class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($log['kegiatan']); ?></td>
+                            <td data-label="Kegiatan" class="px-6 py-4 text-gray-600 break-all"><?php echo htmlspecialchars($log['kegiatan']); ?></td>
                             <td data-label="Detail" class="px-6 py-4 text-center">
                                 <?php if ($log['detail']): ?>
                                     <button class="detail-log-btn text-primary hover:underline text-sm" data-detail='<?php echo htmlspecialchars($log['detail']); ?>'>Lihat</button>

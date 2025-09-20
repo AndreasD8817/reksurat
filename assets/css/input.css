@@ -4,16 +4,51 @@
 
 @layer components {
   .sidebar {
-    transition: all 0.3s ease;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
   }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    pointer-events: none;
+  }
+
+  .overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Lock body scroll when sidebar is open */
+  body.sidebar-open {
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    .sidebar {
+      transform: translateX(0);
+    }
+  }
+
   .main-content {
     transition: margin-left 0.3s ease;
   }
   .nav-active {
-    @apply bg-primary text-white shadow-md;
+    @apply bg-gray-100 text-primary font-bold shadow-md;
   }
   .nav-active:hover {
-    @apply bg-indigo-700;
+    @apply bg-gray-200 text-primary;
   }
   .main-container {
     height: calc(100vh - 80px); /* 80px adalah tinggi header */
