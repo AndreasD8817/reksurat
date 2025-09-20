@@ -114,26 +114,31 @@ require_once 'templates/header.php';
             <span class="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Daftar Pengguna</span>
         </h3>
     </div>
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="tableBodyUsers" class="bg-white divide-y divide-gray-200">
-                <?php foreach ($users as $user): ?>
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900"><?php echo htmlspecialchars($user['id']); ?></td>
-                        <td class="px-6 py-4 whitespace-nowrap"><?php echo htmlspecialchars($user['nama']); ?></td>
-                        <td class="px-6 py-4 whitespace-nowrap"><?php echo htmlspecialchars($user['username']); ?></td>
-                        <td class="px-6 py-4 whitespace-nowrap"><?php echo htmlspecialchars($user['email']); ?></td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+
+    <!-- Grid container for users -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <?php if (empty($users)): ?>
+            <div class="col-span-full text-center py-8 text-gray-500">
+                <p>Belum ada data pengguna.</p>
+            </div>
+        <?php else: ?>
+            <?php foreach ($users as $user): ?>
+                <div class="bg-white border border-gray-200 rounded-lg p-4 flex flex-col hover:shadow-lg transition-shadow duration-200">
+                    <div class="flex-grow">
+                        <div class="flex items-center mb-3">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white font-bold text-xl">
+                                <?php echo strtoupper(substr($user['nama'], 0, 1)); ?>
+                            </div>
+                            <div class="ml-4">
+                                <p class="font-bold text-gray-800"><?php echo htmlspecialchars($user['nama']); ?></p>
+                                <p class="text-sm text-gray-500">@<?php echo htmlspecialchars($user['username']); ?></p>
+                            </div>
+                        </div>
+                        
+                        <p class="text-sm text-gray-600 mb-2"><i class="fas fa-envelope w-5 mr-2 text-gray-400"></i><?php echo htmlspecialchars($user['email']); ?></p>
+                        
+                        <div class="flex items-center">
+                            <i class="fas fa-user-shield w-5 mr-2 text-gray-400"></i>
                             <?php
                                 $role = htmlspecialchars($user['role']);
                                 $badge_class = 'bg-blue-100 text-blue-800';
@@ -147,26 +152,18 @@ require_once 'templates/header.php';
                             <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $badge_class; ?>">
                                 <?php echo ucfirst($role); ?>
                             </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div class="flex space-x-3">
-                                <a href="/edit-user?id=<?php echo $user['id']; ?>" class="text-indigo-600 hover:text-indigo-900" title="Edit"><i class="fas fa-edit"></i></a>
-                                <?php if ($user['id'] != $_SESSION['user_id']): // Admin tidak bisa menghapus diri sendiri ?>
-                                <button onclick="confirmDelete('user', <?php echo $user['id']; ?>)" class="text-red-600 hover:text-red-900" title="Hapus"><i class="fas fa-trash-alt"></i></button>
-                                <?php endif; ?>
-                            </div>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-                 <?php if (empty($users)): ?>
-                    <tr>
-                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                            <p>Belum ada data pengguna.</p>
-                        </td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-200 mt-4 pt-4 flex justify-end space-x-3">
+                        <a href="/edit-user?id=<?php echo $user['id']; ?>" class="text-indigo-600 hover:text-indigo-900" title="Edit"><i class="fas fa-edit"></i> Edit</a>
+                        <?php if ($user['id'] != $_SESSION['user_id']): ?>
+                        <button onclick="confirmDelete('user', <?php echo $user['id']; ?>)" class="text-red-600 hover:text-red-900" title="Hapus"><i class="fas fa-trash-alt"></i> Hapus</button>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 </div>
 

@@ -104,7 +104,7 @@ $can_access_sistem = ($user_role === 'superadmin');
                     <h2 class="text-xl font-semibold text-gray-700"><?php echo $pageTitle ?? 'Dashboard'; ?></h2>
                 </div>
                 <div class="flex items-center cursor-pointer">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white font-bold shadow-md hover:shadow-lg transition-shadow">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex-shrink-0 flex items-center justify-center text-white font-bold shadow-md hover:shadow-lg transition-shadow leading-none">
                         <?php echo htmlspecialchars($inisial_user); ?>
                     </div>
                     <span class="text-gray-700 font-medium text-sm ml-3 hidden md:block">

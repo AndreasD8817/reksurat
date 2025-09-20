@@ -30,6 +30,51 @@ $pageTitle = 'Log Aktivitas User';
 require_once 'templates/header.php';
 ?>
 
+<style>
+    /* Styling untuk tampilan mobile */
+    @media (max-width: 767px) {
+        .responsive-table thead {
+            display: none; /* Sembunyikan header tabel di mobile */
+        }
+        .responsive-table tbody {
+            display: block;
+            width: 100%;
+        }
+        .responsive-table tr {
+            display: block;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb; /* border-gray-200 */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            background-color: #ffffff;
+            padding: 1rem;
+        }
+        .responsive-table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid #f3f4f6; /* border-gray-100 */
+            text-align: right; /* Data di sebelah kanan */
+        }
+        .responsive-table td:last-child {
+            border-bottom: none;
+        }
+        .responsive-table td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            text-align: left; /* Label di sebelah kiri */
+            color: #4b5563; /* text-gray-600 */
+        }
+        .responsive-table td.text-center {
+            justify-content: flex-end; /* Pastikan tombol tetap di kanan */
+        }
+        .responsive-table td.text-center::before {
+            flex-grow: 1; /* Dorong tombol ke kanan */
+        }
+    }
+</style>
+
 <div class="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl p-6 animate-fade-in border border-blue-100">
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <h3 class="text-2xl font-bold text-gray-800 flex items-center">
@@ -52,35 +97,35 @@ require_once 'templates/header.php';
     </div>
 
     <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
-        <table class="min-w-full divide-y divide-gray-200">
+        <table class="min-w-full responsive-table">
             <thead class="bg-gradient-to-r from-primary to-secondary">
                 <tr>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">No</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">User</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Kegiatan</th>
-                    <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Detail</th>
+                    <th class="px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider">Detail</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Tanggal</th>
                     <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Jam</th>
                 </tr>
             </thead>
-            <tbody id="tableBodyLog" class="bg-white divide-y divide-gray-200">
+            <tbody id="tableBodyLog" class="bg-white md:divide-y md:divide-gray-200">
                 <?php if (empty($logs)): ?>
                     <tr>
                         <td colspan="6" class="text-center py-10 text-gray-500">Belum ada aktivitas yang tercatat.</td>
                     </tr>
                 <?php else: ?>
                     <?php $no = 1; foreach ($logs as $log): ?>
-                        <tr class="hover:bg-blue-50 transition-colors duration-200">
-                            <td class="px-6 py-4 font-medium text-gray-500"><?php echo $no++; ?></td>
-                            <td class="px-6 py-4 font-semibold text-gray-800"><?php echo htmlspecialchars($log['user_nama']); ?></td>
-                            <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($log['kegiatan']); ?></td>
-                            <td class="px-6 py-4 text-center">
+                        <tr class="md:hover:bg-blue-50 transition-colors duration-200">
+                            <td data-label="No" class="px-6 py-4 font-medium text-gray-700"><?php echo $no++; ?></td>
+                            <td data-label="User" class="px-6 py-4 font-semibold text-gray-800"><?php echo htmlspecialchars($log['user_nama']); ?></td>
+                            <td data-label="Kegiatan" class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($log['kegiatan']); ?></td>
+                            <td data-label="Detail" class="px-6 py-4 text-center">
                                 <?php if ($log['detail']): ?>
                                     <button class="detail-log-btn text-primary hover:underline text-sm" data-detail='<?php echo htmlspecialchars($log['detail']); ?>'>Lihat</button>
                                 <?php endif; ?>
                             </td>
-                            <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($log['tanggal']); ?></td>
-                            <td class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($log['jam']); ?></td>
+                            <td data-label="Tanggal" class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($log['tanggal']); ?></td>
+                            <td data-label="Jam" class="px-6 py-4 text-gray-600"><?php echo htmlspecialchars($log['jam']); ?></td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>

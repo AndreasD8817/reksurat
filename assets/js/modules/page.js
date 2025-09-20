@@ -182,7 +182,7 @@ export function setupPageFunctionality(config) {
         .then((data) => {
           // Modifikasi: Cek berbagai kemungkinan nama properti data
           const listData = data.logs || data.disposisi_list || data.surat_list;
-          config.updateTable(listData);
+          config.updateTable(listData, data.pagination);
 
           if (data.pagination) {
             updatePagination(data.pagination, config.searchFormId);

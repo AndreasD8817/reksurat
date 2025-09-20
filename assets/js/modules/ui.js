@@ -405,14 +405,17 @@ function getDisposisiRowHTML(disposisi) {
     </tr>`;
 }
 
-export function updateTableLog(logs) {
+export function updateTableLog(logs, pagination) {
   const tableBody = document.getElementById("tableBodyLog");
   if (!tableBody) return;
+
   if (!logs || logs.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500"><p>Data log tidak ditemukan.</p></td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-gray-500">Data log tidak ditemukan.</td></tr>`;
   } else {
-    let rowNumber =
-      (document.getElementById("searchFormLog").currentPage - 1) * 15 + 1;
+    const currentPage = pagination ? pagination.current_page : 1;
+    const limit = 15; // Sesuaikan dengan limit di backend
+    let rowNumber = (currentPage - 1) * limit + 1;
+
     tableBody.innerHTML = logs
       .map((log) => getLogRowHTML(log, rowNumber++))
       .join("");
@@ -426,15 +429,13 @@ function getLogRowHTML(log, no) {
       )}'>Lihat</button>`
     : "";
 
-  return `<tr class="hover:bg-blue-50">
-      <td class="px-6 py-4 font-medium text-gray-500">${no}</td>
-      <td class="px-6 py-4 font-semibold text-gray-800">${escapeHTML(
-        log.user_nama
-      )}</td>
-      <td class="px-6 py-4 text-gray-600">${escapeHTML(log.kegiatan)}</td>
-      <td class="px-6 py-4 text-center">${detailButton}</td>
-      <td class="px-6 py-4 text-gray-600">${escapeHTML(log.tanggal)}</td>
-      <td class="px-6 py-4 text-gray-600">${escapeHTML(log.jam)}</td>
+  return `<tr class="md:hover:bg-blue-50 transition-colors duration-200">
+      <td data-label="No" class="px-6 py-4 font-medium text-gray-700">${no}</td>
+      <td data-label="User" class="px-6 py-4 font-semibold text-gray-800">${escapeHTML(log.user_nama)}</td>
+      <td data-label="Kegiatan" class="px-6 py-4 text-gray-600">${escapeHTML(log.kegiatan)}</td>
+      <td data-label="Detail" class="px-6 py-4 text-center">${detailButton}</td>
+      <td data-label="Tanggal" class="px-6 py-4 text-gray-600">${escapeHTML(log.tanggal)}</td>
+      <td data-label="Jam" class="px-6 py-4 text-gray-600">${escapeHTML(log.jam)}</td>
     </tr>`;
 }
 
