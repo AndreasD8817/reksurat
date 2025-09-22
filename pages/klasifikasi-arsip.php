@@ -15,7 +15,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_klasifikasi'])
     $kode = $_POST['kode'];
     $deskripsi = $_POST['deskripsi'];
 
-    // Validasi sederhana
     if (empty($kode) || empty($deskripsi)) {
         $_SESSION['error_message'] = "Kode dan Deskripsi tidak boleh kosong.";
     } else {
@@ -27,38 +26,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_klasifikasi'])
     exit;
 }
 
-// --- Logika Pencarian dan Pagination (Versi Perbaikan Final) ---
+// --- Logika Pencarian dan Pagination (Final Corrected Version) ---
 $limit = 10;
 $page = max(1, (int)($_GET['page'] ?? 1));
 $offset = ($page - 1) * $limit;
 $search_term = $_GET['search'] ?? '';
 
-// 1. Bangun query dan parameter untuk COUNT
+// 1. Build base queries
 $sql_count = "SELECT COUNT(id) FROM klasifikasi_arsip";
-$params_count = [];
+$sql_data = "SELECT * FROM klasifikasi_arsip";
+
+// 2. Build parameters and WHERE clause if a search is performed
+$params = [];
 if (!empty($search_term)) {
-    $sql_count .= " WHERE kode LIKE :search OR deskripsi LIKE :search";
-    $params_count[':search'] = '%' . $search_term . '%';
+    $sql_count .= " WHERE kode LIKE ? OR deskripsi LIKE ?";
+    $sql_data .= " WHERE kode LIKE ? OR deskripsi LIKE ?";
+    $like_term = '%' . $search_term . '%';
+    $params[] = $like_term;
+    $params[] = $like_term;
 }
 
+// 3. Execute the COUNT query
 $stmt_count = $pdo->prepare($sql_count);
-$stmt_count->execute($params_count);
+$stmt_count->execute($params);
 $total_records = $stmt_count->fetchColumn();
 $total_pages = ceil($total_records / $limit);
 
-// 2. Bangun query dan parameter untuk SELECT DATA
-$sql_data = "SELECT * FROM klasifikasi_arsip";
-$params_data = [];
-if (!empty($search_term)) {
-    $sql_data .= " WHERE kode LIKE :search OR deskripsi LIKE :search";
-    $params_data[':search'] = '%' . $search_term . '%';
-}
-$sql_data .= " ORDER BY kode ASC LIMIT {$limit} OFFSET {$offset}"; // Embed safe integers
+// 4. Build the final DATA query with ordering and limits
+$sql_data .= " ORDER BY kode ASC LIMIT ? OFFSET ?";
 
+// 5. Add limit and offset to the parameters array for the data query
+$params[] = $limit;
+$params[] = $offset;
+
+// 6. Execute the DATA query
 $stmt_data = $pdo->prepare($sql_data);
-$stmt_data->execute($params_data);
+$stmt_data->execute($params);
 $klasifikasi_list = $stmt_data->fetchAll(PDO::FETCH_ASSOC);
-// --- Akhir Perbaikan --- 
 
 $pageTitle = 'Kelola Klasifikasi Arsip';
 require_once 'templates/header.php';

@@ -31,7 +31,7 @@ $can_access_sistem = ($user_role === 'superadmin');
 <body class="bg-gray-50 min-h-screen flex" data-user-role="<?php echo $_SESSION['user_role'] ?? 'staff'; ?>">
     <div class="overlay" id="overlay"></div>
 
-    <aside class="sidebar bg-white w-64 shadow-lg z-50 h-screen fixed md:fixed transition-transform duration-300 ease-in-out" id="sidebar">
+    <aside class="sidebar bg-white w-64 shadow-lg z-50 h-screen fixed md:fixed transition-transform duration-300 ease-in-out flex flex-col" id="sidebar">
         <div class="px-4 h-20 flex items-center gap-3 border-b border-gray-200 bg-gradient-to-r from-primary to-secondary">
             <img src="/assets/img/ArekSurat icon.png" alt="Logo Aplikasi ArekSurat" class="h-12 w-12">
             <div>
@@ -39,57 +39,76 @@ $can_access_sistem = ($user_role === 'superadmin');
                 <p class="text-sm text-indigo-100">Dashboard Penomoran</p>
             </div>
         </div>
-        <nav class="mt-6">
+        <nav class="mt-6 flex-grow overflow-y-auto">
             
             <a href="/dashboard" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'dashboard' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
                 <i class="fas fa-tachometer-alt mr-3 w-5 text-center"></i> Dashboard
             </a>
-            <div class="px-5 mt-4 mb-2">
-                <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Sekretariat</p>
-            </div>
-            <?php if ($can_access_surat_keluar): ?>
-                <a href="/surat-keluar" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'surat-keluar' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
-                    <i class="fas fa-paper-plane mr-3 w-5 text-center"></i> Surat Keluar Setwan
-                </a>
-            <?php endif; ?>
-            <?php if ($can_access_surat_masuk): ?>
-                <a href="/surat-masuk" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'surat-masuk' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
-                    <i class="fas fa-envelope mr-3 w-5 text-center"></i> Surat Masuk Setwan
-                </a>
-            <?php endif; ?>
-            <?php if ($can_access_disposisi): ?>
-                <a href="/disposisi-sekwan" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'disposisi-sekwan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
-                    <i class="fas fa-share-square mr-3 w-5 text-center"></i> Disposisi Setwan
-                </a>
-            <?php endif; ?>
 
-            <div class="px-5 mt-6 mb-2">
-                <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Dewan</p>
-            </div>
-            <?php if ($can_access_surat_keluar): ?>
-                <a href="/surat-keluar-dewan" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'surat-keluar-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
-                    <i class="fas fa-paper-plane mr-3 w-5 text-center"></i> Surat Keluar Dewan
-                </a>
-            <?php endif; ?>
-            <?php if ($can_access_surat_masuk): ?>
-                <a href="/surat-masuk-dewan" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'surat-masuk-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
-                    <i class="fas fa-envelope mr-3 w-5 text-center"></i> Surat Masuk Dewan
-                </a>
-            <?php endif; ?>
+            <!-- Sekretariat Section -->
+            <details open class="group">
+                <summary class="flex items-center justify-between px-5 mt-4 mb-2 cursor-pointer">
+                    <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Sekretariat</p>
+                    <i class="fas fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform duration-200"></i>
+                </summary>
+                <div class="pb-2">
+                    <?php if ($can_access_surat_keluar): ?>
+                        <a href="/surat-keluar" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'surat-keluar' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                            <i class="fas fa-paper-plane mr-3 w-5 text-center"></i> Surat Keluar Setwan
+                        </a>
+                    <?php endif; ?>
+                    <?php if ($can_access_surat_masuk): ?>
+                        <a href="/surat-masuk" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'surat-masuk' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                            <i class="fas fa-envelope mr-3 w-5 text-center"></i> Surat Masuk Setwan
+                        </a>
+                    <?php endif; ?>
+                    <?php if ($can_access_disposisi): ?>
+                        <a href="/disposisi-sekwan" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'disposisi-sekwan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                            <i class="fas fa-share-square mr-3 w-5 text-center"></i> Disposisi Setwan
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </details>
+
+            <!-- Dewan Section -->
+            <details open class="group">
+                <summary class="flex items-center justify-between px-5 mt-6 mb-2 cursor-pointer">
+                    <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Dewan</p>
+                    <i class="fas fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform duration-200"></i>
+                </summary>
+                <div class="pb-2">
+                    <?php if ($can_access_surat_keluar): ?>
+                        <a href="/surat-keluar-dewan" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'surat-keluar-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                            <i class="fas fa-paper-plane mr-3 w-5 text-center"></i> Surat Keluar Dewan
+                        </a>
+                    <?php endif; ?>
+                    <?php if ($can_access_surat_masuk): ?>
+                        <a href="/surat-masuk-dewan" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'surat-masuk-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                            <i class="fas fa-envelope mr-3 w-5 text-center"></i> Surat Masuk Dewan
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </details>
             
             <?php if ($can_access_sistem): ?>
-                <div class="px-5 mt-8 mb-2">
-                    <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Sistem</p>
-                </div>
-                <a href="/users" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'users' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
-                    <i class="fas fa-users-cog mr-3 w-5 text-center"></i> Manajemen User
-                </a>
-                <a href="/klasifikasi-arsip" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'klasifikasi-arsip' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
-                    <i class="fas fa-archive mr-3 w-5 text-center"></i> Klasifikasi Arsip
-                </a>
-                <a href="/log-user" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'log-user' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
-                    <i class="fas fa-history mr-3 w-5 text-center"></i> Log User
-                </a>
+                <!-- Sistem Section -->
+                <details open class="group">
+                    <summary class="flex items-center justify-between px-5 mt-8 mb-2 cursor-pointer">
+                        <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Sistem</p>
+                        <i class="fas fa-chevron-down text-gray-400 group-open:rotate-180 transition-transform duration-200"></i>
+                    </summary>
+                    <div class="pb-2">
+                        <a href="/users" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'users' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                            <i class="fas fa-users-cog mr-3 w-5 text-center"></i> Manajemen User
+                        </a>
+                        <a href="/klasifikasi-arsip" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'klasifikasi-arsip' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                            <i class="fas fa-archive mr-3 w-5 text-center"></i> Klasifikasi Arsip
+                        </a>
+                        <a href="/log-user" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'log-user' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                            <i class="fas fa-history mr-3 w-5 text-center"></i> Log User
+                        </a>
+                    </div>
+                </details>
             <?php endif; ?>
             <a href="/logout" class="block py-3 px-5 mx-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-primary ">
                 <i class="fas fa-sign-out-alt mr-3 w-5 text-center"></i> Keluar
