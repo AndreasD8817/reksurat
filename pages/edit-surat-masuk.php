@@ -80,6 +80,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat_masuk'])
 }
 
 $tahun_surat = date('Y', strtotime($surat['tanggal_diterima']));
+
+// --- LOGIKA UNTUK MENGAMBIL DATA KLASIFIKASI ---
+$stmt_klasifikasi = $pdo->query("SELECT kode, deskripsi FROM klasifikasi_arsip ORDER BY kode");
+$klasifikasi_list = $stmt_klasifikasi->fetchAll(PDO::FETCH_ASSOC);
+
 $pageTitle = 'Edit Surat Masuk';
 require_once 'templates/header.php';
 ?>
@@ -96,7 +101,14 @@ require_once 'templates/header.php';
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Klasifikasi / No. Urut Agenda / Tahun</label>
                 <div class="flex items-center space-x-2">
-                    <input type="text" name="agenda_klasifikasi" value="<?php echo htmlspecialchars($surat['agenda_klasifikasi']); ?>" class="flex-1 px-4 py-3 rounded-xl border border-gray-300" placeholder="Klasifikasi">
+                    <input type="text" name="agenda_klasifikasi" list="klasifikasi-list" value="<?php echo htmlspecialchars($surat['agenda_klasifikasi']); ?>" class="flex-1 px-4 py-3 rounded-xl border border-gray-300" placeholder="Ketik/Pilih Klasifikasi..." required />
+                    <datalist id="klasifikasi-list">
+                        <?php foreach ($klasifikasi_list as $klas): ?>
+                            <option value="<?php echo htmlspecialchars($klas['kode']); ?>">
+                                <?php echo htmlspecialchars($klas['deskripsi']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </datalist>
                     <span class="text-gray-500 pt-2">/</span>
                     <input type="text" id="agenda_urut_edit" name="agenda_urut" value="<?php echo htmlspecialchars($surat['agenda_urut']); ?>" class="w-24 px-4 py-3 rounded-xl border border-gray-300 text-center" placeholder="No. Urut">
                     <span class="text-gray-500 pt-2">/</span>

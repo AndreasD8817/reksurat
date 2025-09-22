@@ -91,6 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_surat'])) {
 // Ambil tahun dari tanggal surat untuk default dropdown
 $tahun_surat = date('Y', strtotime($surat['tanggal_surat']));
 
+// --- LOGIKA UNTUK MENGAMBIL DATA KLASIFIKASI ---
+$stmt_klasifikasi = $pdo->query("SELECT kode, deskripsi FROM klasifikasi_arsip ORDER BY kode");
+$klasifikasi_list = $stmt_klasifikasi->fetchAll(PDO::FETCH_ASSOC);
+
 $pageTitle = 'Edit Surat Keluar';
 require_once 'templates/header.php';
 ?>
@@ -109,7 +113,14 @@ require_once 'templates/header.php';
                     <!-- 1. Kolom Tahun(drop down) dan fungsi cek nomor -->
                     <label class="block text-sm font-medium text-gray-700 mb-2">Klasifikasi / Nomor Urut / Tahun</label>
                     <div class="flex items-center space-x-2">
-                        <input type="text" name="kode_klasifikasi" value="<?php echo htmlspecialchars($surat['kode_klasifikasi']); ?>" class="flex-1 px-4 py-3 rounded-xl border border-gray-300" placeholder="Klasifikasi" required />
+                        <input type="text" name="kode_klasifikasi" list="klasifikasi-list" value="<?php echo htmlspecialchars($surat['kode_klasifikasi']); ?>" class="flex-1 px-4 py-3 rounded-xl border border-gray-300" placeholder="Ketik/Pilih Klasifikasi..." required />
+                        <datalist id="klasifikasi-list">
+                            <?php foreach ($klasifikasi_list as $klas): ?>
+                                <option value="<?php echo htmlspecialchars($klas['kode']); ?>">
+                                    <?php echo htmlspecialchars($klas['deskripsi']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </datalist>
                         <span class="text-gray-500 pt-2">/</span>
                         <input type="number" id="nomor_urut_edit" name="nomor_urut" value="<?php echo htmlspecialchars($surat['nomor_urut']); ?>" class="w-24 px-4 py-3 rounded-xl border border-gray-300 text-center" placeholder="No. Urut" required />
                         <span class="text-gray-500 pt-2">/</span>

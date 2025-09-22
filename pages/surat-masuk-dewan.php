@@ -88,6 +88,10 @@ $stmt_next_num->execute([$current_year]);
 $max_num = $stmt_next_num->fetchColumn();
 $next_nomor_urut = $max_num ? (int)$max_num + 1 : 1;
 
+// --- LOGIKA UNTUK MENGAMBIL DATA KLASIFIKASI ---
+$stmt_klasifikasi = $pdo->query("SELECT kode, deskripsi FROM klasifikasi_arsip ORDER BY kode");
+$klasifikasi_list = $stmt_klasifikasi->fetchAll(PDO::FETCH_ASSOC);
+
 $pageTitle = 'Surat Masuk Dewan';
 require_once 'templates/header.php';
 ?>
@@ -112,13 +116,20 @@ require_once 'templates/header.php';
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Klasifikasi / No. Urut Agenda / Tahun</label>
                         <div class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-2">
-                            <input type="text" id="agenda_klasifikasi_dewan" name="agenda_klasifikasi" class="flex-1 px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300" placeholder="Klasifikasi">
+                            <input type="text" id="agenda_klasifikasi_dewan" name="agenda_klasifikasi" list="klasifikasi-list" class="flex-1 px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300" placeholder="Ketik/Pilih Klasifikasi..." required />
+                            <datalist id="klasifikasi-list">
+                                <?php foreach ($klasifikasi_list as $klas): ?>
+                                    <option value="<?php echo htmlspecialchars($klas['kode']); ?>">
+                                        <?php echo htmlspecialchars($klas['deskripsi']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </datalist>
                             <span class="hidden md:block text-gray-500 pt-2">/</span>
                             <input type="text" id="agenda_urut_dewan" name="agenda_urut" value="<?php echo $next_nomor_urut; ?>" class="w-full md:w-24 px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300 text-center" placeholder="No. Urut">
                             <span class="hidden md:block text-gray-500 pt-2">/</span>
                             <select id="tahun_penomoran_masuk_dewan" name="tahun_penomoran" class="w-full md:w-28 px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300 bg-white" required>
                                 <?php foreach ($all_years as $year): ?>
-                                    <option value="<?php echo $year; ?>" <?php echo ($year == $current_year) ? 'selected' : ''; ?>>
+                                    <option value="<?php echo $year; ?>" <?php echo ($year == $current_year) ? 'selected' : ''; ?> >
                                         <?php echo $year; ?>
                                     </option>
                                 <?php endforeach; ?>

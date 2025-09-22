@@ -77,22 +77,23 @@ $total_records = $stmt_count->fetchColumn();
 $total_pages = ceil($total_records / $limit);
 
 // --- LOGIKA UNTUK DROPDOWN TAHUN DINAMIS ---
-// 1. Ambil tahun-tahun yang sudah ada dari database
 $stmt_years = $pdo->query("SELECT DISTINCT YEAR(tanggal_diterima) as year FROM surat_masuk WHERE YEAR(tanggal_diterima) IS NOT NULL ORDER BY year ASC");
 $db_years = $stmt_years->fetchAll(PDO::FETCH_COLUMN);
 
-// 2. Dapatkan tahun saat ini dan tahun depan
 $current_year = date('Y');
 
-// 3. Gabungkan semua tahun, buat unik, dan urutkan dari terbaru ke terlama
 $all_years = array_unique(array_merge($db_years, [$current_year, $current_year + 1]));
-rsort($all_years); // Mengurutkan dari besar ke kecil (descending)
+rsort($all_years);
 
 // --- LOGIKA UNTUK NOMOR URUT OTOMATIS ---
 $stmt_next_num = $pdo->prepare("SELECT MAX(CAST(agenda_urut AS UNSIGNED)) FROM surat_masuk WHERE YEAR(tanggal_diterima) = ?");
 $stmt_next_num->execute([$current_year]);
 $max_num = $stmt_next_num->fetchColumn();
 $next_nomor_urut = $max_num ? (int)$max_num + 1 : 1;
+
+// --- LOGIKA UNTUK MENGAMBIL DATA KLASIFIKASI ---
+$stmt_klasifikasi = $pdo->query("SELECT kode, deskripsi FROM klasifikasi_arsip ORDER BY kode");
+$klasifikasi_list = $stmt_klasifikasi->fetchAll(PDO::FETCH_ASSOC);
 
 $pageTitle = 'Surat Masuk';
 require_once 'templates/header.php';
@@ -117,13 +118,20 @@ require_once 'templates/header.php';
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Klasifikasi / No. Urut Agenda / Tahun</label>
                         <div class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-2">
-                            <input type="text" id="agenda_klasifikasi" name="agenda_klasifikasi" class="flex-1 px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300" placeholder="Klasifikasi">
+                            <input type="text" id="agenda_klasifikasi" name="agenda_klasifikasi" list="klasifikasi-list" class="flex-1 px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300" placeholder="Ketik/Pilih Klasifikasi..." required />
+                            <datalist id="klasifikasi-list">
+                                <?php foreach ($klasifikasi_list as $klas):
+                                    ?><option value="<?php echo htmlspecialchars($klas['kode']); ?>">
+                                        <?php echo htmlspecialchars($klas['deskripsi']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </datalist>
                             <span class="hidden md:block text-gray-500 pt-2">/</span>
                             <input type="text" id="agenda_urut" name="agenda_urut" value="<?php echo $next_nomor_urut; ?>" class="w-full md:w-24 px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300 text-center" placeholder="No. Urut">
                             <span class="hidden md:block text-gray-500 pt-2">/</span>
                             <select id="tahun_penomoran_masuk" name="tahun_penomoran" class="w-full md:w-28 px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300 bg-white" required>
-                                <?php foreach ($all_years as $year): ?>
-                                    <option value="<?php echo $year; ?>" <?php echo ($year == $current_year) ? 'selected' : ''; ?>>
+                                <?php foreach ($all_years as $year):
+                                    ?><option value="<?php echo $year; ?>" <?php echo ($year == $current_year) ? 'selected' : ''; ?> >
                                         <?php echo $year; ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -216,8 +224,8 @@ require_once 'templates/header.php';
             <!-- Filter Tahun -->
             <select id="filterTahunMasuk" name="filter_tahun" class="w-full md:w-44 px-3 md:px-4 py-2 md:py-3 rounded-xl border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500 transition duration-200">
                 <option value="">Semua Tahun</option>
-                <?php foreach ($all_years as $year): ?>
-                    <option value="<?php echo $year; ?>">
+                <?php foreach ($all_years as $year):
+                    ?><option value="<?php echo $year; ?>">
                         <?php echo $year; ?>
                     </option>
                 <?php endforeach; ?>
@@ -239,14 +247,14 @@ require_once 'templates/header.php';
                     <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Asal Surat</th>
                     <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Perihal</th>
                     <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Tgl Diterima</th>
-                    <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])): ?>
-                        <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
+                    <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])):
+                        ?><th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
                     <?php endif; ?>
                 </tr>
             </thead>
             <tbody id="tableBodyMasuk" class="bg-white divide-y divide-gray-200">
-                <?php foreach ($surat_masuk_list as $surat): ?>
-                    <tr class="hover:bg-blue-50 transition-colors duration-200">
+                <?php foreach ($surat_masuk_list as $surat):
+                    ?><tr class="hover:bg-blue-50 transition-colors duration-200">
                         <td class="px-4 md:px-6 py-3 md:py-4 font-semibold">
                             <a href="#" class="text-primary hover:underline detail-link" data-id="<?php echo $surat['id']; ?>">
                                 <?php echo htmlspecialchars($surat['nomor_agenda_lengkap']); ?>
@@ -260,25 +268,25 @@ require_once 'templates/header.php';
                         <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($surat['asal_surat']); ?></td>
                         <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($surat['perihal']); ?></td>
                         <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($surat['tgl_terima_formatted']); ?></td>
-                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])): ?>
-                            <td class="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
-                                <?php if ($surat['disposisi_id']): ?>
-                                    <div class="flex items-center space-x-2">
+                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])):
+                            ?><td class="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                                <?php if ($surat['disposisi_id']):
+                                    ?><div class="flex items-center space-x-2">
                                         <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700" title="Surat ini sudah didisposisi pada ID Disposisi: <?php echo $surat['disposisi_id']; ?>">
                                             <i class="fas fa-check-circle mr-1"></i> Terdisposisi
                                         </span>
                                         <!-- Tombol dinonaktifkan -->
                                         <span class="text-gray-300 cursor-not-allowed" title="Tidak dapat diedit/dihapus karena sudah terdisposisi"><i class="fas fa-edit"></i></span>
-                                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin'])): ?>
-                                            <span class="text-gray-300 cursor-not-allowed" title="Tidak dapat diedit/dihapus karena sudah terdisposisi"><i class="fas fa-trash"></i></span>
+                                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin'])):
+                                            ?><span class="text-gray-300 cursor-not-allowed" title="Tidak dapat diedit/dihapus karena sudah terdisposisi"><i class="fas fa-trash"></i></span>
                                         <?php endif; ?>
                                     </div>
-                                <?php else: ?>
-                                    <!-- Tombol aktif -->
+                                <?php else:
+                                    ?><!-- Tombol aktif -->
                                     <div class="flex space-x-2">
                                         <a href="/edit-surat-masuk?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
-                                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin'])): ?>
-                                            <button onclick="window.confirmDelete('surat-masuk', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin'])):
+                                            ?><button onclick="window.confirmDelete('surat-masuk', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
                                         <?php endif; ?>
                                     <?php endif; ?>
                                 </div>
