@@ -99,7 +99,7 @@ require_once 'templates/header.php';
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password Baru (Opsional)</label>
                 <div class="relative">
-                    <input type="password" id="password" name="password" class="w-full px-4 py-3 rounded-xl border border-gray-300 pr-10" placeholder="Isi untuk mengganti password">
+                    <input type="password" id="password" name="password" class="w-full px-4 py-3 rounded-xl border border-gray-300 pr-10" placeholder="Isi untuk mengganti password" autocomplete="new-password">
                     <button type="button" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-primary focus:outline-none toggle-password" aria-label="Tampilkan password">
                         <i class="fas fa-eye"></i>
                     </button>

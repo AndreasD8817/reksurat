@@ -35,6 +35,7 @@ http_response_code(503);
             align-items: center;
             overflow: hidden;
             padding: 20px;
+            position: relative;
         }
         
         .maintenance-container {
@@ -225,6 +226,59 @@ http_response_code(503);
             stroke: currentColor;
         }
         
+        /* Animasi gambar jatuh */
+        .falling-image {
+            position: absolute;
+            top: -100px;
+            z-index: 2;
+            animation: fall linear infinite;
+            opacity: 0.7;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(360deg);
+            }
+        }
+
+        /* Variasi ukuran untuk gambar */
+        .size-small {
+            width: 40px;
+            height: 40px;
+            animation-duration: 15s;
+        }
+
+        .size-medium {
+            width: 70px;
+            height: 70px;
+            animation-duration: 20s;
+        }
+
+        .size-large {
+            width: 100px;
+            height: 100px;
+            animation-duration: 25s;
+        }
+
+        /* Variasi delay untuk animasi */
+        .delay-1 {
+            animation-delay: 0s;
+        }
+
+        .delay-2 {
+            animation-delay: 3s;
+        }
+
+        .delay-3 {
+            animation-delay: 6s;
+        }
+
+        .delay-4 {
+            animation-delay: 9s;
+        }
+        
         /* Media queries untuk perangkat mobile */
         @media (max-width: 480px) {
             body {
@@ -272,6 +326,22 @@ http_response_code(503);
             .shape-2,
             .shape-3 {
                 transform: scale(0.8);
+            }
+            
+            /* Ukuran gambar lebih kecil di mobile */
+            .size-small {
+                width: 30px;
+                height: 30px;
+            }
+
+            .size-medium {
+                width: 50px;
+                height: 50px;
+            }
+
+            .size-large {
+                width: 70px;
+                height: 70px;
             }
         }
         
@@ -413,6 +483,41 @@ http_response_code(503);
     
     // Jalankan sekali saat pertama kali halaman dimuat
     updateCountdown();
-</script>
+    
+    // Fungsi untuk membuat gambar jatuh
+    document.addEventListener('DOMContentLoaded', function() {
+        // Jumlah gambar yang akan dijatuhkan
+        const imageCount = 15;
+        const container = document.body;
+        
+        // Buat elemen gambar yang jatuh
+        for (let i = 0; i < imageCount; i++) {
+            const fallingImg = document.createElement('img');
+            fallingImg.src = '../assets/img/wawan.png';
+            fallingImg.classList.add('falling-image');
+            fallingImg.alt = 'Wawan';
+            
+            // Tentukan ukuran acak
+            const sizes = ['size-small', 'size-medium', 'size-large'];
+            const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
+            fallingImg.classList.add(randomSize);
+            
+            // Tentukan delay acak
+            const delays = ['delay-1', 'delay-2', 'delay-3', 'delay-4'];
+            const randomDelay = delays[Math.floor(Math.random() * delays.length)];
+            fallingImg.classList.add(randomDelay);
+            
+            // Posisi horizontal acak
+            const randomLeft = Math.floor(Math.random() * 100);
+            fallingImg.style.left = randomLeft + 'vw';
+            
+            // Rotasi awal acak
+            const randomRotation = Math.floor(Math.random() * 360);
+            fallingImg.style.transform = `rotate(${randomRotation}deg)`;
+            
+            container.appendChild(fallingImg);
+        }
+    });
+    </script>
 </body>
 </html>
