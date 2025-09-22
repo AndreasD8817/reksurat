@@ -61,17 +61,17 @@ function verify_csrf_token($token) {
 $csrf_token = generate_csrf_token();
 
 // Ambil halaman yang diminta dari URL, defaultnya 'login'
-$page = $_GET['page'] ?? 'login';
+$route = $_GET['route'] ?? 'login';
 
 // Routing sederhana
-if (!isLoggedIn() && $page !== 'login') {
+if (!isLoggedIn() && $route !== 'login') {
     // Jika belum login dan mencoba akses halaman lain, paksa ke login
-    header('Location: /?page=login');
+    header('Location: /login');
     exit;
 }
 
 // Tentukan file halaman yang akan dimuat
-$pageFile = "pages/{$page}.php";
+$pageFile = "pages/{$route}.php";
 
 // Jika file halaman ada, muat file tersebut. Jika tidak, tampilkan halaman 404.
 if (file_exists($pageFile)) {

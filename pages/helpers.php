@@ -61,3 +61,46 @@ function delete_file(?string $filePath, string $uploadDir): bool
     // Cek jika path valid dan file ada, lalu hapus.
     return ($absolutePath && file_exists($absolutePath)) ? unlink($absolutePath) : true;
 }
+
+/**
+ * Membuat komponen pagination dengan gaya Tailwind CSS.
+ *
+ * @param int $total_pages Jumlah total halaman.
+ * @param int $current_page Halaman saat ini.
+ * @param string $base_url URL dasar untuk link pagination.
+ * @param array $query_params Parameter query tambahan untuk disertakan dalam link.
+ * @return void
+ */
+function generate_pagination(int $total_pages, int $current_page, string $base_url, array $query_params = []): void
+{
+    if ($total_pages <= 1) {
+        return;
+    }
+
+    // Hapus parameter 'page' yang mungkin ada untuk menghindari duplikasi
+    unset($query_params['page']);
+
+    // Bangun query string dari parameter yang ada
+    $query_string = http_build_query($query_params);
+
+    echo '<nav class="flex items-center justify-between" aria-label="Pagination">';
+
+    // Tombol Previous
+    $prev_page = $current_page - 1;
+    $prev_link = $base_url . '?page=' . $prev_page . ($query_string ? '&' . $query_string : '');
+    $prev_disabled = $current_page <= 1 ? 'disabled' : '';
+    echo '<a href="' . ($current_page > 1 ? $prev_link : '#') . '" class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 ' . ($prev_disabled ? 'opacity-50 cursor-not-allowed' : '') . '" ' . $prev_disabled . '>Sebelumnya</a>';
+
+    // Info Halaman
+    echo '<div class="hidden md:block">';
+    echo '<p class="text-sm text-gray-700">Halaman <span class="font-medium">' . $current_page . '</span> dari <span class="font-medium">' . $total_pages . '</span></p>';
+    echo '</div>';
+
+    // Tombol Next
+    $next_page = $current_page + 1;
+    $next_link = $base_url . '?page=' . $next_page . ($query_string ? '&' . $query_string : '');
+    $next_disabled = $current_page >= $total_pages ? 'disabled' : '';
+    echo '<a href="' . ($current_page < $total_pages ? $next_link : '#') . '" class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 ' . ($next_disabled ? 'opacity-50 cursor-not-allowed' : '') . '" ' . $next_disabled . '>Selanjutnya</a>';
+
+    echo '</nav>';
+}

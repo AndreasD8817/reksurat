@@ -13,5 +13,5 @@ RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R=301,L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-# Arahkan semua request ke index.php
-RewriteRule ^(.*)$ index.php?page=$1 [L,QSA]
+# Arahkan semua request ke index.php menggunakan parameter 'route'
+RewriteRule ^(.*)$ index.php?route=$1 [L,QSA]
