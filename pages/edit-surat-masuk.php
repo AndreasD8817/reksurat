@@ -4,7 +4,7 @@
 require_once 'helpers.php';
 
 // Keamanan: Pastikan hanya admin yang bisa mengakses
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['admin', 'staff surat masuk'])) {
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['admin', 'staff surat masuk', 'superadmin'])) {
     $_SESSION['error_message'] = "Anda tidak memiliki izin untuk mengakses halaman ini.";
     header('Location: /surat-masuk');
     exit;
