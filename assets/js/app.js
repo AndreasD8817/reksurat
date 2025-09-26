@@ -205,6 +205,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (document.getElementById("searchFormDisposisi")) {
+    let searchUrl = "/ajax-search-disposisi-sekwan"; // Default URL
+    // Cek jika kita berada di halaman dewan
+        let updateFunction = updateTableDisposisi; // Default function
+
+    if (document.getElementById("disposisi-dewan-page")) {
+      searchUrl = "/ajax-search-disposisi-dewan";
+      updateFunction = updateTableDisposisiDewan;
+    }
+
     setupPageFunctionality({
       toggleBtnId: "toggle-form-disposisi-btn",
       formBodyId: "form-disposisi-body",
@@ -221,8 +230,8 @@ document.addEventListener("DOMContentLoaded", () => {
       searchInputId: "searchInputDisposisi",
       tableBodyId: "tableBodyDisposisi",
       paginationContainerId: "paginationContainerDisposisi",
-      searchUrl: "/ajax-search-disposisi-sekwan",
-      updateTable: updateTableDisposisi,
+      searchUrl: searchUrl, // Gunakan URL yang sudah ditentukan
+      updateTable: updateFunction, // Gunakan fungsi update yang sudah ditentukan
       filterTahunId: "filterTahunDisposisi",
     });
   }

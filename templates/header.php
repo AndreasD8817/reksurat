@@ -87,6 +87,11 @@ $can_access_sistem = ($user_role === 'superadmin');
                             <i class="fas fa-envelope mr-3 w-5 text-center"></i> Surat Masuk Dewan
                         </a>
                     <?php endif; ?>
+                    <?php if ($can_access_disposisi): ?>
+                        <a href="/disposisi-dewan" class="block py-3 px-5 mx-2 rounded-lg <?php echo ($_GET['route'] ?? '') === 'disposisi-dewan' ? 'nav-active shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-primary'; ?>">
+                            <i class="fas fa-share-square mr-3 w-5 text-center"></i> Disposisi Dewan
+                        </a>
+                    <?php endif; ?>
                 </div>
             </details>
             

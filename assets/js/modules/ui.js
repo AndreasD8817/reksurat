@@ -405,6 +405,64 @@ function getDisposisiRowHTML(disposisi) {
     </tr>`;
 }
 
+export function updateTableDisposisiDewan(disposisiList) {
+  const tableBody = document.getElementById("tableBodyDisposisi");
+  renderTableRows(tableBody, disposisiList, getDisposisiDewanRowHTML);
+}
+function getDisposisiDewanRowHTML(disposisi) {
+  const isAdminOrStaff =
+    userRole === "superadmin" ||
+    userRole === "admin";
+
+  const noAgendaHtml = disposisi.file_lampiran
+    ? `<a href="#" class="text-primary hover:underline pdf-modal-trigger" data-pdf-src="/uploads-dewan/${escapeHTML(
+        disposisi.file_lampiran
+      )}" data-agenda-no="${escapeHTML(disposisi.nomor_agenda_lengkap)}">
+          ${escapeHTML(disposisi.nomor_agenda_lengkap)}
+       </a>`
+    : `<span class="text-gray-800">${escapeHTML(
+        disposisi.nomor_agenda_lengkap
+      )}</span>`;
+
+  let actionButtons = "";
+  if (isAdminOrStaff) {
+    let editButton = `<a href="/edit-disposisi-dewan?id=${disposisi.id}" class="text-blue-500 hover:text-blue-700" title="Edit Disposisi"><i class="fas fa-edit"></i></a>`;
+    let deleteButton = canDelete
+      ? `<button onclick="window.confirmDelete('disposisi-dewan', ${disposisi.id})" class="text-red-500 hover:text-red-700" title="Batalkan Disposisi"><i class="fas fa-trash-alt"></i></button>`
+      : "";
+    actionButtons = `
+      <td class="px-4 md:px-6 py-3 md:py-4 text-sm font-medium">
+          <div class="flex space-x-2">
+              ${editButton}
+              ${deleteButton}
+          </div>
+      </td>`;
+  }
+
+  return `<tr class="hover:bg-blue-50 transition-colors duration-200">
+        <td class="px-4 md:px-6 py-3 md:py-4 font-medium">
+            ${noAgendaHtml}
+            <div class="md:hidden text-sm text-gray-600 mt-1">
+                <div class="truncate">Perihal: ${escapeHTML(
+                  disposisi.perihal
+                )}</div>
+                <div>Tujuan: ${escapeHTML(disposisi.nama_pegawai)}</div>
+                <div>Tgl: ${escapeHTML(disposisi.tgl_disposisi_formatted)}</div>
+            </div>
+        </td>
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
+          disposisi.perihal
+        )}</td>
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell">${escapeHTML(
+          disposisi.nama_pegawai
+        )}</td>
+        <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell text-sm">${escapeHTML(
+          disposisi.tgl_disposisi_formatted
+        )}</td>
+        ${actionButtons}
+    </tr>`;
+}
+
 export function updateTableLog(logs, pagination) {
   const tableBody = document.getElementById("tableBodyLog");
   if (!tableBody) return;
