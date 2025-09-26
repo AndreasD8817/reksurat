@@ -26,6 +26,31 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// --- AKTIVASI APLIKASI TAHUNAN ---
+require_once __DIR__ . '/config/secrets.php'; // Memuat semua konstanta aktivasi
+
+$currentYear = (int)date('Y');
+$route = $_GET['route'] ?? 'login'; // Ambil route lebih awal
+
+// Cek cookie aktivasi terlebih dahulu
+if (isset($_COOKIE[ACTIVATION_COOKIE_NAME])) {
+    $expected_token = md5($currentYear . ACTIVATION_SECRET_SALT . ACTIVATION_COOKIE_SALT);
+    if (hash_equals($expected_token, $_COOKIE[ACTIVATION_COOKIE_NAME])) {
+        // Cookie valid, pulihkan sesi aktivasi
+        $_SESSION['app_activated_year'] = $currentYear;
+    }
+}
+
+// Cek apakah aplikasi sudah diaktifkan untuk tahun ini (setelah pengecekan cookie)
+if (!isset($_SESSION['app_activated_year']) || $_SESSION['app_activated_year'] !== $currentYear) {
+    // Jika belum diaktifkan dan bukan halaman aktivasi/login, redirect
+    if ($route !== 'activate' && $route !== 'login' && $route !== 'logout') {
+        header('Location: /activate');
+        exit;
+    }
+}
+// --- AKHIR AKTIVASI APLIKASI TAHUNAN ---
+
 // Cek jika mode maintenance aktif
 if ($maintenance_mode) {
     require_once 'pages/maintenance.php';
