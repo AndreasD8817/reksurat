@@ -144,31 +144,28 @@ export function setupPageFunctionality(config) {
     });
   }
 
-  // Logika untuk pencarian data
+  // Logika untuk pencarian dan pengurutan data
   const searchForm = document.getElementById(config.searchFormId);
   if (searchForm) {
     const searchInput = document.getElementById(config.searchInputId);
     const tableBody = document.getElementById(config.tableBodyId);
+    const sortableColumns = document.querySelectorAll(".sortable-col");
     let debounceTimer;
 
+    // State untuk pengurutan
+    let currentSort = {
+      column: "tanggal_diterima",
+      order: "desc",
+    };
+
     const fetchData = (page = 1) => {
-      // Ambil nilai dari search input dan filter tahun
       const query = searchInput.value;
       const filterTahunEl = document.getElementById(config.filterTahunId);
-      const startDateEl = document.getElementById(config.startDateId);
-      const endDateEl = document.getElementById(config.endDateId);
       const year = filterTahunEl ? filterTahunEl.value : "";
-      const startDate = startDateEl ? startDateEl.value : "";
-      const endDate = endDateEl ? endDateEl.value : "";
 
-      // Bangun URL dengan parameter search, page, dan year
       const url = `${config.searchUrl}?search=${encodeURIComponent(
         query
-      )}&p=${page}&year=${encodeURIComponent(
-        year
-      )}&start_date=${encodeURIComponent(
-        startDate
-      )}&end_date=${encodeURIComponent(endDate)}`;
+      )}&p=${page}&year=${encodeURIComponent(year)}&sort_col=${currentSort.column}&sort_order=${currentSort.order}`;
 
       tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8"><i class="fas fa-spinner fa-spin text-primary text-3xl"></i></td></tr>`;
 
@@ -180,7 +177,6 @@ export function setupPageFunctionality(config) {
       fetch(url)
         .then((response) => response.json())
         .then((data) => {
-          // Modifikasi: Cek berbagai kemungkinan nama properti data
           const listData = data.logs || data.disposisi_list || data.surat_list;
           config.updateTable(listData, data.pagination);
 
@@ -194,6 +190,8 @@ export function setupPageFunctionality(config) {
     };
 
     searchForm.fetchData = fetchData;
+
+    // Event listener untuk input pencarian
     if (searchInput) {
       searchInput.addEventListener("input", () => {
         clearTimeout(debounceTimer);
@@ -201,21 +199,44 @@ export function setupPageFunctionality(config) {
       });
     }
 
-    // Tambahkan event listener untuk filter tahun
+    // Event listener untuk filter tahun
     const filterTahunEl = document.getElementById(config.filterTahunId);
     if (filterTahunEl) {
       filterTahunEl.addEventListener("change", () => fetchData(1));
     }
 
-    // Tambahkan event listener untuk filter rentang tanggal
-    const startDateEl = document.getElementById(config.startDateId);
-    const endDateEl = document.getElementById(config.endDateId);
-    if (startDateEl) {
-      startDateEl.addEventListener("change", () => fetchData(1));
-    }
-    if (endDateEl) {
-      endDateEl.addEventListener("change", () => fetchData(1));
-    }
+    // Event listener untuk pengurutan kolom
+    sortableColumns.forEach((column) => {
+      column.addEventListener("click", () => {
+        const sortColumn = column.dataset.sortCol;
+        let sortOrder;
+
+        if (currentSort.column === sortColumn) {
+          // Jika kolom sama, balik urutannya
+          sortOrder = currentSort.order === "asc" ? "desc" : "asc";
+        } else {
+          // Jika kolom baru, default ke ascending
+          sortOrder = "asc";
+        }
+
+        // Update state
+        currentSort.column = sortColumn;
+        currentSort.order = sortOrder;
+
+        // Update ikon
+        sortableColumns.forEach((col) => {
+          const icon = col.querySelector(".sort-icon");
+          if (col === column) {
+            icon.innerHTML = sortOrder === "asc" ? '<i class="fas fa-sort-up"></i>' : '<i class="fas fa-sort-down"></i>';
+          } else {
+            icon.innerHTML = "";
+          }
+        });
+
+        // Ambil data dengan pengurutan baru
+        fetchData(1);
+      });
+    });
 
     searchForm.addEventListener("submit", (e) => {
       e.preventDefault();

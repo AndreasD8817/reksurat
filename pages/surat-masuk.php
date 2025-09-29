@@ -66,7 +66,7 @@ $stmt_data = $pdo->prepare(
     "SELECT sm.*, DATE_FORMAT(sm.tanggal_diterima, '%d-%m-%Y') as tgl_terima_formatted, ds.id as disposisi_id 
      FROM surat_masuk sm
      LEFT JOIN disposisi_sekwan ds ON sm.id = ds.surat_masuk_id
-     ORDER BY sm.id DESC LIMIT ?"
+     ORDER BY sm.tanggal_diterima DESC, sm.id DESC LIMIT ?"
 );
 $stmt_data->bindValue(1, $limit, PDO::PARAM_INT);
 $stmt_data->execute();
@@ -243,10 +243,18 @@ require_once 'templates/header.php';
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gradient-to-r from-primary to-secondary">
                 <tr>
-                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">No. Agenda</th>
-                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Asal Surat</th>
-                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Perihal</th>
-                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Tgl Diterima</th>
+                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider sortable-col cursor-pointer" data-sort-col="nomor_agenda_lengkap" data-sort-order="asc">
+                        No. Agenda <span class="sort-icon"></span>
+                    </th>
+                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell sortable-col cursor-pointer" data-sort-col="asal_surat" data-sort-order="asc">
+                        Asal Surat <span class="sort-icon"></span>
+                    </th>
+                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell sortable-col cursor-pointer" data-sort-col="perihal" data-sort-order="asc">
+                        Perihal <span class="sort-icon"></span>
+                    </th>
+                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell sortable-col cursor-pointer" data-sort-col="tanggal_diterima" data-sort-order="desc">
+                        Tgl Diterima <span class="sort-icon"><i class="fas fa-sort-down"></i></span>
+                    </th>
                     <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])):
                         ?><th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
                     <?php endif; ?>

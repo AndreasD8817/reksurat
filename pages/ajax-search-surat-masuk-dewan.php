@@ -18,6 +18,20 @@ $offset = ($page > 0) ? ($page - 1) * $limit : 0;
 $search = $_GET['search'] ?? '';
 $year = $_GET['year'] ?? '';
 
+// --- BARU: Pengaturan Pengurutan ---
+$sort_col = $_GET['sort_col'] ?? 'tanggal_diterima';
+$sort_order = $_GET['sort_order'] ?? 'DESC';
+
+// Whitelist untuk kolom yang bisa diurutkan demi keamanan
+$allowed_cols = ['nomor_agenda_lengkap', 'asal_surat', 'perihal', 'tanggal_diterima', 'tanggal_surat'];
+if (!in_array($sort_col, $allowed_cols)) {
+    $sort_col = 'tanggal_diterima'; // Default jika kolom tidak valid
+}
+if (strtoupper($sort_order) !== 'ASC' && strtoupper($sort_order) !== 'DESC') {
+    $sort_order = 'DESC'; // Default jika urutan tidak valid
+}
+// --- AKHIR BARU ---
+
 $sql_where = "";
 $params = [];
 $conditions = [];
@@ -42,7 +56,7 @@ $stmt_count->execute($params);
 $total_records = $stmt_count->fetchColumn();
 $total_pages = ceil($total_records / $limit);
 
-$query = "SELECT *, DATE_FORMAT(tanggal_diterima, '%d-%m-%Y') as tgl_terima_formatted FROM surat_masuk_dewan " . $sql_where . " ORDER BY id DESC LIMIT ? OFFSET ?";
+$query = "SELECT *, DATE_FORMAT(tanggal_diterima, '%d-%m-%Y') as tgl_terima_formatted FROM surat_masuk_dewan " . $sql_where . " ORDER BY {$sort_col} {$sort_order}, id DESC LIMIT ? OFFSET ?";
 $stmt_data = $pdo->prepare($query);
 
 $param_index = 1;
