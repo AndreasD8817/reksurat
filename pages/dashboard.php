@@ -31,6 +31,7 @@ $total_surat_keluar = get_total_surat_by_year($pdo, 'surat_keluar', 'tanggal_sur
 $total_surat_masuk_dewan = get_total_surat_by_year($pdo, 'surat_masuk_dewan', 'tanggal_diterima', $selected_year);
 $total_surat_keluar_dewan = get_total_surat_by_year($pdo, 'surat_keluar_dewan', 'tanggal_surat', $selected_year);
 $total_disposisi = get_total_surat_by_year($pdo, 'disposisi_sekwan', 'tanggal_disposisi', $selected_year);
+$total_disposisi_dewan = get_total_surat_by_year($pdo, 'disposisi_dewan', 'tanggal_disposisi', $selected_year);
 
 // Query untuk menghitung surat masuk setwan yang belum didisposisi untuk tahun yang dipilih
 $stmt = $pdo->prepare(
@@ -41,6 +42,16 @@ $stmt = $pdo->prepare(
 );
 $stmt->execute([$selected_year]);
 $surat_belum_disposisi = $stmt->fetchColumn();
+
+// Query untuk menghitung surat masuk dewan yang belum didisposisi untuk tahun yang dipilih
+$stmt_dewan = $pdo->prepare(
+    "SELECT COUNT(smd.id)
+     FROM surat_masuk_dewan smd
+     LEFT JOIN disposisi_dewan dd ON smd.id = dd.surat_masuk_id 
+     WHERE dd.id IS NULL AND YEAR(smd.tanggal_diterima) = ?"
+);
+$stmt_dewan->execute([$selected_year]);
+$surat_dewan_belum_disposisi = $stmt_dewan->fetchColumn();
 
 // Ambil data untuk line chart (12 bulan dalam tahun yang dipilih)
 $line_chart_labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -168,7 +179,7 @@ require_once 'templates/header.php';
             </div>
         </div>
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6 mb-12">
             <a href="/cetak-laporan-tahunan?tipe=surat-masuk&tahun=<?php echo $selected_year; ?>" target="_blank" class="card p-6 text-center block">
                 <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Masuk Setwan</h3> 
                 <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_surat_masuk; ?></div>
@@ -185,36 +196,59 @@ require_once 'templates/header.php';
                 <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Keluar Dewan</h3> 
                 <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_surat_keluar_dewan; ?></div>
             </a>
-            <a href="/cetak-laporan-tahunan?tipe=disposisi-sekwan&tahun=<?php echo $selected_year; ?>" target="_blank" class="card p-6 text-center block sm:col-span-2 lg:col-span-1">
+            <a href="/cetak-laporan-tahunan?tipe=disposisi-sekwan&tahun=<?php echo $selected_year; ?>" target="_blank" class="card p-6 text-center block">
                 <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Setwan Terdisposisi</h3>
                 <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_disposisi; ?></div>
             </a>
+            <a href="/cetak-laporan-tahunan?tipe=disposisi-dewan&tahun=<?php echo $selected_year; ?>" target="_blank" class="card p-6 text-center block">
+                <h3 class="text-lg font-semibold mb-2 text-gray-600">Surat Dewan Terdisposisi</h3>
+                <div class="stats-number" title="Total untuk tahun <?php echo $selected_year; ?>"><?php echo $total_disposisi_dewan; ?></div>
+            </a>
         </div>
         
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-            <div class="card p-6 lg:col-span-2">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            <div class="card p-6">
                 <h3 class="text-xl font-semibold mb-4 text-center text-gray-700">Grafik Surat Setwan Tahun <?php echo $selected_year; ?></h3>
                 <div class="chart-container">
                     <canvas id="lineChart"></canvas>
                 </div>
             </div>
             
-            <a href="/disposisi-sekwan" class="card p-6 flex flex-col justify-center items-center <?php echo ($surat_belum_disposisi > 0) ? 'blinking-red' : 'blinking-green'; ?>">
-                <h3 class="text-xl font-semibold mb-4 text-center text-gray-700">Perlu Disposisi (<?php echo $selected_year; ?>)</h3>
-                <div class="text-6xl font-bold text-gray-800 my-4">
-                    <?php echo $surat_belum_disposisi; ?>
-                </div>
-                <p class="text-center text-gray-600 font-medium">
-                    <?php
-                    if ($surat_belum_disposisi > 0) {
-                        echo "Surat Masuk Setwan<br>menunggu untuk didisposisi.";
-                    } else {
-                        echo "Semua Surat Masuk Setwan<br>telah berhasil didisposisi.";
-                    }
-                    ?>
-                </p>
-                <span class="mt-4 text-sm font-semibold text-primary group-hover:underline">Lihat Detail &rarr;</span>
-            </a>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <a href="/disposisi-sekwan" class="card p-6 flex flex-col justify-center items-center <?php echo ($surat_belum_disposisi > 0) ? 'blinking-red' : 'blinking-green'; ?>">
+                    <h3 class="text-xl font-semibold mb-4 text-center text-gray-700">Perlu Disposisi (Sekwan)</h3>
+                    <div class="text-6xl font-bold text-gray-800 my-4">
+                        <?php echo $surat_belum_disposisi; ?>
+                    </div>
+                    <p class="text-center text-gray-600 font-medium">
+                        <?php
+                        if ($surat_belum_disposisi > 0) {
+                            echo "Surat Masuk Setwan<br>menunggu untuk didisposisi.";
+                        } else {
+                            echo "Semua Surat Masuk Setwan<br>telah berhasil didisposisi.";
+                        }
+                        ?>
+                    </p>
+                    <span class="mt-4 text-sm font-semibold text-primary group-hover:underline">Lihat Detail &rarr;</span>
+                </a>
+
+                <a href="/disposisi-dewan" class="card p-6 flex flex-col justify-center items-center <?php echo ($surat_dewan_belum_disposisi > 0) ? 'blinking-red' : 'blinking-green'; ?>">
+                    <h3 class="text-xl font-semibold mb-4 text-center text-gray-700">Perlu Disposisi (Dewan)</h3>
+                    <div class="text-6xl font-bold text-gray-800 my-4">
+                        <?php echo $surat_dewan_belum_disposisi; ?>
+                    </div>
+                    <p class="text-center text-gray-600 font-medium">
+                        <?php
+                        if ($surat_dewan_belum_disposisi > 0) {
+                            echo "Surat Masuk Dewan<br>menunggu untuk didisposisi.";
+                        } else {
+                            echo "Semua Surat Masuk Dewan<br>telah berhasil didisposisi.";
+                        }
+                        ?>
+                    </p>
+                    <span class="mt-4 text-sm font-semibold text-primary group-hover:underline">Lihat Detail &rarr;</span>
+                </a>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -242,6 +276,7 @@ require_once 'templates/header.php';
             const totalSuratMasukDewan = <?php echo $total_surat_masuk_dewan; ?>;
             const totalSuratKeluarDewan = <?php echo $total_surat_keluar_dewan; ?>;
             const totalDisposisi = <?php echo $total_disposisi; ?>;
+            const totalDisposisiDewan = <?php echo $total_disposisi_dewan; ?>;
             const lineChartLabels = <?php echo $line_chart_labels; ?>;
             const lineChartMasuk = <?php echo $line_chart_masuk; ?>;
             const lineChartKeluar = <?php echo $line_chart_keluar; ?>;

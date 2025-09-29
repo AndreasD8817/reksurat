@@ -71,6 +71,17 @@ $report_configs = [
         'headers' => ['No. Agenda', 'Perihal Surat', 'Pegawai Tertuju', 'Tgl Disposisi'],
         'columns' => ['nomor_agenda_lengkap', 'perihal', 'nama_pegawai', 'tgl_disposisi_formatted'],
         'col_widths' => [40, 70, 45, 25]
+    ],
+    'disposisi-dewan' => [
+        'title' => 'Laporan Tahunan Disposisi Dewan',
+        'table' => 'disposisi_dewan dd JOIN surat_masuk_dewan smd ON dd.surat_masuk_id = smd.id',
+        'date_col' => 'dd.tanggal_disposisi',
+        'logo' => 'Logo_DPRD.png',
+        'kop1' => 'DEWAN PERWAKILAN RAKYAT DAERAH',
+        'kop2' => 'KOTA SURABAYA',
+        'headers' => ['No. Agenda', 'Perihal Surat', 'Pegawai Tertuju', 'Tgl Disposisi'],
+        'columns' => ['nomor_agenda_lengkap', 'perihal', 'nama_pegawai', 'tgl_disposisi_formatted'],
+        'col_widths' => [40, 70, 45, 25]
     ]
 ];
 
