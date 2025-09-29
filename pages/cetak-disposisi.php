@@ -81,44 +81,45 @@ class PDF extends FPDF
 // --- Inisialisasi Dokumen PDF ---
 $pdf = new PDF('P', 'mm', array(215.9, 330.2));
 $pdf->AddPage();
-$pdf->SetMargins(20, 15, 20);
+$pdf->SetMargins(5, 15, 5);
 
 // Atur margin bawah secara eksplisit, agar bisa kita panggil nilainya nanti
-$bottomMargin = 20;
+$bottomMargin = 5;
 $pdf->SetAutoPageBreak(true, $bottomMargin);
 
 
 // --- KOP SURAT ---
-$pdf->Image('assets/img/Logo_Pemkot.png', 20, 15, 25);
+$pdf->Image('assets/img/Logo_Pemkot.png', 10, 10, 30);
 $pdf->SetFont('Arial', '', 14);
 $pdf->Cell(0, 7, 'PEMERINTAH KOTA SURABAYA', 0, 1, 'C');
 $pdf->SetFont('Arial', 'B', 25);
 $pdf->Cell(0, 12, 'SEKRETARIAT DPRD', 0, 1, 'C');
-$pdf->SetFont('Arial', '', 12);
+$pdf->SetFont('Arial', '', 13);
 $pdf->Cell(0, 6, 'Jalan Yos Sudarso Nomor 18 - 22 Surabaya 60272', 0, 1, 'C');
 $pdf->Cell(0, 6, 'Telp. (031) 5463551', 0, 1, 'C');
 $pdf->Cell(0, 6, 'Laman : dprd.surabaya.go.id, Pos-el : sekwan@surabaya.go.id', 0, 1, 'C');
-// $pdf->Line($pdf->GetX(), $pdf->GetY()+2, $pdf->GetX() + 175.9, $pdf->GetY()+2);
 $pdf->Ln(8);
 
 // --- JUDUL LEMBAR ---
-$pdf->SetFont('Arial', 'BU', 14);
+$pdf->SetFont('Arial', 'B', 14);
 $pdf->Cell(0, 8, 'LEMBAR DISPOSISI', 0, 1, 'C');
 $pdf->Ln(5);
 
-// ==================================================================
-// --- KONTEN UTAMA (VERSI FINAL PRESISI v3) ---
-// ==================================================================
+// --- KONTEN UTAMA ---
 
 // Mengatur font default untuk konten.
-$pdf->SetFont('Arial', '', 11);
+$pdf->SetFont('Arial', '', 12);
 
 // --- Definisi Variabel Layout ---
 $x = $pdf->GetX();
 $y = $pdf->GetY();
-$lebar_total = 175.9;
-$lebar_kiri = 90;
-$lebar_kanan = $lebar_total - $lebar_kiri;
+// REVISI: Hitung lebar total secara dinamis dari lebar halaman dikurangi total margin
+// $lebar_total = $pdf->GetPageWidth() - 10;
+// $lebar_kiri = 90;
+// $lebar_kanan = $lebar_total - $lebar_kiri;
+$lebar_total = $pdf->GetPageWidth() - 10;
+$lebar_kiri = $lebar_total / 2;
+$lebar_kanan = $lebar_total / 2;
 $padding_x = 2;
 $lebar_label = 28;
 $lebar_colon = 3;
@@ -215,6 +216,7 @@ $pdf->MultiCell($lebar_teks_perihal, $tinggi_baris_label, $surat['perihal'], 0, 
 
 // --- Bagian Disposisi ---
 $pdf->SetY($y_perihal_start + $tinggi_kotak_perihal + 5);
+$pdf->SetFont('Arial', '', 11);
 $pdf->Cell($lebar_total, 7, 'Diteruskan Kepada :', 'LTR', 1);
 $pdf->Cell($lebar_total, 7, '1. Kepala Bagian Umum', 'LR', 1);
 $pdf->Cell($lebar_total, 7, '2. Kepala Bagian Rapat dan Perundang-Undangan', 'LR', 1);

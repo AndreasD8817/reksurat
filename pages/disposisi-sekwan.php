@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_disposisi'])) 
 
 // Ambil daftar surat masuk yang BELUM didisposisikan untuk dropdown
 $surat_untuk_disposisi = $pdo->query(
-    "SELECT sm.id, sm.nomor_agenda_lengkap 
+    "SELECT sm.id, sm.nomor_agenda_lengkap, sm.perihal 
      FROM surat_masuk sm
      LEFT JOIN disposisi_sekwan ds ON sm.id = ds.surat_masuk_id
      WHERE ds.id IS NULL
@@ -106,7 +106,11 @@ require_once 'templates/header.php';
                         <option value="" disabled selected>-- Pilih Nomor Agenda --</option>
                         <?php foreach ($surat_untuk_disposisi as $surat): ?>
                             <option value="<?php echo $surat['id']; ?>">
-                                <?php echo htmlspecialchars($surat['nomor_agenda_lengkap']); ?>
+                                <?php
+                                $perihal = $surat['perihal'];
+                                $perihal_pendek = (strlen($perihal) > 50) ? substr($perihal, 0, 50) . '...' : $perihal;
+                                echo htmlspecialchars($surat['nomor_agenda_lengkap']) . ' - ' . htmlspecialchars($perihal_pendek);
+                                ?>
                             </option>
                         <?php endforeach; ?>
                     </select>

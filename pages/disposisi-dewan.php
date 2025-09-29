@@ -111,7 +111,11 @@ require_once __DIR__ . '/../templates/header.php';
                         <option value="" disabled selected>-- Pilih Nomor Agenda --</option>
                         <?php foreach ($surat_untuk_disposisi as $surat): ?>
                             <option value="<?= htmlspecialchars($surat['id']) ?>">
-                                <?= htmlspecialchars($surat['nomor_agenda_lengkap']) ?> - <?= htmlspecialchars($surat['perihal']) ?>
+                                <?php
+                                $perihal = $surat['perihal'];
+                                $perihal_pendek = (strlen($perihal) > 50) ? substr($perihal, 0, 50) . '...' : $perihal;
+                                ?>
+                                <?= htmlspecialchars($surat['nomor_agenda_lengkap']) ?> - <?= htmlspecialchars($perihal_pendek) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
