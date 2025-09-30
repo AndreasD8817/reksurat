@@ -8,12 +8,23 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Pengaturan Pagination & Pencarian
+// Pengaturan Pagination, Pencarian, dan Pengurutan
 $limit = 10; 
 $page = isset($_GET['p']) ? (int)$_GET['p'] : 1;
 $offset = ($page > 0) ? ($page - 1) * $limit : 0;
 $search = $_GET['search'] ?? '';
 $year = $_GET['year'] ?? '';
+
+// Pengurutan
+$sort_col = $_GET['sort_col'] ?? 'tanggal_surat'; // Default sort column
+$sort_order = $_GET['sort_order'] ?? 'DESC'; // Default sort order
+
+// Whitelist untuk kolom yang bisa diurutkan untuk keamanan
+$allowed_cols = ['nomor_surat_lengkap', 'tanggal_surat', 'perihal', 'tujuan'];
+if (!in_array($sort_col, $allowed_cols)) {
+    $sort_col = 'tanggal_surat'; // Fallback ke default jika kolom tidak valid
+}
+$sort_order = (strtoupper($sort_order) === 'ASC') ? 'ASC' : 'DESC';
 
 // Siapkan query
 $sql_where = "";
@@ -41,8 +52,11 @@ $stmt_count->execute($params);
 $total_records = $stmt_count->fetchColumn();
 $total_pages = ceil($total_records / $limit);
 
+// Bangun klausa ORDER BY
+$order_by_clause = "ORDER BY {$sort_col} {$sort_order}, id DESC";
+
 // Ambil data surat
-$stmt_data = $pdo->prepare("SELECT *, DATE_FORMAT(tanggal_surat, '%d-%m-%Y') as tgl_formatted FROM surat_keluar " . $sql_where . " ORDER BY id DESC LIMIT ? OFFSET ?");
+$stmt_data = $pdo->prepare("SELECT *, DATE_FORMAT(tanggal_surat, '%d-%m-%Y') as tgl_formatted FROM surat_keluar " . $sql_where . " " . $order_by_clause . " LIMIT ? OFFSET ?");
 $param_index = 1;
 foreach ($params as $param) {
     $stmt_data->bindValue($param_index++, $param, PDO::PARAM_STR);
@@ -58,7 +72,9 @@ $response = [
     'pagination' => [
         'current_page' => $page,
         'total_pages' => $total_pages,
-        'search_query' => $search
+        'search_query' => $search,
+        'sort_col' => $sort_col,
+        'sort_order' => $sort_order
     ]
 ];
 

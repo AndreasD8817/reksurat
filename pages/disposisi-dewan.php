@@ -69,7 +69,7 @@ $stmt_data = $pdo->prepare(
             smd.nomor_agenda_lengkap, smd.perihal, smd.file_lampiran as surat_masuk_file
      FROM disposisi_dewan dd
      JOIN surat_masuk_dewan smd ON dd.surat_masuk_id = smd.id
-     ORDER BY dd.id DESC LIMIT ?"
+     ORDER BY dd.tanggal_disposisi DESC, dd.id DESC LIMIT ?"
 );
 $stmt_data->bindValue(1, $limit, PDO::PARAM_INT);
 $stmt_data->execute();
@@ -189,10 +189,10 @@ require_once __DIR__ . '/../templates/header.php';
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gradient-to-r from-primary to-secondary">
                 <tr>
-                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">No. Agenda</th>
-                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Perihal</th>
-                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Pegawai Tertuju</th>
-                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Tanggal Disposisi</th>
+                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider sortable-col cursor-pointer" data-sort-col="nomor_agenda_lengkap" data-sort-order="asc">No. Agenda <span class="sort-icon"></span></th>
+                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell sortable-col cursor-pointer" data-sort-col="perihal" data-sort-order="asc">Perihal <span class="sort-icon"></span></th>
+                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell sortable-col cursor-pointer" data-sort-col="nama_pegawai" data-sort-order="asc">Kepada Tertuju <span class="sort-icon"></span></th>
+                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell sortable-col cursor-pointer" data-sort-col="tanggal_disposisi" data-sort-order="desc">Tanggal Disposisi <span class="sort-icon"><i class="fas fa-sort-down"></i></span></th>
                     <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
                 </tr>
             </thead>
@@ -251,46 +251,64 @@ require_once __DIR__ . '/../templates/header.php';
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Skrip ini akan menangani AJAX khusus untuk halaman ini,
-    // menimpa logika dari app.js untuk menghindari konflik.
-
-    // Logika untuk Tombol Minimize Form
+    const formContainer = document.getElementById('form-disposisi-container');
     const toggleBtn = document.getElementById('toggle-form-disposisi-btn');
     const formBody = document.getElementById('form-disposisi-body');
-    if (toggleBtn && formBody) {
-        const icon = toggleBtn.querySelector('i');
-        toggleBtn.addEventListener('click', () => {
-            const isHidden = formBody.classList.toggle('hidden');
-            icon.classList.toggle('fa-chevron-up', !isHidden);
-            icon.classList.toggle('fa-chevron-down', isHidden);
-        });
+    const icon = toggleBtn.querySelector('i');
+
+    // Cek status minimize dari localStorage
+    const isMinimized = localStorage.getItem('disposisiDewanFormMinimized') === 'true';
+
+    function applyMinimizeState(minimized) {
+        if (minimized) {
+            formBody.classList.add('hidden');
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+        } else {
+            formBody.classList.remove('hidden');
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+        }
     }
 
+    // Terapkan state saat halaman dimuat
+    applyMinimizeState(isMinimized);
+
+    // Event listener untuk tombol toggle
+    toggleBtn.addEventListener('click', () => {
+        const currentlyHidden = formBody.classList.toggle('hidden');
+        localStorage.setItem('disposisiDewanFormMinimized', currentlyHidden);
+        applyMinimizeState(currentlyHidden); // Perbarui ikon
+    });
+
+    // ... sisa skrip AJAX ...
     const searchInput = document.getElementById('searchInputDisposisi');
     const filterTahun = document.getElementById('filterTahunDisposisi');
     const tableBody = document.getElementById('tableBodyDisposisi');
     const paginationContainer = document.getElementById('paginationContainerDisposisi');
+    const tableHeader = document.querySelector('#list-disposisi-container thead');
     let searchTimeout;
+
+    let currentSort = {
+        col: 'tanggal_disposisi',
+        order: 'desc'
+    };
 
     function fetchDisposisi(page = 1) {
         const searchTerm = searchInput.value;
         const year = filterTahun.value;
-        // Gunakan URL relatif yang akan ditangani oleh router index.php
-        const url = `/ajax-search-disposisi-dewan?search=${encodeURIComponent(searchTerm)}&page_num=${page}&filter_tahun=${year}`;
+        const { col, order } = currentSort;
+        
+        const url = `/ajax-search-disposisi-dewan?search=${encodeURIComponent(searchTerm)}&page_num=${page}&filter_tahun=${year}&sort_col=${col}&sort_order=${order}`;
 
-        // Tampilkan spinner loading
         tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-10"><i class="fas fa-spinner fa-spin text-primary text-3xl"></i></td></tr>';
 
         fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 tableBody.innerHTML = data.html;
                 paginationContainer.innerHTML = data.pagination;
+                updateSortIcons();
             })
             .catch(error => {
                 console.error('Error fetching disposisi:', error);
@@ -298,8 +316,32 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    // Initial fetch is no longer needed as the page loads the initial data via PHP
-    // fetchDisposisi(1);
+    function updateSortIcons() {
+        tableHeader.querySelectorAll('.sortable-col').forEach(th => {
+            const sortCol = th.dataset.sortCol;
+            const sortIcon = th.querySelector('.sort-icon');
+            
+            if (sortCol === currentSort.col) {
+                sortIcon.innerHTML = currentSort.order === 'asc' ? '<i class="fas fa-sort-up"></i>' : '<i class="fas fa-sort-down"></i>';
+            } else {
+                sortIcon.innerHTML = '';
+            }
+        });
+    }
+
+    tableHeader.addEventListener('click', function(event) {
+        const target = event.target.closest('.sortable-col');
+        if (target) {
+            const sortCol = target.dataset.sortCol;
+            if (currentSort.col === sortCol) {
+                currentSort.order = currentSort.order === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.col = sortCol;
+                currentSort.order = 'asc';
+            }
+            fetchDisposisi(1);
+        }
+    });
 
     searchInput.addEventListener('keyup', () => {
         clearTimeout(searchTimeout);
@@ -310,9 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchDisposisi(1);
     });
 
-    // Event listener untuk klik pagination, harus didelegasikan ke body atau container static
     document.getElementById('list-disposisi-container').addEventListener('click', function(event) {
-        // Cek apakah yang diklik adalah link di dalam pagination
         const target = event.target.closest('#paginationContainerDisposisi a');
         if (target) {
             event.preventDefault();
@@ -321,6 +361,9 @@ document.addEventListener('DOMContentLoaded', function() {
             fetchDisposisi(page);
         }
     });
+
+    // Initial UI setup
+    updateSortIcons();
 });
 </script>
 

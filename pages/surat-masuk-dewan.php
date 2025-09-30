@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat_masuk_de
 
 // Logika untuk memuat data awal untuk tabel
 $limit = 10;
-$stmt_data = $pdo->prepare("SELECT *, DATE_FORMAT(tanggal_diterima, '%d-%m-%Y') as tgl_terima_formatted FROM surat_masuk_dewan ORDER BY tanggal_diterima DESC, id DESC LIMIT ?");
+$stmt_data = $pdo->prepare("SELECT smd.*, DATE_FORMAT(smd.tanggal_diterima, '%d-%m-%Y') as tgl_terima_formatted, dd.id as disposisi_id FROM surat_masuk_dewan smd LEFT JOIN disposisi_dewan dd ON smd.id = dd.surat_masuk_id ORDER BY smd.tanggal_diterima DESC, smd.id DESC LIMIT ?");
 $stmt_data->bindValue(1, $limit, PDO::PARAM_INT);
 $stmt_data->execute();
 $surat_masuk_list = $stmt_data->fetchAll(PDO::FETCH_ASSOC);
@@ -289,14 +289,26 @@ require_once 'templates/header.php';
                         <td class="px-4 md:px-6 py-3 md:py-4 text-gray-600 hidden md:table-cell"><?php echo htmlspecialchars($surat['tgl_terima_formatted']); ?></td>
                         
                         <!-- [PERBAIKAN] Kolom Aksi KHUSUS DESKTOP -->
-                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])): ?>
-                            <td class="px-4 md:px-6 py-3 md:py-4 hidden md:table-cell">
-                                <div class="flex space-x-2">
-                                    <a href="/edit-surat-masuk-dewan?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
-                                    <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin'])): ?>
-                                        <button onclick="window.confirmDelete('surat-masuk-dewan', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
-                                    <?php endif; ?>
-                                </div>
+                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])):
+                            ?><td class="px-4 md:px-6 py-3 md:py-4 hidden md:table-cell whitespace-nowrap">
+                                <?php if ($surat['disposisi_id']):
+                                    ?><div class="flex items-center space-x-2">
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700" title="Surat ini sudah didisposisi pada ID Disposisi: <?php echo $surat['disposisi_id']; ?>">
+                                            <i class="fas fa-check-circle mr-1"></i> Terdisposisi
+                                        </span>
+                                        <span class="text-gray-300 cursor-not-allowed" title="Tidak dapat diedit/dihapus karena sudah terdisposisi"><i class="fas fa-edit"></i></span>
+                                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin'])):
+                                            ?><span class="text-gray-300 cursor-not-allowed" title="Tidak dapat diedit/dihapus karena sudah terdisposisi"><i class="fas fa-trash"></i></span>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php else:
+                                    ?><div class="flex space-x-2">
+                                        <a href="/edit-surat-masuk-dewan?id=<?php echo $surat['id']; ?>" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></a>
+                                        <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin'])):
+                                            ?><button onclick="window.confirmDelete('surat-masuk-dewan', <?php echo $surat['id']; ?>)" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
                             </td>
                         <?php endif; ?>
 

@@ -60,7 +60,7 @@ $stmt_data = $pdo->prepare(
             sm.nomor_agenda_lengkap, sm.perihal, sm.file_lampiran as surat_masuk_file
      FROM disposisi_sekwan ds
      JOIN surat_masuk sm ON ds.surat_masuk_id = sm.id
-     ORDER BY ds.id DESC LIMIT ?"
+     ORDER BY ds.tanggal_disposisi DESC, ds.id DESC LIMIT ?"
 );
 $stmt_data->bindValue(1, $limit, PDO::PARAM_INT);
 $stmt_data->execute();
@@ -184,10 +184,10 @@ require_once 'templates/header.php';
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gradient-to-r from-primary to-secondary">
                 <tr>
-                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">No. Agenda</th>
-                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Perihal</th>
-                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Pegawai Tertuju</th>
-                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Tanggal Disposisi</th>
+                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider sortable-col cursor-pointer" data-sort-col="nomor_agenda_lengkap" data-sort-order="asc">No. Agenda <span class="sort-icon"></span></th>
+                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell sortable-col cursor-pointer" data-sort-col="perihal" data-sort-order="asc">Perihal <span class="sort-icon"></span></th>
+                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell sortable-col cursor-pointer" data-sort-col="nama_pegawai" data-sort-order="asc">Pegawai Tertuju <span class="sort-icon"></span></th>
+                    <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell sortable-col cursor-pointer" data-sort-col="tanggal_disposisi" data-sort-order="desc">Tanggal Disposisi <span class="sort-icon"><i class="fas fa-sort-down"></i></span></th>
                     <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat masuk'])): ?>
                         <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
                     <?php endif; ?>

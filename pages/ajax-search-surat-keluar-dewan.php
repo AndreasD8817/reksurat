@@ -1,6 +1,9 @@
 <?php
 // pages/ajax-search-surat-keluar-dewan.php
 
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/helpers.php';
+
 // Keamanan: Pastikan user sudah login
 if (!isset($_SESSION['user_id'])) {
     http_response_code(403);
@@ -8,12 +11,21 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Pengaturan Pagination & Pencarian
+// Pengaturan Pagination, Pencarian, dan Pengurutan
 $limit = 10; 
 $page = isset($_GET['p']) ? (int)$_GET['p'] : 1;
 $offset = ($page > 0) ? ($page - 1) * $limit : 0;
 $search = $_GET['search'] ?? '';
 $year = $_GET['year'] ?? '';
+
+// Pengurutan
+$sort_col = $_GET['sort_col'] ?? 'tanggal_surat';
+$sort_order = $_GET['sort_order'] ?? 'DESC';
+
+// Whitelist untuk kolom yang bisa diurutkan
+$allowed_cols = ['nomor_surat_lengkap', 'tanggal_surat', 'perihal', 'tujuan'];
+$sort_col_validated = in_array($sort_col, $allowed_cols) ? $sort_col : 'tanggal_surat';
+$sort_order_validated = (strtoupper($sort_order) === 'ASC') ? 'ASC' : 'DESC';
 
 $sql_where = "";
 $params = [];
@@ -40,8 +52,11 @@ $stmt_count->execute($params);
 $total_records = $stmt_count->fetchColumn();
 $total_pages = ceil($total_records / $limit);
 
+// Bangun klausa ORDER BY yang dinamis
+$order_by_clause = "ORDER BY {$sort_col_validated} {$sort_order_validated}, id DESC";
+
 // Ambil data surat dari tabel surat_keluar_dewan
-$query = "SELECT *, DATE_FORMAT(tanggal_surat, '%d-%m-%Y') as tgl_formatted FROM surat_keluar_dewan " . $sql_where . " ORDER BY id DESC LIMIT ? OFFSET ?";
+$query = "SELECT *, DATE_FORMAT(tanggal_surat, '%d-%m-%Y') as tgl_formatted FROM surat_keluar_dewan " . $sql_where . " " . $order_by_clause . " LIMIT ? OFFSET ?";
 $stmt_data = $pdo->prepare($query);
 
 $param_index = 1;
@@ -59,7 +74,9 @@ $response = [
     'pagination' => [
         'current_page' => $page,
         'total_pages' => $total_pages,
-        'search_query' => $search
+        'search_query' => $search,
+        'sort_col' => $sort_col,
+        'sort_order' => $sort_order
     ]
 ];
 

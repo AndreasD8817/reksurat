@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['simpan_surat'])) {
 
 // Logika untuk menampilkan data awal di tabel
 $limit = 10;
-$stmt_data = $pdo->prepare("SELECT *, DATE_FORMAT(tanggal_surat, '%d-%m-%Y') as tgl_formatted FROM surat_keluar_dewan ORDER BY id DESC LIMIT ?");
+$stmt_data = $pdo->prepare("SELECT *, DATE_FORMAT(tanggal_surat, '%d-%m-%Y') as tgl_formatted FROM surat_keluar_dewan ORDER BY tanggal_surat DESC, id DESC LIMIT ?");
 $stmt_data->bindValue(1, $limit, PDO::PARAM_INT);
 $stmt_data->execute();
 $surat_keluar_list = $stmt_data->fetchAll(PDO::FETCH_ASSOC);
@@ -237,10 +237,10 @@ require_once 'templates/header.php';
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gradient-to-r from-primary to-secondary">
                     <tr>
-                        <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">No. Surat</th>
-                        <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Tanggal</th>
-                        <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Perihal</th>
-                        <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">Tujuan</th>
+                        <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider sortable-col cursor-pointer" data-sort-col="nomor_surat_lengkap" data-sort-order="asc">No. Surat <span class="sort-icon"></span></th>
+                        <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell sortable-col cursor-pointer" data-sort-col="tanggal_surat" data-sort-order="desc">Tanggal <span class="sort-icon"><i class="fas fa-sort-down"></i></span></th>
+                        <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell sortable-col cursor-pointer" data-sort-col="perihal" data-sort-order="asc">Perihal <span class="sort-icon"></span></th>
+                        <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell sortable-col cursor-pointer" data-sort-col="tujuan" data-sort-order="asc">Tujuan <span class="sort-icon"></span></th>
                         <?php if (in_array($_SESSION['user_role'], ['superadmin', 'admin', 'staff surat keluar'])):
                         ?>
                             <th class="px-4 md:px-6 py-2 md:py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>

@@ -9,12 +9,24 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['user_role'], ['superadm
     exit;
 }
 
-// Ambil parameter dari GET request. Gunakan nama parameter yang konsisten.
+// Ambil parameter dari GET request
 $searchTerm = $_GET['search'] ?? '';
 $filter_tahun = $_GET['filter_tahun'] ?? '';
 $limit = 10;
 $page_num = isset($_GET['page_num']) ? (int)$_GET['page_num'] : 1;
 $offset = ($page_num - 1) * $limit;
+
+// Pengurutan
+$sort_col = $_GET['sort_col'] ?? 'tanggal_disposisi';
+$sort_order = $_GET['sort_order'] ?? 'DESC';
+
+// Whitelist untuk kolom yang bisa diurutkan
+$allowed_cols = ['nomor_agenda_lengkap', 'perihal', 'nama_pegawai', 'tanggal_disposisi'];
+$sort_col_validated = in_array($sort_col, $allowed_cols) ? $sort_col : 'tanggal_disposisi';
+$sort_order_validated = (strtoupper($sort_order) === 'ASC') ? 'ASC' : 'DESC';
+
+// Tentukan prefix tabel untuk kolom ambigu
+$col_prefix = ($sort_col_validated === 'perihal' || $sort_col_validated === 'nomor_agenda_lengkap') ? 'smd.' : 'dd.';
 
 $params = [];
 $where_clauses = [];
@@ -36,6 +48,9 @@ if (!empty($where_clauses)) {
     $where_sql = " WHERE " . implode(" AND ", $where_clauses);
 }
 
+// Bangun klausa ORDER BY yang dinamis
+$order_by_clause = "ORDER BY {$col_prefix}{$sort_col_validated} {$sort_order_validated}, dd.id DESC";
+
 // Query untuk mengambil data disposisi dewan
 $sql = "SELECT dd.id, dd.nama_pegawai, dd.file_lampiran, 
                DATE_FORMAT(dd.tanggal_disposisi, '%d-%m-%Y %H:%i') as tgl_disposisi_formatted, 
@@ -43,7 +58,7 @@ $sql = "SELECT dd.id, dd.nama_pegawai, dd.file_lampiran,
         FROM disposisi_dewan dd
         JOIN surat_masuk_dewan smd ON dd.surat_masuk_id = smd.id
         $where_sql
-        ORDER BY dd.id DESC
+        $order_by_clause
         LIMIT $limit OFFSET $offset";
 
 $count_sql = "SELECT COUNT(dd.id) FROM disposisi_dewan dd JOIN surat_masuk_dewan smd ON dd.surat_masuk_id = smd.id $where_sql";

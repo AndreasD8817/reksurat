@@ -1,10 +1,8 @@
 <?php
 // pages/ajax-search-surat-masuk-dewan.php
 
-// if (session_status() === PHP_SESSION_NONE) {
-//     session_start();
-// }
-// require_once '../config/database.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/helpers.php';
 
 if (!isset($_SESSION['user_id'])) {
     http_response_code(403);
@@ -37,13 +35,13 @@ $params = [];
 $conditions = [];
 
 if (!empty($search)) {
-    $conditions[] = "(nomor_agenda_lengkap LIKE ? OR nomor_surat_lengkap LIKE ? OR asal_surat LIKE ? OR perihal LIKE ?)";
+    $conditions[] = "(smd.nomor_agenda_lengkap LIKE ? OR smd.nomor_surat_lengkap LIKE ? OR smd.asal_surat LIKE ? OR smd.perihal LIKE ?)";
     $search_param = "%$search%";
     array_push($params, $search_param, $search_param, $search_param, $search_param);
 }
 
 if (!empty($year) && is_numeric($year)) {
-    $conditions[] = "YEAR(tanggal_diterima) = ?";
+    $conditions[] = "YEAR(smd.tanggal_diterima) = ?";
     $params[] = $year;
 }
 
@@ -51,12 +49,13 @@ if (!empty($conditions)) {
     $sql_where = "WHERE " . implode(' AND ', $conditions);
 }
 
-$stmt_count = $pdo->prepare("SELECT COUNT(id) FROM surat_masuk_dewan " . $sql_where);
+$count_query = "SELECT COUNT(smd.id) FROM surat_masuk_dewan smd " . $sql_where;
+$stmt_count = $pdo->prepare($count_query);
 $stmt_count->execute($params);
 $total_records = $stmt_count->fetchColumn();
 $total_pages = ceil($total_records / $limit);
 
-$query = "SELECT *, DATE_FORMAT(tanggal_diterima, '%d-%m-%Y') as tgl_terima_formatted FROM surat_masuk_dewan " . $sql_where . " ORDER BY {$sort_col} {$sort_order}, id DESC LIMIT ? OFFSET ?";
+$query = "SELECT smd.*, DATE_FORMAT(smd.tanggal_diterima, '%d-%m-%Y') as tgl_terima_formatted, dd.id as disposisi_id FROM surat_masuk_dewan smd LEFT JOIN disposisi_dewan dd ON smd.id = dd.surat_masuk_id " . $sql_where . " ORDER BY smd.{$sort_col} {$sort_order}, smd.id DESC LIMIT ? OFFSET ?";
 $stmt_data = $pdo->prepare($query);
 
 $param_index = 1;
